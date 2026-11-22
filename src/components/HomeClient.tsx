@@ -15,6 +15,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { MobileCircularCarousel } from "@/components/MobileCircularCarousel";
 import {
   LineReveal,
   LUXURY_EASE,
@@ -233,7 +234,7 @@ export function HomeClient() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: LUXURY_EASE }}
-              className="eyebrow mx-auto inline-flex items-center justify-center gap-2 text-center text-[10px] text-pearl drop-shadow-[0_1px_6px_rgba(86,30,31,0.35)] lg:hidden"
+              className="eyebrow mx-auto inline-flex items-center justify-center gap-2 text-center text-[10px] text-pearl lg:hidden"
             >
               <span className="h-[1.5px] w-5 bg-accent" />
               <span>
@@ -259,8 +260,8 @@ export function HomeClient() {
                 </span>
               </motion.p>
 
-              {/* Mobile: Vertical stacked magazine-cover typography down the left edge so eyes, nose & lips stay completely unobstructed */}
-              <h1 className="font-display text-[2.55rem] leading-[0.94] font-bold tracking-[-0.025em] uppercase lg:hidden">
+              {/* Mobile: Vertical stacked magazine-cover typography down the left edge (clean white letters, zero drop-shadow box, +5% line breathing) */}
+              <h1 className="font-display text-[2.55rem] leading-[0.99] font-bold tracking-[-0.025em] uppercase lg:hidden">
                 {lang === "uk" ? (
                   <>
                     <LineReveal delay={0.06} className="text-ink">
@@ -269,16 +270,10 @@ export function HomeClient() {
                     <LineReveal delay={0.12} className="text-ink">
                       яку
                     </LineReveal>
-                    <LineReveal
-                      delay={0.18}
-                      className="text-pearl drop-shadow-[0_2px_12px_rgba(86,30,31,0.30)]"
-                    >
+                    <LineReveal delay={0.18} className="text-pearl">
                       хочеться
                     </LineReveal>
-                    <LineReveal
-                      delay={0.24}
-                      className="text-pearl drop-shadow-[0_2px_12px_rgba(86,30,31,0.30)]"
-                    >
+                    <LineReveal delay={0.24} className="text-pearl">
                       торкатись.
                     </LineReveal>
                   </>
@@ -293,16 +288,10 @@ export function HomeClient() {
                     <LineReveal delay={0.16} className="text-ink">
                       want
                     </LineReveal>
-                    <LineReveal
-                      delay={0.21}
-                      className="text-pearl drop-shadow-[0_2px_12px_rgba(86,30,31,0.30)]"
-                    >
+                    <LineReveal delay={0.21} className="text-pearl">
                       to
                     </LineReveal>
-                    <LineReveal
-                      delay={0.26}
-                      className="text-pearl drop-shadow-[0_2px_12px_rgba(86,30,31,0.30)]"
-                    >
+                    <LineReveal delay={0.26} className="text-pearl">
                       touch.
                     </LineReveal>
                   </>
@@ -374,12 +363,8 @@ export function HomeClient() {
         </div>
       </section>
 
-      {/* ==================== ACT 2: BESTSELLERS — SMOKED CHARCOAL SALON GALLERY ==================== */}
+      {/* ==================== ACT 2: BESTSELLERS — BORDEAUX SALON GALLERY ==================== */}
       <section className="relative overflow-hidden border-t border-accent/20 bg-ink text-pearl">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(185,154,99,0.08),transparent_55%)]"
-        />
         <div className="relative mx-auto max-w-[1440px] px-4 py-16 sm:px-8 lg:px-12 lg:py-24">
           <Reveal>
             <div className="flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-end">
@@ -390,8 +375,8 @@ export function HomeClient() {
                 </h2>
               </div>
 
-              {/* Inline Interactive Spring Tabs */}
-              <div className="no-scrollbar flex max-w-full items-center gap-1.5 overflow-x-auto pb-1">
+              {/* Inline Interactive Spring Tabs (compact on mobile so all 4 tabs stay crisp without right-edge clipping) */}
+              <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto pb-1 sm:gap-1.5">
                 {tabs.map((tab) => {
                   const active = showcaseTab === tab.key;
                   return (
@@ -399,7 +384,7 @@ export function HomeClient() {
                       key={tab.key}
                       type="button"
                       onClick={() => setShowcaseTab(tab.key)}
-                      className={`relative shrink-0 rounded-full px-4 py-2 text-xs font-bold tracking-[0.12em] uppercase transition-colors ${
+                      className={`relative shrink-0 rounded-full px-3 py-1.5 text-[11px] font-bold tracking-[0.10em] uppercase transition-colors sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.12em] ${
                         active ? "text-ink" : "text-pearl/60 hover:text-pearl"
                       }`}
                     >
@@ -426,51 +411,102 @@ export function HomeClient() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.3, ease: LUXURY_EASE }}
-                className="no-scrollbar -mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 lg:mt-10 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible"
               >
-                {BUNDLES.map((bundle) => (
-                  <div
-                    key={bundle.id}
-                    className="flex w-[78vw] max-w-[320px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-pearl/12 bg-espresso lg:w-auto lg:max-w-none"
-                  >
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      <img
-                        src={bundle.image}
-                        alt={bundle.name[lang]}
-                        className="h-full w-full object-cover"
-                      />
-                      <span className="absolute left-3 top-3 rounded-full bg-ink/90 px-3 py-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
-                        {bundle.badge[lang]}
-                      </span>
-                    </div>
-                    <div className="flex flex-1 flex-col p-5">
-                      <h3 className="font-display text-xl font-bold text-pearl">
-                        {bundle.name[lang]}
-                      </h3>
-                      <p className="mt-1 text-xs text-pearl/65">{bundle.subtitle[lang]}</p>
-                      <div className="mt-auto flex items-center justify-between pt-4">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-lg font-bold text-pearl">
-                            {formatPrice(bundle.bundlePrice, lang)}
-                          </span>
-                          <span className="text-xs text-pearl/45 line-through">
-                            {formatPrice(bundle.originalPrice, lang)}
-                          </span>
+                {/* Mobile: Centered single-card infinite circular carousel */}
+                <MobileCircularCarousel
+                  key={`mobile-sets-${lang}`}
+                  items={BUNDLES}
+                  getKey={(b) => b.id}
+                  prevLabel={lang === "uk" ? "Попередній набір" : "Previous set"}
+                  nextLabel={lang === "uk" ? "Наступний набір" : "Next set"}
+                  renderItem={(bundle) => (
+                    <div className="flex flex-col overflow-hidden rounded-2xl border border-pearl/12 bg-espresso">
+                      <div className="relative aspect-[4/3] overflow-hidden">
+                        <img
+                          src={bundle.image}
+                          alt={bundle.name[lang]}
+                          className="h-full w-full object-cover"
+                        />
+                        <span className="absolute left-3 top-3 rounded-full bg-ink/90 px-3 py-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
+                          {bundle.badge[lang]}
+                        </span>
+                      </div>
+                      <div className="flex flex-1 flex-col p-5">
+                        <h3 className="font-display text-xl font-bold text-pearl">
+                          {bundle.name[lang]}
+                        </h3>
+                        <p className="mt-1 text-xs text-pearl/65">{bundle.subtitle[lang]}</p>
+                        <div className="mt-auto flex items-center justify-between pt-4">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-lg font-bold text-pearl">
+                              {formatPrice(bundle.bundlePrice, lang)}
+                            </span>
+                            <span className="text-xs text-pearl/45 line-through">
+                              {formatPrice(bundle.originalPrice, lang)}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              addBundleToCart(bundle.id);
+                              openOverlay("cart");
+                            }}
+                            className="btn-tactile rounded-full bg-accent px-4 py-2 text-[11px] font-bold tracking-[0.12em] text-ink uppercase hover:bg-pearl"
+                          >
+                            + {t("common.quickAdd")}
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            addBundleToCart(bundle.id);
-                            openOverlay("cart");
-                          }}
-                          className="btn-tactile rounded-full bg-accent px-4 py-2 text-[11px] font-bold tracking-[0.12em] text-ink uppercase hover:bg-pearl"
-                        >
-                          + {t("common.quickAdd")}
-                        </button>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  )}
+                />
+
+                {/* Desktop: 3-column grid */}
+                <div className="mt-10 hidden lg:grid lg:grid-cols-3 lg:gap-6">
+                  {BUNDLES.map((bundle) => (
+                    <div
+                      key={bundle.id}
+                      className="flex flex-col overflow-hidden rounded-2xl border border-pearl/12 bg-espresso"
+                    >
+                      <div className="relative aspect-[4/3] overflow-hidden">
+                        <img
+                          src={bundle.image}
+                          alt={bundle.name[lang]}
+                          className="h-full w-full object-cover"
+                        />
+                        <span className="absolute left-3 top-3 rounded-full bg-ink/90 px-3 py-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
+                          {bundle.badge[lang]}
+                        </span>
+                      </div>
+                      <div className="flex flex-1 flex-col p-5">
+                        <h3 className="font-display text-xl font-bold text-pearl">
+                          {bundle.name[lang]}
+                        </h3>
+                        <p className="mt-1 text-xs text-pearl/65">{bundle.subtitle[lang]}</p>
+                        <div className="mt-auto flex items-center justify-between pt-4">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-lg font-bold text-pearl">
+                              {formatPrice(bundle.bundlePrice, lang)}
+                            </span>
+                            <span className="text-xs text-pearl/45 line-through">
+                              {formatPrice(bundle.originalPrice, lang)}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              addBundleToCart(bundle.id);
+                              openOverlay("cart");
+                            }}
+                            className="btn-tactile rounded-full bg-accent px-4 py-2 text-[11px] font-bold tracking-[0.12em] text-ink uppercase hover:bg-pearl"
+                          >
+                            + {t("common.quickAdd")}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </motion.div>
             ) : (
               <motion.div
@@ -479,16 +515,25 @@ export function HomeClient() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.3, ease: LUXURY_EASE }}
-                className="no-scrollbar -mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 lg:mt-10 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible"
               >
-                {showcaseProducts.map((product, idx) => (
-                  <div
-                    key={product.id}
-                    className="w-[70vw] max-w-[285px] shrink-0 snap-start lg:w-auto lg:max-w-none"
-                  >
+                {/* Mobile: Centered single-card infinite circular carousel */}
+                <MobileCircularCarousel
+                  key={`mobile-${showcaseTab}`}
+                  items={showcaseProducts}
+                  getKey={(p) => p.id}
+                  prevLabel={lang === "uk" ? "Попередній засіб" : "Previous formula"}
+                  nextLabel={lang === "uk" ? "Наступний засіб" : "Next formula"}
+                  renderItem={(product, idx) => (
                     <ProductCard product={product} variant="dark" index={idx} />
-                  </div>
-                ))}
+                  )}
+                />
+
+                {/* Desktop: 4-column studio gallery grid */}
+                <div className="mt-10 hidden lg:grid lg:grid-cols-4 lg:gap-6">
+                  {showcaseProducts.map((product, idx) => (
+                    <ProductCard key={product.id} product={product} variant="dark" index={idx} />
+                  ))}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -507,10 +552,6 @@ export function HomeClient() {
 
       {/* ==================== ACT 3: FLAGSHIP IN MOTION — ICE-BLOOM.MP4 VIDEO SPOTLIGHT (VELVET OXBLOOD) ==================== */}
       <section className="relative overflow-hidden border-t border-pearl/10 bg-espresso py-16 text-pearl lg:py-28">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_78%_30%,rgba(128,44,47,0.36),transparent_62%),radial-gradient(ellipse_at_22%_75%,rgba(182,154,109,0.14),transparent_55%)]"
-        />
         <div className="relative mx-auto grid max-w-[1440px] items-center gap-10 px-4 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:px-12">
           {/* Left: Tall Portrait Video with Subtle Parallax (clamped max width so it stays balanced on all monitors) */}
           <div className="mx-auto w-full max-w-[440px] lg:col-span-6 lg:max-w-[520px]">
@@ -915,7 +956,6 @@ export function HomeClient() {
                 alt={activeBundle.name[lang]}
                 className="h-full w-full object-cover"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-transparent lg:bg-gradient-to-r lg:from-ink/35 lg:via-transparent lg:to-transparent" />
             </div>
 
             {/* Architectural Floating Set Switcher Card (bottom-left on desktop, clean block below on mobile) */}
@@ -1049,12 +1089,46 @@ export function HomeClient() {
               </a>
             </div>
 
-            {/* Horizontal Swipe on Mobile / 4-Col Desktop */}
-            <div className="no-scrollbar -mx-4 mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 lg:grid lg:grid-cols-4 lg:overflow-visible">
+            {/* Mobile: Centered single-card infinite circular review carousel with hairline chevrons & progress bar */}
+            <MobileCircularCarousel
+              items={CLIENT_REVIEWS}
+              getKey={(rev) => rev.id}
+              prevLabel={lang === "uk" ? "Попередній відгук" : "Previous review"}
+              nextLabel={lang === "uk" ? "Наступний відгук" : "Next review"}
+              theme="light"
+              arrowTopClass="top-1/2"
+              renderItem={(rev) => (
+                <div className="flex min-h-[228px] flex-col rounded-2xl border border-line bg-paper/55 p-5">
+                  <div className="flex items-center gap-0.5 text-accent">
+                    {Array.from({ length: rev.rating }).map((_, i) => (
+                      <Star key={i} className="h-3.5 w-3.5 fill-current" />
+                    ))}
+                  </div>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-soft">
+                    «{rev.text[lang]}»
+                  </p>
+                  <div className="mt-4 border-t border-line pt-3">
+                    <div className="flex items-center justify-between text-xs font-bold text-ink">
+                      <span>{rev.author[lang]}</span>
+                      <span className="text-accent">{rev.city[lang]}</span>
+                    </div>
+                    <Link
+                      href={`/product/${rev.productId}`}
+                      className="mt-1 block truncate text-[11px] font-semibold text-muted hover:text-accent"
+                    >
+                      {rev.productName[lang]} →
+                    </Link>
+                  </div>
+                </div>
+              )}
+            />
+
+            {/* Desktop: 4-Col Grid */}
+            <div className="mt-7 hidden gap-4 lg:grid lg:grid-cols-4">
               {CLIENT_REVIEWS.map((rev) => (
                 <div
                   key={rev.id}
-                  className="flex w-[82vw] max-w-[320px] shrink-0 snap-start flex-col rounded-2xl border border-line bg-paper/55 p-5 lg:w-auto lg:max-w-none"
+                  className="flex flex-col rounded-2xl border border-line bg-paper/55 p-5"
                 >
                   <div className="flex items-center gap-0.5 text-accent">
                     {Array.from({ length: rev.rating }).map((_, i) => (

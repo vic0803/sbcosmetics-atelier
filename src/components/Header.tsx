@@ -144,14 +144,14 @@ export function Header() {
             </nav>
           </div>
 
-          {/* Right: Desktop minimal UA / EN + Account + Bag; Mobile ONLY Bag */}
-          <div className="flex items-center justify-end gap-4">
-            {/* Minimalist slash UA / EN switcher (desktop only; mobile lives in drawer) */}
-            <div className="hidden items-center gap-1.5 text-[12px] font-semibold tracking-[0.12em] uppercase lg:flex">
+          {/* Right: UA / EN on all screens; Account + Bag on desktop only (mobile Bag lives in MobileBottomBar) */}
+          <div className="flex items-center justify-end gap-3 lg:gap-4">
+            {/* Minimalist slash UA / EN switcher (visible on both mobile and desktop) */}
+            <div className="flex items-center gap-1 text-[11px] font-semibold tracking-[0.12em] uppercase lg:gap-1.5 lg:text-[12px]">
               <button
                 type="button"
                 onClick={() => setLang("uk")}
-                className={`transition-colors ${
+                className={`py-1 transition-colors ${
                   lang === "uk" ? "text-ink" : "text-muted/60 hover:text-ink"
                 }`}
               >
@@ -161,7 +161,7 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setLang("en")}
-                className={`transition-colors ${
+                className={`py-1 transition-colors ${
                   lang === "en" ? "text-ink" : "text-muted/60 hover:text-ink"
                 }`}
               >
@@ -185,15 +185,15 @@ export function Header() {
               )}
             </button>
 
-            {/* Cart trigger (Desktop + Mobile right slot) */}
+            {/* Desktop Cart trigger (mobile already has Bag in MobileBottomBar) */}
             <button
               type="button"
               onClick={() => openOverlay("cart")}
               aria-label={t("nav.cart")}
-              className="btn-tactile relative flex h-10 items-center gap-2 rounded-full px-2.5 text-ink hover:bg-ink/5 lg:bg-ink lg:px-4 lg:text-surface lg:hover:bg-accent lg:hover:text-ink"
+              className="btn-tactile relative hidden h-10 items-center gap-2 rounded-full bg-ink px-4 text-surface hover:bg-accent hover:text-ink lg:flex"
             >
-              <ShoppingBag className="h-[18px] w-[18px] lg:h-[16px] lg:w-[16px]" strokeWidth={1.8} />
-              <span className="hidden text-[11px] font-semibold tracking-[0.15em] uppercase lg:inline">
+              <ShoppingBag className="h-[16px] w-[16px]" strokeWidth={1.8} />
+              <span className="text-[11px] font-semibold tracking-[0.15em] uppercase">
                 {t("nav.cart")}
               </span>
               <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[10px] font-bold text-ink">

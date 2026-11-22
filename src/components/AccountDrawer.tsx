@@ -150,7 +150,7 @@ export function AccountDrawer() {
             <button
               type="button"
               onClick={() => startOAuthLogin("google")}
-              className="btn-tactile flex min-h-[52px] w-full items-center justify-center gap-3 rounded-full border border-line-strong bg-white px-6 py-3.5 text-sm font-medium text-ink hover:border-ink"
+              className="btn-tactile flex min-h-[52px] w-full items-center justify-center gap-3 rounded-full border border-line-strong bg-pearl px-6 py-3.5 text-sm font-medium text-ink hover:border-ink"
             >
               <GoogleIcon />
               <span>{t("auth.google")}</span>
@@ -255,7 +255,7 @@ export function AccountDrawer() {
                 />
               </div>
               {emailError && (
-                <p className="mt-1.5 text-xs text-red-700">{emailError}</p>
+                <p className="mt-1.5 text-xs font-semibold text-ink">{emailError}</p>
               )}
             </div>
 
