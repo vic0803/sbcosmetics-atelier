@@ -71,7 +71,7 @@ export function RitualQuizWidget() {
               {step === 2 && QUIZ_STEPS.intensity.eyebrow[lang]}
               {step === 3 && QUIZ_STEPS.extra.eyebrow[lang]}
             </span>
-            <span className="text-accent-deep">{Math.round(progressPct + 25)}%</span>
+            <span className="text-accent">{Math.round(progressPct + 25)}%</span>
           </div>
           <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-line">
             <motion.div
@@ -101,7 +101,7 @@ export function RitualQuizWidget() {
                   key={opt.value}
                   type="button"
                   onClick={() => selectSkin(opt.value)}
-                  className={`btn-tactile flex flex-col items-start rounded-2xl border p-5 text-left transition-all sm:p-6 ${
+                  className={`btn-tactile flex flex-col items-start rounded-2xl border p-5 text-left sm:p-6 ${
                     answers.skinType === opt.value
                       ? "border-ink bg-ink text-surface"
                       : "border-line bg-surface text-ink hover:border-accent"
@@ -148,7 +148,7 @@ export function RitualQuizWidget() {
                   key={opt.value}
                   type="button"
                   onClick={() => selectGoal(opt.value)}
-                  className={`btn-tactile flex flex-col items-start rounded-2xl border p-5 text-left transition-all sm:p-6 ${
+                  className={`btn-tactile flex flex-col items-start rounded-2xl border p-5 text-left sm:p-6 ${
                     answers.goal === opt.value
                       ? "border-ink bg-ink text-surface"
                       : "border-line bg-surface text-ink hover:border-accent"
@@ -195,7 +195,7 @@ export function RitualQuizWidget() {
                   key={opt.value}
                   type="button"
                   onClick={() => selectIntensity(opt.value)}
-                  className={`btn-tactile flex flex-col items-start rounded-2xl border p-6 text-left transition-all ${
+                  className={`btn-tactile flex flex-col items-start rounded-2xl border p-6 text-left ${
                     answers.intensity === opt.value
                       ? "border-ink bg-ink text-surface"
                       : "border-line bg-surface text-ink hover:border-accent"
@@ -242,7 +242,7 @@ export function RitualQuizWidget() {
                   key={opt.value}
                   type="button"
                   onClick={() => selectExtra(opt.value)}
-                  className={`btn-tactile flex flex-col items-start rounded-2xl border p-5 text-left transition-all sm:p-6 ${
+                  className={`btn-tactile flex flex-col items-start rounded-2xl border p-5 text-left sm:p-6 ${
                     answers.extra === opt.value
                       ? "border-ink bg-ink text-surface"
                       : "border-line bg-surface text-ink hover:border-accent"
@@ -367,12 +367,12 @@ export function RitualQuizWidget() {
                   </Link>
 
                   <div className="flex flex-1 flex-col">
-                    <span className="text-[10px] font-bold tracking-[0.14em] text-accent-deep uppercase">
+                    <span className="text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
                       0{idx + 1} · {item.slot[lang]}
                     </span>
                     <Link
                       href={`/product/${item.product.id}`}
-                      className="mt-0.5 text-base leading-snug font-bold text-ink hover:text-accent-deep"
+                      className="mt-0.5 text-base leading-snug font-bold text-ink hover:text-accent"
                     >
                       {item.product.line ? item.product.line[lang] : item.product.name[lang]}
                     </Link>
@@ -383,7 +383,7 @@ export function RitualQuizWidget() {
                       <span className="text-sm font-bold text-ink">
                         {formatPrice(item.product.price, lang)}
                       </span>
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent-deep">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent">
                         <Check className="h-3.5 w-3.5" />
                         {item.product.variants[0]?.label[lang]}
                       </span>

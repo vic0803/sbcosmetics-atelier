@@ -76,11 +76,11 @@ export function Header() {
           scrolled
             ? "border-b border-line/90 bg-paper/92 text-ink shadow-[0_1px_0_rgba(23,26,28,0.05)] backdrop-blur-md"
             : isHome
-              ? "bg-paper/88 text-ink backdrop-blur-md lg:bg-transparent lg:backdrop-blur-none"
+              ? "bg-transparent text-ink"
               : "border-b border-line/70 bg-paper/90 text-ink backdrop-blur-md"
         }`}
       >
-        <div className="mx-auto grid h-[64px] max-w-[1440px] grid-cols-3 items-center px-4 sm:px-6 lg:flex lg:h-[68px] lg:justify-between lg:px-10">
+        <div className="grid h-[64px] w-full grid-cols-3 items-center px-4 sm:px-6 lg:h-[68px] lg:grid-cols-[1fr_auto_1fr] lg:px-8 xl:px-10">
           {/* Left: Mobile Burger / Desktop Monogram + Wordmark */}
           <div className="flex items-center gap-2.5">
             <button
@@ -180,7 +180,7 @@ export function Header() {
               {user && (
                 <span
                   aria-hidden="true"
-                  className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent ring-2 ring-[#fbf1e2]"
+                  className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent ring-2 ring-surface"
                 />
               )}
             </button>

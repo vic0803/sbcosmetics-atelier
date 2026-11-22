@@ -70,7 +70,7 @@ export function CatalogClient() {
         {/* Header */}
         <div className="flex flex-col justify-between gap-5 border-b border-line pb-8 lg:flex-row lg:items-end lg:pb-10">
           <div>
-            <p className="eyebrow text-accent-deep">{t("catalog.eyebrow")}</p>
+            <p className="eyebrow text-accent">{t("catalog.eyebrow")}</p>
             <h1 className="mt-1.5 font-display text-4xl font-bold uppercase text-ink sm:text-6xl">
               {t("catalog.title")}
             </h1>
@@ -81,9 +81,9 @@ export function CatalogClient() {
 
           <Link
             href="/quiz"
-            className="btn-tactile inline-flex min-h-[46px] items-center gap-2 self-start rounded-full border border-accent-deep/40 bg-accent-soft px-5 py-2.5 text-xs font-bold tracking-[0.14em] text-ink uppercase hover:bg-accent"
+            className="btn-tactile inline-flex min-h-[46px] items-center gap-2 self-start rounded-full border border-accent/40 bg-accent-soft px-5 py-2.5 text-xs font-bold tracking-[0.14em] text-ink uppercase hover:bg-accent"
           >
-            <Sparkles className="h-4 w-4 text-accent-deep" strokeWidth={2} />
+            <Sparkles className="h-4 w-4 text-accent" strokeWidth={2} />
             <span>{t("hero.ctaSecondary")}</span>
           </Link>
         </div>
@@ -101,7 +101,7 @@ export function CatalogClient() {
                   className={`relative inline-flex min-h-[42px] items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold tracking-[0.12em] uppercase transition-colors sm:px-5 ${
                     active
                       ? "border-ink text-surface"
-                      : "border-line-strong bg-surface text-ink hover:border-accent-deep"
+                      : "border-line-strong bg-surface text-ink hover:border-accent"
                   }`}
                 >
                   {active && (
@@ -166,7 +166,7 @@ export function CatalogClient() {
                   <h2 className="font-display text-2xl font-bold text-ink">
                     {bundle.name[lang]}
                   </h2>
-                  <p className="mt-1 text-xs font-semibold text-accent-deep">
+                  <p className="mt-1 text-xs font-semibold text-accent">
                     {bundle.subtitle[lang]}
                   </p>
                   <p className="mt-3 text-sm leading-relaxed text-muted">

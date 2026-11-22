@@ -35,7 +35,7 @@ export function MobileBottomBar() {
 
   const btnCls = (active: boolean) =>
     `relative flex flex-1 flex-col items-center justify-center gap-1 py-2.5 min-h-[56px] text-[10px] font-semibold tracking-[0.06em] uppercase transition-colors ${
-      active ? "text-accent-deep" : "text-muted hover:text-ink"
+      active ? "text-accent" : "text-muted hover:text-ink"
     }`;
 
   return (
@@ -78,7 +78,7 @@ export function MobileBottomBar() {
           )}
           <Sparkles
             className={`h-[19px] w-[19px] ${
-              activeKey === "quiz" ? "text-accent-deep" : "text-accent-deep"
+              activeKey === "quiz" ? "text-accent" : "text-accent"
             }`}
             strokeWidth={1.9}
           />

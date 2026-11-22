@@ -99,35 +99,35 @@ export function CheckoutClient() {
     return (
       <div className="pt-28 pb-24 lg:pt-36">
         <div className="mx-auto max-w-2xl px-5 text-center sm:px-8">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-obsidian text-bronze-light">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-ink text-accent">
             <CheckCircle2 className="h-8 w-8" strokeWidth={1.5} />
           </div>
-          <p className="eyebrow mt-6 text-bronze-dark">{placedOrder.id}</p>
-          <h1 className="mt-2 font-editorial text-4xl font-medium text-obsidian sm:text-5xl">
+          <p className="eyebrow mt-6 text-accent">{placedOrder.id}</p>
+          <h1 className="mt-2 font-display font-bold tracking-[-0.02em] text-4xl text-ink sm:text-5xl">
             {t("checkout.successTitle")}
           </h1>
-          <p className="mt-4 text-sm leading-relaxed text-umber sm:text-base">
+          <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
             {t("checkout.successDesc")}
           </p>
 
-          <div className="mt-8 rounded-3xl border border-sand bg-alabaster p-6 text-left text-sm">
+          <div className="mt-8 rounded-3xl border border-line bg-surface p-6 text-left text-sm">
             <div className="flex justify-between py-2">
-              <span className="text-umber">
+              <span className="text-muted">
                 {lang === "uk" ? "Орієнтовна ТТН НП" : "Preview NP Waybill"}
               </span>
-              <span className="font-mono font-medium text-obsidian">
+              <span className="font-mono font-medium text-ink">
                 {placedOrder.trackingNumber}
               </span>
             </div>
-            <div className="flex justify-between border-t border-sand py-2">
-              <span className="text-umber">{lang === "uk" ? "Доставка" : "Delivery"}</span>
-              <span className="text-right text-obsidian">
+            <div className="flex justify-between border-t border-line py-2">
+              <span className="text-muted">{lang === "uk" ? "Доставка" : "Delivery"}</span>
+              <span className="text-right text-ink">
                 {placedOrder.city}, {placedOrder.branch}
               </span>
             </div>
-            <div className="flex justify-between border-t border-sand py-2 font-medium">
-              <span className="text-umber">{t("cart.total")}</span>
-              <span className="text-obsidian">
+            <div className="flex justify-between border-t border-line py-2 font-medium">
+              <span className="text-muted">{t("cart.total")}</span>
+              <span className="text-ink">
                 {formatPrice(placedOrder.total, lang)}
               </span>
             </div>
@@ -137,13 +137,13 @@ export function CheckoutClient() {
             <button
               type="button"
               onClick={() => openOverlay("account")}
-              className="btn-tactile rounded-full bg-obsidian px-7 py-4 text-xs font-medium tracking-[0.16em] text-pearl uppercase hover:bg-bronze hover:text-obsidian"
+              className="btn-tactile rounded-full bg-ink px-7 py-4 text-xs font-medium tracking-[0.16em] text-pearl uppercase hover:bg-accent hover:text-ink"
             >
               {lang === "uk" ? "Відкрити в кабінеті" : "View in Account"}
             </button>
             <Link
               href="/catalog"
-              className="btn-tactile rounded-full border border-sand-dark px-7 py-4 text-xs font-medium tracking-[0.16em] text-obsidian uppercase hover:border-obsidian"
+              className="btn-tactile rounded-full border border-line-strong px-7 py-4 text-xs font-medium tracking-[0.16em] text-ink uppercase hover:border-ink"
             >
               {t("checkout.backCatalog")}
             </Link>
@@ -156,20 +156,20 @@ export function CheckoutClient() {
   return (
     <div className="pt-24 pb-24 lg:pt-32">
       <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
-        <p className="eyebrow text-bronze-dark">{t("checkout.eyebrow")}</p>
-        <h1 className="mt-2 font-editorial text-4xl font-medium text-obsidian sm:text-5xl">
+        <p className="eyebrow text-accent">{t("checkout.eyebrow")}</p>
+        <h1 className="mt-2 font-display font-bold tracking-[-0.02em] text-4xl text-ink sm:text-5xl">
           {t("checkout.title")}
         </h1>
 
         {cartItems.length === 0 ? (
-          <div className="mt-10 rounded-3xl border border-sand bg-alabaster p-12 text-center">
-            <Package className="mx-auto h-8 w-8 text-umber" strokeWidth={1.4} />
-            <p className="mt-4 font-editorial text-2xl text-obsidian">
+          <div className="mt-10 rounded-3xl border border-line bg-surface p-12 text-center">
+            <Package className="mx-auto h-8 w-8 text-muted" strokeWidth={1.4} />
+            <p className="mt-4 font-display font-bold tracking-[-0.02em] text-2xl text-ink">
               {t("cart.emptyTitle")}
             </p>
             <Link
               href="/catalog"
-              className="btn-tactile mt-6 inline-flex rounded-full bg-obsidian px-7 py-3.5 text-xs font-medium tracking-[0.16em] text-pearl uppercase"
+              className="btn-tactile mt-6 inline-flex rounded-full bg-ink px-7 py-3.5 text-xs font-medium tracking-[0.16em] text-pearl uppercase"
             >
               {t("hero.ctaPrimary")}
             </Link>
@@ -183,10 +183,10 @@ export function CheckoutClient() {
             <div className="space-y-6 lg:col-span-7">
               {/* Quick Apple/Google prompt if not logged in */}
               {!user && (
-                <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-bronze/40 bg-alabaster p-5 sm:flex-row sm:items-center">
+                <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-accent/40 bg-surface p-5 sm:flex-row sm:items-center">
                   <div className="flex items-center gap-3">
-                    <UserCheck className="h-5 w-5 text-bronze-dark" />
-                    <p className="text-sm text-espresso">
+                    <UserCheck className="h-5 w-5 text-accent" />
+                    <p className="text-sm text-ink-soft">
                       {lang === "uk"
                         ? "Увійдіть через Apple або Google, щоб зберегти ТТН і чек у кабінеті."
                         : "Sign in with Apple or Google to save tracking and receipts in your Account."}
@@ -195,7 +195,7 @@ export function CheckoutClient() {
                   <button
                     type="button"
                     onClick={() => openOverlay("account")}
-                    className="btn-tactile shrink-0 rounded-full bg-obsidian px-5 py-2.5 text-xs font-medium tracking-[0.14em] text-pearl uppercase"
+                    className="btn-tactile shrink-0 rounded-full bg-ink px-5 py-2.5 text-xs font-medium tracking-[0.14em] text-pearl uppercase"
                   >
                     {lang === "uk" ? "Увійти" : "Sign In"}
                   </button>
@@ -203,15 +203,15 @@ export function CheckoutClient() {
               )}
 
               {/* Step 1: Recipient */}
-              <div className="rounded-3xl border border-sand bg-alabaster p-6 sm:p-8">
-                <h2 className="font-editorial text-2xl font-medium text-obsidian">
+              <div className="rounded-3xl border border-line bg-surface p-6 sm:p-8">
+                <h2 className="font-display font-bold tracking-[-0.02em] text-2xl text-ink">
                   {t("checkout.step1")}
                 </h2>
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
                   <div className="sm:col-span-2">
                     <label
                       htmlFor="chk-name"
-                      className="mb-1.5 block text-xs font-medium text-espresso"
+                      className="mb-1.5 block text-xs font-medium text-ink-soft"
                     >
                       {t("auth.nameLabel")} *
                     </label>
@@ -222,13 +222,13 @@ export function CheckoutClient() {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder={lang === "uk" ? "Олена Коваленко" : "Olena Kovalenko"}
-                      className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-3 text-base text-obsidian"
+                      className="w-full rounded-xl border border-line bg-paper/60 px-4 py-3 text-base text-ink"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="chk-email"
-                      className="mb-1.5 block text-xs font-medium text-espresso"
+                      className="mb-1.5 block text-xs font-medium text-ink-soft"
                     >
                       Email *
                     </label>
@@ -239,13 +239,13 @@ export function CheckoutClient() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="name@example.com"
-                      className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-3 text-base text-obsidian"
+                      className="w-full rounded-xl border border-line bg-paper/60 px-4 py-3 text-base text-ink"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="chk-phone"
-                      className="mb-1.5 block text-xs font-medium text-espresso"
+                      className="mb-1.5 block text-xs font-medium text-ink-soft"
                     >
                       {lang === "uk" ? "Телефон *" : "Phone *"}
                     </label>
@@ -256,19 +256,19 @@ export function CheckoutClient() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="+380 (63) 000-00-00"
-                      className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-3 text-base text-obsidian"
+                      className="w-full rounded-xl border border-line bg-paper/60 px-4 py-3 text-base text-ink"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Step 2: Nova Poshta */}
-              <div className="rounded-3xl border border-sand bg-alabaster p-6 sm:p-8">
+              <div className="rounded-3xl border border-line bg-surface p-6 sm:p-8">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-editorial text-2xl font-medium text-obsidian">
+                  <h2 className="font-display font-bold tracking-[-0.02em] text-2xl text-ink">
                     {t("checkout.step2")}
                   </h2>
-                  <Truck className="h-5 w-5 text-bronze-dark" />
+                  <Truck className="h-5 w-5 text-accent" />
                 </div>
 
                 <div className="mt-5 grid grid-cols-3 gap-2">
@@ -285,8 +285,8 @@ export function CheckoutClient() {
                       onClick={() => setDeliveryType(opt.id)}
                       className={`min-h-[44px] rounded-xl border px-3 py-2 text-xs font-medium tracking-wide transition-colors ${
                         deliveryType === opt.id
-                          ? "border-obsidian bg-obsidian text-pearl"
-                          : "border-sand bg-travertine/60 text-espresso hover:border-bronze"
+                          ? "border-ink bg-ink text-pearl"
+                          : "border-line bg-paper/60 text-ink-soft hover:border-accent"
                       }`}
                     >
                       {opt[lang]}
@@ -298,9 +298,9 @@ export function CheckoutClient() {
                   <div>
                     <label
                       htmlFor="chk-city"
-                      className="mb-1.5 block text-xs font-medium text-espresso"
+                      className="mb-1.5 block text-xs font-medium text-ink-soft"
                     >
-                      <MapPin className="mr-1 inline h-3.5 w-3.5 text-bronze-dark" />
+                      <MapPin className="mr-1 inline h-3.5 w-3.5 text-accent" />
                       {lang === "uk" ? "Місто" : "City"} *
                     </label>
                     <input
@@ -309,7 +309,7 @@ export function CheckoutClient() {
                       required
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-3 text-base text-obsidian"
+                      className="w-full rounded-xl border border-line bg-paper/60 px-4 py-3 text-base text-ink"
                     />
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {POPULAR_CITIES.map((c) => (
@@ -322,7 +322,7 @@ export function CheckoutClient() {
                               NP_BRANCHES_BY_CITY[c]?.[0] ?? `Відділення №1 (${c})`
                             );
                           }}
-                          className="rounded-full border border-sand bg-travertine px-3 py-1 text-[11px] text-umber hover:border-bronze hover:text-obsidian"
+                          className="rounded-full border border-line bg-paper px-3 py-1 text-[11px] text-muted hover:border-accent hover:text-ink"
                         >
                           {c}
                         </button>
@@ -333,7 +333,7 @@ export function CheckoutClient() {
                   <div>
                     <label
                       htmlFor="chk-branch"
-                      className="mb-1.5 block text-xs font-medium text-espresso"
+                      className="mb-1.5 block text-xs font-medium text-ink-soft"
                     >
                       {deliveryType === "courier"
                         ? lang === "uk"
@@ -351,14 +351,14 @@ export function CheckoutClient() {
                         value={branch}
                         onChange={(e) => setBranch(e.target.value)}
                         placeholder={lang === "uk" ? "вул. ..." : "Street, apt..."}
-                        className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-3 text-base text-obsidian"
+                        className="w-full rounded-xl border border-line bg-paper/60 px-4 py-3 text-base text-ink"
                       />
                     ) : (
                       <select
                         id="chk-branch"
                         value={branch}
                         onChange={(e) => setBranch(e.target.value)}
-                        className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-3 text-base text-obsidian"
+                        className="w-full rounded-xl border border-line bg-paper/60 px-4 py-3 text-base text-ink"
                       >
                         {branchOptions.map((b) => (
                           <option key={b} value={b}>
@@ -372,12 +372,12 @@ export function CheckoutClient() {
               </div>
 
               {/* Step 3: Payment */}
-              <div className="rounded-3xl border border-sand bg-alabaster p-6 sm:p-8">
+              <div className="rounded-3xl border border-line bg-surface p-6 sm:p-8">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-editorial text-2xl font-medium text-obsidian">
+                  <h2 className="font-display font-bold tracking-[-0.02em] text-2xl text-ink">
                     {t("checkout.step3")}
                   </h2>
-                  <CreditCard className="h-5 w-5 text-bronze-dark" />
+                  <CreditCard className="h-5 w-5 text-accent" />
                 </div>
 
                 <div className="mt-5 space-y-2.5">
@@ -412,15 +412,15 @@ export function CheckoutClient() {
                       onClick={() => setPaymentMethod(pm.id)}
                       className={`flex w-full items-center justify-between rounded-2xl border p-4 text-left transition-colors ${
                         paymentMethod === pm.id
-                          ? "border-obsidian bg-obsidian text-pearl"
-                          : "border-sand bg-travertine/55 text-obsidian hover:border-bronze"
+                          ? "border-ink bg-ink text-pearl"
+                          : "border-line bg-paper/55 text-ink hover:border-accent"
                       }`}
                     >
                       <div>
                         <p className="text-sm font-medium">{pm.title}</p>
                         <p
                           className={`mt-0.5 text-xs ${
-                            paymentMethod === pm.id ? "text-pearl/70" : "text-umber"
+                            paymentMethod === pm.id ? "text-pearl/70" : "text-muted"
                           }`}
                         >
                           {pm.sub}
@@ -429,8 +429,8 @@ export function CheckoutClient() {
                       <span
                         className={`h-4 w-4 rounded-full border-2 ${
                           paymentMethod === pm.id
-                            ? "border-bronze bg-bronze"
-                            : "border-sand-dark"
+                            ? "border-accent bg-accent"
+                            : "border-line-strong"
                         }`}
                       />
                     </button>
@@ -441,12 +441,12 @@ export function CheckoutClient() {
 
             {/* Right: Sticky Summary */}
             <div className="lg:sticky lg:top-24 lg:col-span-5">
-              <div className="rounded-3xl border border-sand bg-alabaster p-6 sm:p-8">
-                <h2 className="font-editorial text-2xl font-medium text-obsidian">
+              <div className="rounded-3xl border border-line bg-surface p-6 sm:p-8">
+                <h2 className="font-display font-bold tracking-[-0.02em] text-2xl text-ink">
                   {lang === "uk" ? "Ваше замовлення" : "Order Summary"}
                 </h2>
 
-                <ul className="mt-5 divide-y divide-sand">
+                <ul className="mt-5 divide-y divide-line">
                   {cartItems.map((item) => {
                     if (item.kind === "bundle") {
                       const b = BUNDLES.find((x) => x.id === item.id);
@@ -456,10 +456,10 @@ export function CheckoutClient() {
                           key={`sum-b-${b.id}`}
                           className="flex items-center justify-between gap-3 py-3 text-sm"
                         >
-                          <span className="text-espresso">
+                          <span className="text-ink-soft">
                             {b.name[lang]} × {item.qty}
                           </span>
-                          <span className="font-medium text-obsidian">
+                          <span className="font-medium text-ink">
                             {formatPrice(b.bundlePrice * item.qty, lang)}
                           </span>
                         </li>
@@ -474,11 +474,11 @@ export function CheckoutClient() {
                         key={`sum-p-${p.id}-${item.variantIndex}`}
                         className="flex items-center justify-between gap-3 py-3 text-sm"
                       >
-                        <span className="text-espresso">
+                        <span className="text-ink-soft">
                           {p.line ? p.line[lang] : p.name[lang]} ({v?.label[lang]}) ×{" "}
                           {item.qty}
                         </span>
-                        <span className="font-medium text-obsidian">
+                        <span className="font-medium text-ink">
                           {formatPrice(price, lang)}
                         </span>
                       </li>
@@ -486,8 +486,8 @@ export function CheckoutClient() {
                   })}
                 </ul>
 
-                <div className="mt-5 space-y-2 border-t border-sand pt-4 text-sm">
-                  <div className="flex justify-between text-umber">
+                <div className="mt-5 space-y-2 border-t border-line pt-4 text-sm">
+                  <div className="flex justify-between text-muted">
                     <span>{t("cart.subtotal")}</span>
                     <span>{formatPrice(cartSubtotal, lang)}</span>
                   </div>
@@ -497,13 +497,13 @@ export function CheckoutClient() {
                       <span>−{formatPrice(discountAmount, lang)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-umber">
+                  <div className="flex justify-between text-muted">
                     <span>{t("cart.shipping")}</span>
                     <span className={freeShipping ? "font-medium text-sage" : ""}>
                       {freeShipping ? t("cart.shippingFree") : t("cart.shippingCalc")}
                     </span>
                   </div>
-                  <div className="flex justify-between border-t border-sand pt-3 text-lg font-medium text-obsidian">
+                  <div className="flex justify-between border-t border-line pt-3 text-lg font-medium text-ink">
                     <span>{t("cart.total")}</span>
                     <span>{formatPrice(cartTotal, lang)}</span>
                   </div>
@@ -511,7 +511,7 @@ export function CheckoutClient() {
 
                 <button
                   type="submit"
-                  className="btn-tactile mt-6 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-full bg-obsidian px-6 py-4 text-xs font-medium tracking-[0.18em] text-pearl uppercase hover:bg-bronze hover:text-obsidian"
+                  className="btn-tactile mt-6 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-4 text-xs font-medium tracking-[0.18em] text-pearl uppercase hover:bg-accent hover:text-ink"
                 >
                   <Lock className="h-3.5 w-3.5" />
                   <span>{t("checkout.placeOrder")}</span>

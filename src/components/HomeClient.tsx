@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   LineReveal,
   LUXURY_EASE,
@@ -22,6 +22,7 @@ import {
   Reveal,
 } from "@/components/MotionPrimitives";
 import { ProductCard } from "@/components/ProductCard";
+import { SilkVeilHero } from "@/components/SilkVeilHero";
 import { useStore } from "@/context/StoreContext";
 import { BUNDLES } from "@/data/bundles";
 import { JOURNAL_ARTICLES } from "@/data/journal";
@@ -142,6 +143,8 @@ export function HomeClient() {
     openOverlay,
   } = useStore();
 
+  // Act 1: Hero ref for scroll-driven silk organza sweep
+  const heroSectionRef = useRef<HTMLElement | null>(null);
   // Act 2: Inline category showcase tab
   const [showcaseTab, setShowcaseTab] = useState<ShowcaseTab>("hits");
   // Act 4: Inline interactive quiz selection
@@ -184,34 +187,69 @@ export function HomeClient() {
 
   return (
     <div className="overflow-x-clip">
-      {/* ==================== ACT 1: HERO — SCULPTURAL PORCELAIN PORTRAIT (SAFE FROM 360px TO 3440px) ==================== */}
-      <section className="relative overflow-hidden bg-paper pt-[96px] lg:h-[min(100svh,900px)] lg:min-h-[660px] lg:pt-0">
-        <div className="mx-auto flex h-full w-full max-w-[1440px] flex-col lg:grid lg:grid-cols-12">
-          {/* Mobile Clean Unobstructed Sculptural Portrait Top Frame */}
-          <div className="relative h-[44svh] min-h-[290px] max-h-[420px] w-full shrink-0 overflow-hidden lg:hidden">
-            <motion.img
-              initial={{ scale: 1.04, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.85, ease: LUXURY_EASE }}
-              src={assetPath("/assets/hero/hero-sculpture.jpg")}
-              alt={
-                lang === "uk"
-                  ? "Порцелянова гладкість і сяйво шкіри Sophie Bilynska Cosmetics"
-                  : "Porcelain smoothness and radiant skin with Sophie Bilynska Cosmetics"
-              }
-              className="absolute inset-0 h-full w-full object-cover object-[center_26%]"
-            />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-paper to-transparent" />
-          </div>
+      {/* ==================== ACT 1: HERO — EXACT 100SVH FULL-BLEED EDITORIAL PORTRAIT + 3D SUNLIT SHIMMER ==================== */}
+      <section
+        ref={heroSectionRef}
+        className="relative h-[100svh] min-h-[680px] overflow-hidden bg-paper"
+      >
+        {/* Mobile Full-Height Sculptural Portrait: fills full 100svh screen shifted so left cheekbone stays uncropped and lips/nose breathe cleanly beside the stacked magazine headline */}
+        <div className="pointer-events-auto absolute inset-x-0 bottom-0 top-[32px] overflow-hidden lg:hidden">
+          <SilkVeilHero
+            src={assetPath("/assets/hero/hero-sculpture.jpg")}
+            alt={
+              lang === "uk"
+                ? "Порцелянова гладкість і сяйво шкіри Sophie Bilynska Cosmetics"
+                : "Porcelain smoothness and radiant skin with Sophie Bilynska Cosmetics"
+            }
+            scrollTargetRef={heroSectionRef}
+            objectPosition={[0.22, 0.42]}
+            className="h-full w-full"
+            imgClassName="object-cover object-[22%_42%]"
+          />
+        </div>
 
-          {/* Copy Column: Aligned 1:1 with Header & Page Container on ALL Screen Widths */}
-          <div className="relative z-10 flex flex-col justify-center px-5 pb-12 pt-3 text-ink sm:px-8 lg:col-span-6 lg:h-full lg:min-h-0 lg:px-10 lg:pb-10 lg:pt-[108px]">
-            <div className="max-w-xl">
+        {/* Desktop Full-Bleed 16:9 Mineral-Plaster Portrait Canvas: native 2880x1620 pre-cropped from 6K master for razor-sharp 1:1 rendering without CSS zoom */}
+        <div className="pointer-events-auto absolute inset-x-0 bottom-0 top-[32px] hidden overflow-hidden lg:block">
+          <SilkVeilHero
+            src={assetPath("/assets/hero/hero-sculpture-wide.jpg")}
+            alt={
+              lang === "uk"
+                ? "Порцелянова гладкість і сяйво шкіри Sophie Bilynska Cosmetics"
+                : "Porcelain smoothness and radiant skin with Sophie Bilynska Cosmetics"
+            }
+            scrollTargetRef={heroSectionRef}
+            objectPosition={[1, 0.5]}
+            shimmerMinX={0.44}
+            className="h-full w-full"
+            imgClassName="object-cover object-right"
+          />
+        </div>
+
+        <div className="pointer-events-none relative z-10 mx-auto flex h-full w-full max-w-[1440px] flex-col lg:grid lg:grid-cols-12">
+          {/* Copy Column: Mobile = centered eyebrow right under header + left-edge stacked cover title + vertically centered CTAs; Desktop = editorial split */}
+          <div className="pointer-events-auto relative z-10 flex h-full min-h-0 flex-col justify-between px-5 pb-[86px] pt-[100px] text-ink sm:px-8 lg:col-span-6 lg:items-end lg:justify-center lg:pb-12 lg:pl-10 lg:pr-2 lg:pt-[104px] xl:pr-0">
+            {/* Mobile-only top masthead eyebrow centered cleanly beneath the header */}
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: LUXURY_EASE }}
+              className="eyebrow mx-auto inline-flex items-center justify-center gap-2 text-center text-[10px] text-pearl drop-shadow-[0_1px_6px_rgba(86,30,31,0.35)] lg:hidden"
+            >
+              <span className="h-[1.5px] w-5 bg-accent" />
+              <span>
+                {lang === "uk"
+                  ? "Косметика технолога · Львів"
+                  : "Technologist Skincare · Lviv"}
+              </span>
+            </motion.p>
+
+            <div className="w-full max-w-[560px]">
+              {/* Desktop eyebrow (aligned above headline) */}
               <motion.p
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: LUXURY_EASE }}
-                className="eyebrow inline-flex items-center gap-2.5 text-accent"
+                className="eyebrow hidden items-center gap-2.5 text-pearl lg:inline-flex"
               >
                 <span className="h-[1.5px] w-7 bg-accent" />
                 <span>
@@ -221,34 +259,86 @@ export function HomeClient() {
                 </span>
               </motion.p>
 
-              <h1 className="mt-3.5 font-display text-[2.35rem] leading-[0.98] font-bold tracking-[-0.025em] uppercase sm:text-5xl lg:mt-4 lg:text-[3.75rem] xl:text-[4.65rem]">
-                <LineReveal delay={0.08}>
+              {/* Mobile: Vertical stacked magazine-cover typography down the left edge so eyes, nose & lips stay completely unobstructed */}
+              <h1 className="font-display text-[2.55rem] leading-[0.94] font-bold tracking-[-0.025em] uppercase lg:hidden">
+                {lang === "uk" ? (
+                  <>
+                    <LineReveal delay={0.06} className="text-ink">
+                      Шкіра,
+                    </LineReveal>
+                    <LineReveal delay={0.12} className="text-ink">
+                      яку
+                    </LineReveal>
+                    <LineReveal
+                      delay={0.18}
+                      className="text-pearl drop-shadow-[0_2px_12px_rgba(86,30,31,0.30)]"
+                    >
+                      хочеться
+                    </LineReveal>
+                    <LineReveal
+                      delay={0.24}
+                      className="text-pearl drop-shadow-[0_2px_12px_rgba(86,30,31,0.30)]"
+                    >
+                      торкатись.
+                    </LineReveal>
+                  </>
+                ) : (
+                  <>
+                    <LineReveal delay={0.06} className="text-ink">
+                      Skin
+                    </LineReveal>
+                    <LineReveal delay={0.11} className="text-ink">
+                      you
+                    </LineReveal>
+                    <LineReveal delay={0.16} className="text-ink">
+                      want
+                    </LineReveal>
+                    <LineReveal
+                      delay={0.21}
+                      className="text-pearl drop-shadow-[0_2px_12px_rgba(86,30,31,0.30)]"
+                    >
+                      to
+                    </LineReveal>
+                    <LineReveal
+                      delay={0.26}
+                      className="text-pearl drop-shadow-[0_2px_12px_rgba(86,30,31,0.30)]"
+                    >
+                      touch.
+                    </LineReveal>
+                  </>
+                )}
+              </h1>
+
+              {/* Desktop: Classic 2-line luxury editorial headline */}
+              <h1 className="mt-5 hidden font-display text-[4rem] leading-[0.98] font-bold tracking-[-0.025em] uppercase lg:block xl:text-[5rem]">
+                <LineReveal delay={0.08} className="text-ink">
                   {lang === "uk" ? "Шкіра, яку" : "Skin you want"}
                 </LineReveal>
-                <LineReveal delay={0.18} className="text-accent">
+                <LineReveal delay={0.18} className="text-pearl">
                   {lang === "uk" ? "хочеться торкатись." : "to touch."}
                 </LineReveal>
               </h1>
 
+              {/* Subtitle shown on tablet/desktop; kept off mobile cover for pure Vogue editorial clarity */}
               <motion.p
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.28, ease: LUXURY_EASE }}
-                className="mt-3.5 max-w-md text-sm leading-relaxed text-muted sm:text-base lg:mt-5 lg:text-lg"
+                className="mt-6 hidden max-w-lg text-base leading-relaxed text-muted lg:block lg:text-lg"
               >
                 {t("hero.subtitle")}
               </motion.p>
 
-              {/* Single Bold Primary CTA + Clean Editorial Text Link */}
+              {/* Single Bold Primary CTA + Clean Editorial Text Link (vertically stacked & centered on mobile; inline row on desktop) */}
               <motion.div
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.36, ease: LUXURY_EASE }}
-                className="mt-6 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:gap-7 lg:mt-8"
+                className="mt-6 flex flex-col items-center gap-3 lg:mt-9 lg:flex-row lg:items-center lg:gap-7"
               >
                 <Link
                   href="/catalog"
-                  className="btn-tactile inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full bg-ink px-8 py-3.5 text-xs font-bold tracking-[0.18em] text-surface uppercase shadow-lg hover:bg-accent hover:text-ink"
+                  className="btn-tactile inline-flex min-h-[50px] w-full max-w-[280px] items-center justify-center gap-2.5 rounded-full bg-ink px-7 py-3.5 text-xs font-bold tracking-[0.18em] text-surface uppercase shadow-lg hover:bg-accent hover:text-ink lg:min-h-[54px] lg:w-auto lg:max-w-none lg:px-8 lg:py-4"
                 >
                   <span>{lang === "uk" ? "Обрати догляд" : "Explore Collection"}</span>
                   <ArrowRight className="h-4 w-4" strokeWidth={2.2} />
@@ -256,22 +346,22 @@ export function HomeClient() {
 
                 <a
                   href="#ritual-finder"
-                  className="group inline-flex items-center justify-center gap-1.5 py-2 text-xs font-bold tracking-[0.15em] text-ink uppercase transition-colors hover:text-accent sm:justify-start"
+                  className="group inline-flex items-center justify-center gap-1.5 py-1 text-xs font-bold tracking-[0.15em] text-ink uppercase transition-colors hover:text-accent lg:py-2"
                 >
                   <Sparkles className="h-3.5 w-3.5 text-accent" strokeWidth={2} />
-                  <span className="border-b border-ink/30 pb-0.5 group-hover:border-accent">
+                  <span className="border-b border-ink/40 pb-0.5 group-hover:border-accent">
                     {lang === "uk" ? "Пройти підбір за 30 с" : "30-Sec Ritual Finder"}
                   </span>
                   <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </a>
               </motion.div>
 
-              {/* Single-line quiet proof facts */}
+              {/* Single-line quiet proof facts (desktop) */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.65, delay: 0.48 }}
-                className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-line-strong/60 pt-5 text-[11px] font-semibold tracking-[0.12em] text-muted uppercase lg:mt-8"
+                className="mt-10 hidden flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-line-strong/60 pt-5 text-[11px] font-semibold tracking-[0.12em] text-muted uppercase lg:flex"
               >
                 <span>100% {lang === "uk" ? "еко-активи" : "eco actives"}</span>
                 <span className="text-accent">·</span>
@@ -281,160 +371,150 @@ export function HomeClient() {
               </motion.div>
             </div>
           </div>
-
-          {/* Desktop Right-Side Sculptural Portrait: absolute inset-0 so it NEVER inflates grid height! */}
-          <div className="relative hidden lg:col-span-6 lg:block lg:h-full lg:min-h-0 lg:overflow-hidden">
-            <motion.img
-              initial={{ scale: 1.04, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.95, ease: LUXURY_EASE }}
-              src={assetPath("/assets/hero/hero-sculpture.jpg")}
-              alt={
-                lang === "uk"
-                  ? "Порцелянова гладкість і сяйво шкіри Sophie Bilynska Cosmetics"
-                  : "Porcelain smoothness and radiant skin with Sophie Bilynska Cosmetics"
-              }
-              className="absolute inset-0 h-full w-full object-cover object-[center_24%] [mask-image:linear-gradient(90deg,transparent_0%,black_18%,black_88%,transparent_100%)] [-webkit-mask-image:linear-gradient(90deg,transparent_0%,black_18%,black_88%,transparent_100%)]"
-            />
-          </div>
         </div>
       </section>
 
-      {/* ==================== ACT 2: BESTSELLERS + INLINE TABS + MOBILE SWIPE CAROUSEL ==================== */}
-      <section className="mx-auto max-w-[1440px] px-4 py-16 sm:px-8 lg:px-12 lg:py-24">
-        <Reveal>
-          <div className="flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-end">
-            <div>
-              <p className="eyebrow text-accent">{t("home.bestsellersEyebrow")}</p>
-              <h2 className="mt-1.5 font-display text-3xl font-bold uppercase text-ink sm:text-5xl">
-                {t("home.bestsellersTitle")}
-              </h2>
-            </div>
-
-            {/* Inline Interactive Spring Tabs */}
-            <div className="no-scrollbar flex max-w-full items-center gap-1.5 overflow-x-auto pb-1">
-              {tabs.map((tab) => {
-                const active = showcaseTab === tab.key;
-                return (
-                  <button
-                    key={tab.key}
-                    type="button"
-                    onClick={() => setShowcaseTab(tab.key)}
-                    className={`relative shrink-0 rounded-full px-4 py-2 text-xs font-bold tracking-[0.12em] uppercase transition-colors ${
-                      active ? "text-surface" : "text-muted hover:text-ink"
-                    }`}
-                  >
-                    {active && (
-                      <motion.span
-                        layoutId="home-showcase-tab"
-                        transition={{ type: "spring", stiffness: 420, damping: 32 }}
-                        className="absolute inset-0 rounded-full bg-ink"
-                      />
-                    )}
-                    <span className="relative z-10">{tab.label[lang]}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </Reveal>
-
-        <AnimatePresence mode="wait">
-          {showcaseTab === "sets" ? (
-            <motion.div
-              key="sets"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3, ease: LUXURY_EASE }}
-              className="no-scrollbar -mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 lg:mt-10 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible"
-            >
-              {BUNDLES.map((bundle) => (
-                <div
-                  key={bundle.id}
-                  className="flex w-[78vw] max-w-[320px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-line bg-surface lg:w-auto lg:max-w-none"
-                >
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <img
-                      src={bundle.image}
-                      alt={bundle.name[lang]}
-                      className="h-full w-full object-cover"
-                    />
-                    <span className="absolute left-3 top-3 rounded-full bg-ink/90 px-3 py-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
-                      {bundle.badge[lang]}
-                    </span>
-                  </div>
-                  <div className="flex flex-1 flex-col p-5">
-                    <h3 className="font-display text-xl font-bold text-ink">
-                      {bundle.name[lang]}
-                    </h3>
-                    <p className="mt-1 text-xs text-muted">{bundle.subtitle[lang]}</p>
-                    <div className="mt-auto flex items-center justify-between pt-4">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-lg font-bold text-ink">
-                          {formatPrice(bundle.bundlePrice, lang)}
-                        </span>
-                        <span className="text-xs text-muted line-through">
-                          {formatPrice(bundle.originalPrice, lang)}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          addBundleToCart(bundle.id);
-                          openOverlay("cart");
-                        }}
-                        className="btn-tactile rounded-full bg-ink px-4 py-2 text-[11px] font-bold tracking-[0.12em] text-surface uppercase hover:bg-accent hover:text-ink"
-                      >
-                        + {t("common.quickAdd")}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          ) : (
-            <motion.div
-              key={showcaseTab}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3, ease: LUXURY_EASE }}
-              className="no-scrollbar -mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 lg:mt-10 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible"
-            >
-              {showcaseProducts.map((product, idx) => (
-                <div
-                  key={product.id}
-                  className="w-[70vw] max-w-[285px] shrink-0 snap-start lg:w-auto lg:max-w-none"
-                >
-                  <ProductCard product={product} index={idx} />
-                </div>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className="mt-8 flex justify-end">
-          <Link
-            href="/catalog"
-            className="group inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-ink uppercase hover:text-accent"
-          >
-            <span>{t("home.viewAll")}</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
-      </section>
-
-      {/* ==================== ACT 3: FLAGSHIP IN MOTION — ICE-BLOOM.MP4 VIDEO SPOTLIGHT (SMOKED CHARCOAL & VELVET ESPRESSO) ==================== */}
-      <section className="relative overflow-hidden bg-ink py-16 text-pearl lg:py-28">
+      {/* ==================== ACT 2: BESTSELLERS — SMOKED CHARCOAL SALON GALLERY ==================== */}
+      <section className="relative overflow-hidden border-t border-accent/20 bg-ink text-pearl">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_78%_30%,rgba(90,59,38,0.34),transparent_62%),radial-gradient(ellipse_at_22%_75%,rgba(185,154,99,0.12),transparent_55%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(185,154,99,0.08),transparent_55%)]"
+        />
+        <div className="relative mx-auto max-w-[1440px] px-4 py-16 sm:px-8 lg:px-12 lg:py-24">
+          <Reveal>
+            <div className="flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-end">
+              <div>
+                <p className="eyebrow text-accent">{t("home.bestsellersEyebrow")}</p>
+                <h2 className="mt-1.5 font-display text-3xl font-bold uppercase text-pearl sm:text-5xl">
+                  {t("home.bestsellersTitle")}
+                </h2>
+              </div>
+
+              {/* Inline Interactive Spring Tabs */}
+              <div className="no-scrollbar flex max-w-full items-center gap-1.5 overflow-x-auto pb-1">
+                {tabs.map((tab) => {
+                  const active = showcaseTab === tab.key;
+                  return (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => setShowcaseTab(tab.key)}
+                      className={`relative shrink-0 rounded-full px-4 py-2 text-xs font-bold tracking-[0.12em] uppercase transition-colors ${
+                        active ? "text-ink" : "text-pearl/60 hover:text-pearl"
+                      }`}
+                    >
+                      {active && (
+                        <motion.span
+                          layoutId="home-showcase-tab"
+                          transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                          className="absolute inset-0 rounded-full bg-pearl"
+                        />
+                      )}
+                      <span className="relative z-10">{tab.label[lang]}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </Reveal>
+
+          <AnimatePresence mode="wait">
+            {showcaseTab === "sets" ? (
+              <motion.div
+                key="sets"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3, ease: LUXURY_EASE }}
+                className="no-scrollbar -mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 lg:mt-10 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible"
+              >
+                {BUNDLES.map((bundle) => (
+                  <div
+                    key={bundle.id}
+                    className="flex w-[78vw] max-w-[320px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-pearl/12 bg-espresso lg:w-auto lg:max-w-none"
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <img
+                        src={bundle.image}
+                        alt={bundle.name[lang]}
+                        className="h-full w-full object-cover"
+                      />
+                      <span className="absolute left-3 top-3 rounded-full bg-ink/90 px-3 py-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
+                        {bundle.badge[lang]}
+                      </span>
+                    </div>
+                    <div className="flex flex-1 flex-col p-5">
+                      <h3 className="font-display text-xl font-bold text-pearl">
+                        {bundle.name[lang]}
+                      </h3>
+                      <p className="mt-1 text-xs text-pearl/65">{bundle.subtitle[lang]}</p>
+                      <div className="mt-auto flex items-center justify-between pt-4">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-lg font-bold text-pearl">
+                            {formatPrice(bundle.bundlePrice, lang)}
+                          </span>
+                          <span className="text-xs text-pearl/45 line-through">
+                            {formatPrice(bundle.originalPrice, lang)}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            addBundleToCart(bundle.id);
+                            openOverlay("cart");
+                          }}
+                          className="btn-tactile rounded-full bg-accent px-4 py-2 text-[11px] font-bold tracking-[0.12em] text-ink uppercase hover:bg-pearl"
+                        >
+                          + {t("common.quickAdd")}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                key={showcaseTab}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3, ease: LUXURY_EASE }}
+                className="no-scrollbar -mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 lg:mt-10 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible"
+              >
+                {showcaseProducts.map((product, idx) => (
+                  <div
+                    key={product.id}
+                    className="w-[70vw] max-w-[285px] shrink-0 snap-start lg:w-auto lg:max-w-none"
+                  >
+                    <ProductCard product={product} variant="dark" index={idx} />
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="mt-8 flex justify-end">
+            <Link
+              href="/catalog"
+              className="group inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-pearl/85 uppercase hover:text-accent"
+            >
+              <span>{t("home.viewAll")}</span>
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== ACT 3: FLAGSHIP IN MOTION — ICE-BLOOM.MP4 VIDEO SPOTLIGHT (VELVET OXBLOOD) ==================== */}
+      <section className="relative overflow-hidden border-t border-pearl/10 bg-espresso py-16 text-pearl lg:py-28">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_78%_30%,rgba(128,44,47,0.36),transparent_62%),radial-gradient(ellipse_at_22%_75%,rgba(182,154,109,0.14),transparent_55%)]"
         />
         <div className="relative mx-auto grid max-w-[1440px] items-center gap-10 px-4 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:px-12">
           {/* Left: Tall Portrait Video with Subtle Parallax (clamped max width so it stays balanced on all monitors) */}
           <div className="mx-auto w-full max-w-[440px] lg:col-span-6 lg:max-w-[520px]">
-            <ParallaxMedia className="aspect-[4/5] rounded-[28px] border border-accent/25 bg-obsidian-soft shadow-2xl">
+            <ParallaxMedia className="aspect-[4/5] rounded-[28px] border border-accent/25 bg-espresso shadow-2xl">
               <video
                 className="h-full w-full object-cover"
                 autoPlay
@@ -596,7 +676,7 @@ export function HomeClient() {
                 key={item.goal}
                 type="button"
                 onClick={() => setSelectedGoal(item.goal)}
-                className={`btn-tactile group relative flex flex-col overflow-hidden rounded-2xl border p-3.5 text-left transition-all sm:p-4 ${
+                className={`btn-tactile group relative flex flex-col overflow-hidden rounded-2xl border p-3.5 text-left sm:p-4 ${
                   active
                     ? "border-ink bg-ink text-pearl shadow-lg"
                     : "border-line bg-surface text-ink hover:border-accent"
@@ -1039,7 +1119,7 @@ export function HomeClient() {
       </section>
 
       {/* ==================== ACT 8A: PRE-FOOTER CONCIERGE CTA ==================== */}
-      <section className="border-t border-line bg-[#fbf1e2] py-14 lg:py-20">
+      <section className="border-t border-line bg-surface py-14 lg:py-20">
         <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-6 px-4 sm:px-8 lg:flex-row lg:items-center lg:px-12">
           <div>
             <p className="eyebrow text-accent">

@@ -119,7 +119,7 @@ export function AccountDrawer() {
           <button
             type="button"
             onClick={logout}
-            className="btn-tactile flex w-full items-center justify-center gap-2 rounded-full border border-sand-dark bg-alabaster px-4 py-3 text-xs font-medium tracking-[0.14em] text-obsidian uppercase hover:border-obsidian"
+            className="btn-tactile flex w-full items-center justify-center gap-2 rounded-full border border-line-strong bg-surface px-4 py-3 text-xs font-medium tracking-[0.14em] text-ink uppercase hover:border-ink"
           >
             <LogOut className="h-3.5 w-3.5" />
             <span>{t("auth.logout")}</span>
@@ -130,9 +130,9 @@ export function AccountDrawer() {
       {/* STEP 1: Unauthenticated -> Exclusively Apple & Google OAuth */}
       {!user && !pendingProvider && (
         <div className="space-y-6 py-2">
-          <div className="rounded-2xl border border-sand bg-travertine/70 p-5">
-            <p className="eyebrow text-bronze-dark">Atelier Membership</p>
-            <p className="mt-2 text-sm leading-relaxed text-espresso">
+          <div className="rounded-2xl border border-line bg-paper/70 p-5">
+            <p className="eyebrow text-accent">Atelier Membership</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-soft">
               {t("auth.subtitle")}
             </p>
           </div>
@@ -141,7 +141,7 @@ export function AccountDrawer() {
             <button
               type="button"
               onClick={() => startOAuthLogin("apple")}
-              className="btn-tactile flex min-h-[52px] w-full items-center justify-center gap-3 rounded-full bg-obsidian px-6 py-3.5 text-sm font-medium text-pearl hover:bg-espresso"
+              className="btn-tactile flex min-h-[52px] w-full items-center justify-center gap-3 rounded-full bg-ink px-6 py-3.5 text-sm font-medium text-pearl hover:bg-ink-soft"
             >
               <AppleIcon />
               <span>{t("auth.apple")}</span>
@@ -150,15 +150,15 @@ export function AccountDrawer() {
             <button
               type="button"
               onClick={() => startOAuthLogin("google")}
-              className="btn-tactile flex min-h-[52px] w-full items-center justify-center gap-3 rounded-full border border-sand-dark bg-white px-6 py-3.5 text-sm font-medium text-obsidian hover:border-obsidian"
+              className="btn-tactile flex min-h-[52px] w-full items-center justify-center gap-3 rounded-full border border-line-strong bg-white px-6 py-3.5 text-sm font-medium text-ink hover:border-ink"
             >
               <GoogleIcon />
               <span>{t("auth.google")}</span>
             </button>
           </div>
 
-          <div className="flex items-start gap-3 rounded-2xl border border-sand/80 bg-alabaster p-4 text-xs leading-relaxed text-umber">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-bronze-dark" strokeWidth={1.6} />
+          <div className="flex items-start gap-3 rounded-2xl border border-line/80 bg-surface p-4 text-xs leading-relaxed text-muted">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" strokeWidth={1.6} />
             <p>{t("auth.note")}</p>
           </div>
 
@@ -178,11 +178,11 @@ export function AccountDrawer() {
             ].map((perk) => (
               <div
                 key={perk.title}
-                className="rounded-2xl border border-sand bg-travertine/40 p-4"
+                className="rounded-2xl border border-line bg-paper/40 p-4"
               >
-                <perk.icon className="h-4 w-4 text-bronze-dark" strokeWidth={1.6} />
-                <p className="mt-2 text-xs font-medium text-obsidian">{perk.title}</p>
-                <p className="mt-0.5 text-[11px] text-umber">{perk.desc}</p>
+                <perk.icon className="h-4 w-4 text-accent" strokeWidth={1.6} />
+                <p className="mt-2 text-xs font-medium text-ink">{perk.title}</p>
+                <p className="mt-0.5 text-[11px] text-muted">{perk.desc}</p>
               </div>
             ))}
           </div>
@@ -206,10 +206,10 @@ export function AccountDrawer() {
           </div>
 
           <div>
-            <h3 className="font-editorial text-2xl font-medium text-obsidian">
+            <h3 className="font-display font-bold tracking-[-0.02em] text-2xl text-ink">
               {t("auth.emailTitle")}
             </h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-umber">
+            <p className="mt-1.5 text-sm leading-relaxed text-muted">
               {t("auth.emailSubtitle")}
             </p>
           </div>
@@ -218,7 +218,7 @@ export function AccountDrawer() {
             <div>
               <label
                 htmlFor="onboarding-name"
-                className="mb-1.5 block text-xs font-medium tracking-wide text-espresso"
+                className="mb-1.5 block text-xs font-medium tracking-wide text-ink-soft"
               >
                 {t("auth.nameLabel")}
               </label>
@@ -228,19 +228,19 @@ export function AccountDrawer() {
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
                 placeholder={lang === "uk" ? "Олена Коваленко" : "Olena Kovalenko"}
-                className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-3 text-base text-obsidian placeholder:text-umber/60 focus:border-bronze"
+                className="w-full rounded-xl border border-line bg-paper/60 px-4 py-3 text-base text-ink placeholder:text-muted/60 focus:border-accent"
               />
             </div>
 
             <div>
               <label
                 htmlFor="onboarding-email"
-                className="mb-1.5 block text-xs font-medium tracking-wide text-espresso"
+                className="mb-1.5 block text-xs font-medium tracking-wide text-ink-soft"
               >
                 {t("auth.emailLabel")} *
               </label>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-umber" />
+                <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
                 <input
                   id="onboarding-email"
                   type="email"
@@ -251,7 +251,7 @@ export function AccountDrawer() {
                     if (emailError) setEmailError("");
                   }}
                   placeholder="name@example.com"
-                  className="w-full rounded-xl border border-sand bg-travertine/60 py-3 pl-10 pr-4 text-base text-obsidian placeholder:text-umber/60 focus:border-bronze"
+                  className="w-full rounded-xl border border-line bg-paper/60 py-3 pl-10 pr-4 text-base text-ink placeholder:text-muted/60 focus:border-accent"
                 />
               </div>
               {emailError && (
@@ -262,7 +262,7 @@ export function AccountDrawer() {
             <div>
               <label
                 htmlFor="onboarding-phone"
-                className="mb-1.5 block text-xs font-medium tracking-wide text-espresso"
+                className="mb-1.5 block text-xs font-medium tracking-wide text-ink-soft"
               >
                 {t("auth.phoneLabel")}
               </label>
@@ -272,14 +272,14 @@ export function AccountDrawer() {
                 value={phoneInput}
                 onChange={(e) => setPhoneInput(e.target.value)}
                 placeholder="+380 (__) ___-__-__"
-                className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-3 text-base text-obsidian placeholder:text-umber/60 focus:border-bronze"
+                className="w-full rounded-xl border border-line bg-paper/60 px-4 py-3 text-base text-ink placeholder:text-muted/60 focus:border-accent"
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="btn-tactile w-full rounded-full bg-obsidian px-6 py-4 text-xs font-medium tracking-[0.16em] text-pearl uppercase hover:bg-bronze hover:text-obsidian"
+            className="btn-tactile w-full rounded-full bg-ink px-6 py-4 text-xs font-medium tracking-[0.16em] text-pearl uppercase hover:bg-accent hover:text-ink"
           >
             {t("auth.completeBtn")}
           </button>
@@ -290,7 +290,7 @@ export function AccountDrawer() {
       {user && (
         <div className="space-y-5">
           {/* Tabs */}
-          <div className="grid grid-cols-4 gap-1 rounded-full border border-sand bg-travertine p-1 text-[11px] font-medium">
+          <div className="grid grid-cols-4 gap-1 rounded-full border border-line bg-paper p-1 text-[11px] font-medium">
             {(
               [
                 { id: "ritual", label: t("account.tabRitual") },
@@ -305,8 +305,8 @@ export function AccountDrawer() {
                 onClick={() => setTab(item.id)}
                 className={`rounded-full px-2 py-2 transition-colors ${
                   tab === item.id
-                    ? "bg-obsidian text-pearl"
-                    : "text-umber hover:text-obsidian"
+                    ? "bg-ink text-pearl"
+                    : "text-muted hover:text-ink"
                 }`}
               >
                 {item.label}
@@ -319,14 +319,14 @@ export function AccountDrawer() {
             <div className="space-y-4">
               {savedRecommendation ? (
                 <>
-                  <div className="rounded-2xl border border-bronze/35 bg-travertine/80 p-4">
-                    <p className="eyebrow text-bronze-dark">
+                  <div className="rounded-2xl border border-accent/35 bg-paper/80 p-4">
+                    <p className="eyebrow text-accent">
                       {lang === "uk" ? "Збережений протокол" : "Saved Protocol"}
                     </p>
-                    <h3 className="mt-1 font-editorial text-2xl font-medium text-obsidian">
+                    <h3 className="mt-1 font-display font-bold tracking-[-0.02em] text-2xl text-ink">
                       {savedRecommendation.title[lang]}
                     </h3>
-                    <p className="mt-1.5 text-xs leading-relaxed text-umber">
+                    <p className="mt-1.5 text-xs leading-relaxed text-muted">
                       {savedRecommendation.summary[lang]}
                     </p>
                   </div>
@@ -335,7 +335,7 @@ export function AccountDrawer() {
                     {savedRecommendation.steps.map((s) => (
                       <li
                         key={s.product.id}
-                        className="flex items-center gap-3 rounded-xl border border-sand bg-alabaster p-3"
+                        className="flex items-center gap-3 rounded-xl border border-line bg-surface p-3"
                       >
                         <img
                           src={s.product.image}
@@ -343,14 +343,14 @@ export function AccountDrawer() {
                           className="h-14 w-11 rounded-lg object-cover"
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="text-[10px] font-medium tracking-[0.14em] text-bronze-dark uppercase">
+                          <p className="text-[10px] font-medium tracking-[0.14em] text-accent uppercase">
                             {s.slot[lang]}
                           </p>
-                          <p className="truncate font-editorial text-base font-medium text-obsidian">
+                          <p className="truncate font-display font-bold tracking-[-0.02em] text-base text-ink">
                             {s.product.line ? s.product.line[lang] : s.product.name[lang]}
                           </p>
                         </div>
-                        <span className="text-xs font-medium text-obsidian">
+                        <span className="text-xs font-medium text-ink">
                           {formatPrice(s.product.price, lang)}
                         </span>
                       </li>
@@ -365,20 +365,20 @@ export function AccountDrawer() {
                       );
                       openOverlay("cart");
                     }}
-                    className="btn-tactile w-full rounded-full bg-obsidian px-5 py-3.5 text-xs font-medium tracking-[0.16em] text-pearl uppercase hover:bg-bronze hover:text-obsidian"
+                    className="btn-tactile w-full rounded-full bg-ink px-5 py-3.5 text-xs font-medium tracking-[0.16em] text-pearl uppercase hover:bg-accent hover:text-ink"
                   >
                     {lang === "uk" ? "Додати весь ритуал у кошик" : "Add Full Ritual to Bag"}
                   </button>
                 </>
               ) : (
-                <div className="rounded-2xl border border-sand bg-travertine/60 p-6 text-center">
-                  <Sparkles className="mx-auto h-6 w-6 text-bronze-dark" strokeWidth={1.5} />
-                  <p className="mt-3 font-editorial text-xl font-medium text-obsidian">
+                <div className="rounded-2xl border border-line bg-paper/60 p-6 text-center">
+                  <Sparkles className="mx-auto h-6 w-6 text-accent" strokeWidth={1.5} />
+                  <p className="mt-3 font-display font-bold tracking-[-0.02em] text-xl text-ink">
                     {lang === "uk"
                       ? "Ще немає збереженого ритуалу"
                       : "No saved ritual yet"}
                   </p>
-                  <p className="mt-1.5 text-xs leading-relaxed text-umber">
+                  <p className="mt-1.5 text-xs leading-relaxed text-muted">
                     {lang === "uk"
                       ? "Пройдіть 30-секундний підбір — формули автоматично збережуться тут."
                       : "Take our 30-second Ritual Finder to save your tailored routine here."}
@@ -386,7 +386,7 @@ export function AccountDrawer() {
                   <Link
                     href="/quiz"
                     onClick={closeOverlay}
-                    className="btn-tactile mt-4 inline-flex items-center gap-2 rounded-full bg-obsidian px-5 py-3 text-xs font-medium tracking-[0.16em] text-pearl uppercase"
+                    className="btn-tactile mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-xs font-medium tracking-[0.16em] text-pearl uppercase"
                   >
                     {t("home.quizCta")}
                   </Link>
@@ -401,13 +401,13 @@ export function AccountDrawer() {
               {orders.map((order) => (
                 <div
                   key={order.id}
-                  className="rounded-2xl border border-sand bg-travertine/55 p-4"
+                  className="rounded-2xl border border-line bg-paper/55 p-4"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-semibold tracking-wide text-obsidian">
+                    <span className="text-xs font-semibold tracking-wide text-ink">
                       {order.id}
                     </span>
-                    <span className="rounded-full bg-obsidian/90 px-2.5 py-0.5 text-[10px] font-medium tracking-[0.12em] text-bronze-light uppercase">
+                    <span className="rounded-full bg-ink/90 px-2.5 py-0.5 text-[10px] font-medium tracking-[0.12em] text-accent uppercase">
                       {order.status === "delivered"
                         ? lang === "uk"
                           ? "Доставлено"
@@ -417,14 +417,14 @@ export function AccountDrawer() {
                           : "Processing"}
                     </span>
                   </div>
-                  <p className="mt-2 text-xs leading-relaxed text-espresso">
+                  <p className="mt-2 text-xs leading-relaxed text-ink-soft">
                     {order.itemsSummary}
                   </p>
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-sand pt-2.5 text-[11px] text-umber">
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-2.5 text-[11px] text-muted">
                     <span>
                       {order.date} · НП {order.trackingNumber}
                     </span>
-                    <span className="font-medium text-obsidian">
+                    <span className="font-medium text-ink">
                       {formatPrice(order.total, lang)}
                     </span>
                   </div>
@@ -437,9 +437,9 @@ export function AccountDrawer() {
           {tab === "wishlist" && (
             <div className="space-y-3">
               {wishlist.length === 0 ? (
-                <div className="rounded-2xl border border-sand bg-travertine/60 p-6 text-center">
-                  <Heart className="mx-auto h-6 w-6 text-umber" strokeWidth={1.4} />
-                  <p className="mt-2 text-sm text-umber">
+                <div className="rounded-2xl border border-line bg-paper/60 p-6 text-center">
+                  <Heart className="mx-auto h-6 w-6 text-muted" strokeWidth={1.4} />
+                  <p className="mt-2 text-sm text-muted">
                     {lang === "uk"
                       ? "Натисніть сердечко на будь-якому засобі, щоб зберегти його тут."
                       : "Tap the heart on any formula to save it here."}
@@ -452,7 +452,7 @@ export function AccountDrawer() {
                   return (
                     <div
                       key={p.id}
-                      className="flex items-center gap-3 rounded-2xl border border-sand bg-travertine/50 p-3"
+                      className="flex items-center gap-3 rounded-2xl border border-line bg-paper/50 p-3"
                     >
                       <img
                         src={p.image}
@@ -463,18 +463,18 @@ export function AccountDrawer() {
                         <Link
                           href={`/product/${p.id}`}
                           onClick={closeOverlay}
-                          className="block truncate font-editorial text-base font-medium text-obsidian hover:text-bronze-dark"
+                          className="block truncate font-display font-bold tracking-[-0.02em] text-base text-ink hover:text-accent"
                         >
                           {p.line ? p.line[lang] : p.name[lang]}
                         </Link>
-                        <p className="text-xs text-umber">
+                        <p className="text-xs text-muted">
                           {formatPrice(p.price, lang)}
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={() => addProductToCart(p.id, 1, 0)}
-                        className="btn-tactile rounded-full bg-obsidian px-3 py-2 text-[11px] font-medium tracking-[0.12em] text-pearl uppercase"
+                        className="btn-tactile rounded-full bg-ink px-3 py-2 text-[11px] font-medium tracking-[0.12em] text-pearl uppercase"
                       >
                         + {t("common.quickAdd")}
                       </button>
@@ -482,7 +482,7 @@ export function AccountDrawer() {
                         type="button"
                         onClick={() => toggleWishlist(p.id)}
                         aria-label="Remove"
-                        className="p-2 text-umber hover:text-obsidian"
+                        className="p-2 text-muted hover:text-ink"
                       >
                         ×
                       </button>
@@ -502,22 +502,22 @@ export function AccountDrawer() {
               }}
               className="space-y-4"
             >
-              <div className="flex items-center gap-3 rounded-2xl border border-sand bg-travertine/60 p-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-obsidian text-bronze-light">
+              <div className="flex items-center gap-3 rounded-2xl border border-line bg-paper/60 p-4">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-ink text-accent">
                   <UserIcon className="h-5 w-5" strokeWidth={1.5} />
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate font-medium text-obsidian">{user.name}</p>
-                  <p className="truncate text-xs text-umber">{user.email}</p>
+                  <p className="truncate font-medium text-ink">{user.name}</p>
+                  <p className="truncate text-xs text-muted">{user.email}</p>
                 </div>
               </div>
 
               <div>
                 <label
                   htmlFor="prof-city"
-                  className="mb-1 block text-xs font-medium text-espresso"
+                  className="mb-1 block text-xs font-medium text-ink-soft"
                 >
-                  <MapPin className="mr-1 inline h-3.5 w-3.5 text-bronze-dark" />
+                  <MapPin className="mr-1 inline h-3.5 w-3.5 text-accent" />
                   {lang === "uk" ? "Місто (Нова Пошта)" : "City (Nova Poshta)"}
                 </label>
                 <input
@@ -525,14 +525,14 @@ export function AccountDrawer() {
                   type="text"
                   value={cityEdit}
                   onChange={(e) => setCityEdit(e.target.value)}
-                  className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-2.5 text-base text-obsidian"
+                  className="w-full rounded-xl border border-line bg-paper/60 px-4 py-2.5 text-base text-ink"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="prof-branch"
-                  className="mb-1 block text-xs font-medium text-espresso"
+                  className="mb-1 block text-xs font-medium text-ink-soft"
                 >
                   {lang === "uk" ? "Відділення / Поштомат" : "Branch / Locker"}
                 </label>
@@ -541,14 +541,14 @@ export function AccountDrawer() {
                   type="text"
                   value={branchEdit}
                   onChange={(e) => setBranchEdit(e.target.value)}
-                  className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-2.5 text-base text-obsidian"
+                  className="w-full rounded-xl border border-line bg-paper/60 px-4 py-2.5 text-base text-ink"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="prof-phone"
-                  className="mb-1 block text-xs font-medium text-espresso"
+                  className="mb-1 block text-xs font-medium text-ink-soft"
                 >
                   {lang === "uk" ? "Телефон" : "Phone"}
                 </label>
@@ -557,13 +557,13 @@ export function AccountDrawer() {
                   type="tel"
                   value={phoneEdit}
                   onChange={(e) => setPhoneEdit(e.target.value)}
-                  className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-2.5 text-base text-obsidian"
+                  className="w-full rounded-xl border border-line bg-paper/60 px-4 py-2.5 text-base text-ink"
                 />
               </div>
 
               <button
                 type="submit"
-                className="btn-tactile w-full rounded-full bg-obsidian px-5 py-3.5 text-xs font-medium tracking-[0.16em] text-pearl uppercase hover:bg-bronze hover:text-obsidian"
+                className="btn-tactile w-full rounded-full bg-ink px-5 py-3.5 text-xs font-medium tracking-[0.16em] text-pearl uppercase hover:bg-accent hover:text-ink"
               >
                 {t("common.save")}
               </button>

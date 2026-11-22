@@ -12,7 +12,7 @@ export default function CatalogPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-[1440px] px-5 pt-32 pb-24 text-sm text-umber">
+        <div className="mx-auto max-w-[1440px] px-5 pt-32 pb-24 text-sm text-muted">
           Loading collection…
         </div>
       }

@@ -1,35 +1,22 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Sophie Bilynska Salon Palette: Warm Parchment + Smoked Charcoal + Velvet Espresso + Satin Gold (#B99A63) + Smoked Olive */
-  --color-paper: #efe4d4;
-  --color-surface: #fbf4ea;
-  --color-surface-soft: #f3e9db;
-  --color-line: #ded1be;
-  --color-line-strong: #c8b8a2;
+  /* Sophie Bilynska Palette: Warm Mineral Cream + Deep Bordeaux (#561E1F) + Velvet Oxblood + Crisp White + Champagne Gold (#B69A6D) */
+  --color-paper: #f4e6d8;
+  --color-surface: #fffaf5;
+  --color-surface-soft: #eedcd0;
+  --color-line: #e2cbb9;
+  --color-line-strong: #cca992;
 
-  --color-ink: #1a1816;
-  --color-ink-soft: #2e241d;
-  --color-muted: #66594d;
+  --color-ink: #561e1f;
+  --color-ink-soft: #6e2b2d;
+  --color-espresso: #3b1315;
+  --color-muted: #7c5654;
 
-  --color-accent: #b99a63;
-  --color-accent-deep: #b99a63;
-  --color-accent-soft: #f2e8d6;
-
-  /* Backward-compatible semantic aliases */
-  --color-travertine: #efe4d4;
-  --color-alabaster: #fbf4ea;
-  --color-sand: #ded1be;
-  --color-sand-dark: #c8b8a2;
-  --color-obsidian: #1a1816;
-  --color-obsidian-soft: #2b2019;
-  --color-espresso: #2e241d;
-  --color-umber: #66594d;
-  --color-bronze: #b99a63;
-  --color-bronze-light: #b99a63;
-  --color-bronze-dark: #b99a63;
-  --color-sage: #3f4d37;
-  --color-pearl: #f6ede1;
+  --color-accent: #b69a6d;
+  --color-accent-soft: #f5ebe0;
+  --color-sage: #4a5741;
+  --color-pearl: #ffffff;
 
   /* Official Brand Typography (logo guide.pdf): 100% Futura PT */
   --font-sans: var(--font-futura), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -39,17 +26,16 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    background-color: var(--color-paper);
-    color: var(--color-ink);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
+    min-height: 100vh;
     font-family: var(--font-sans);
     background-color: var(--color-paper);
     color: var(--color-ink);
     overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
@@ -62,100 +48,71 @@
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    outline: 2px solid var(--color-accent-deep);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
-}
 
-/* Official Futura PT Display & Eyebrow helpers */
-.font-editorial,
-.font-display {
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.eyebrow {
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-/* Smooth infinite marquee */
-@keyframes marquee {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(-50%, 0, 0);
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 }
 
-.animate-marquee {
-  display: flex;
-  width: max-content;
-  animation: marquee 28s linear infinite;
-}
+@layer components {
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
 
-.animate-marquee:hover {
-  animation-play-state: paused;
-}
+  /* Tactile press micro-interaction */
+  .btn-tactile {
+    transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.22s ease,
+      border-color 0.22s ease,
+      color 0.22s ease,
+      box-shadow 0.22s ease;
+  }
 
-/* Tactile press micro-interaction */
-.btn-tactile {
-  transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 0.22s ease,
-    border-color 0.22s ease,
-    color 0.22s ease,
-    box-shadow 0.22s ease;
-}
+  .btn-tactile:active {
+    transform: scale(0.97);
+  }
 
-.btn-tactile:active {
-  transform: scale(0.97);
-}
+  /* Thin custom scrollbars inside drawers */
+  .atelier-scroll::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
 
-/* Thin custom scrollbars inside drawers */
-.atelier-scroll::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
+  .atelier-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-.atelier-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
+  .atelier-scroll::-webkit-scrollbar-thumb {
+    background: rgba(86, 30, 31, 0.25);
+    border-radius: 999px;
+  }
 
-.atelier-scroll::-webkit-scrollbar-thumb {
-  background: rgba(23, 26, 28, 0.22);
-  border-radius: 999px;
-}
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Safe area padding for mobile bottom bar */
-.pb-safe-nav {
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
-}
-
-@media (min-width: 1024px) {
+  /* Safe area padding for mobile bottom bar */
   .pb-safe-nav {
-    padding-bottom: 0;
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
-    animation: none !important;
-  }
-  html {
-    scroll-behavior: auto;
+  @media (min-width: 1024px) {
+    .pb-safe-nav {
+      padding-bottom: 0;
+    }
   }
 }

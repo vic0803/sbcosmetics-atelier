@@ -35,7 +35,7 @@ export function ProductCard({
       <div
         className={`relative aspect-[3/4] w-full overflow-hidden rounded-2xl border transition-all duration-300 ${
           dark
-            ? "border-surface/10 bg-obsidian-soft"
+            ? "border-pearl/12 bg-espresso shadow-[0_8px_28px_rgba(0,0,0,0.28)] group-hover:border-accent/55"
             : "border-line bg-surface shadow-[0_2px_12px_rgba(23,26,28,0.03)] group-hover:border-accent/60 group-hover:shadow-[0_14px_34px_rgba(23,26,28,0.08)]"
         }`}
       >
@@ -77,7 +77,7 @@ export function ProductCard({
             type="button"
             onClick={() => toggleWishlist(product.id)}
             aria-label={liked ? t("common.removedFromWishlist") : t("common.savedToWishlist")}
-            className={`btn-tactile pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-colors sm:h-10 sm:w-10 ${
+            className={`btn-tactile pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md sm:h-10 sm:w-10 ${
               liked
                 ? "border-accent bg-ink text-accent"
                 : "border-ink/10 bg-surface/85 text-ink hover:bg-ink hover:text-surface"
@@ -117,10 +117,10 @@ export function ProductCard({
       {/* Product Typography (100% Crisp Futura PT) */}
       <div className="flex flex-1 flex-col pt-3 sm:pt-4">
         <div className="flex items-center justify-between gap-2 text-[10px] font-semibold tracking-[0.12em] uppercase sm:text-[11px]">
-          <span className="truncate text-accent-deep">
+          <span className={`truncate ${dark ? "text-accent" : "text-accent"}`}>
             {getStepLabel(product.ritualStep, lang)}
           </span>
-          <span className="shrink-0 text-muted">
+          <span className={`shrink-0 ${dark ? "text-pearl/55" : "text-muted"}`}>
             {product.variants[0]?.label[lang]}
           </span>
         </div>
@@ -129,8 +129,8 @@ export function ProductCard({
           href={`/product/${product.id}`}
           className={`mt-1 text-base leading-snug font-bold tracking-[-0.01em] transition-colors sm:text-lg ${
             dark
-              ? "text-surface hover:text-accent"
-              : "text-ink hover:text-accent-deep"
+              ? "text-pearl hover:text-accent"
+              : "text-ink hover:text-accent"
           }`}
         >
           {product.line ? product.line[lang] : product.name[lang]}
@@ -138,7 +138,7 @@ export function ProductCard({
 
         <p
           className={`mt-1 line-clamp-2 text-xs leading-relaxed ${
-            dark ? "text-surface/65" : "text-muted"
+            dark ? "text-pearl/65" : "text-muted"
           }`}
         >
           {product.shortTagline[lang]}
@@ -147,12 +147,16 @@ export function ProductCard({
         <div className="mt-auto flex items-center justify-between pt-2.5 sm:pt-3.5">
           <span
             className={`text-sm font-bold tracking-wide sm:text-base ${
-              dark ? "text-surface" : "text-ink"
+              dark ? "text-pearl" : "text-ink"
             }`}
           >
             {formatPrice(product.price, lang)}
           </span>
-          <span className="hidden text-[11px] font-semibold text-accent-deep opacity-0 transition-opacity group-hover:opacity-100 lg:inline">
+          <span
+            className={`hidden text-[11px] font-semibold opacity-0 transition-opacity group-hover:opacity-100 lg:inline ${
+              dark ? "text-accent" : "text-accent"
+            }`}
+          >
             {t("common.details")} →
           </span>
         </div>

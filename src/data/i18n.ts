@@ -13,17 +13,10 @@ const UK = {
   "nav.menu": "Меню",
 
   // Hero
-  "hero.eyebrow": "Ательє натуральної косметики · Львів",
-  "hero.titleLine1": "Чиста ботаніка,",
-  "hero.titleLine2": "створена технологом.",
   "hero.subtitle":
     "Сертифіковані формули малих партій на основі CO₂-екстрактів, гіалуронової кислоти та холоднопресованих рослинних олій.",
   "hero.ctaPrimary": "Відкрити каталог",
   "hero.ctaSecondary": "Підібрати ритуал за 30 с",
-  "hero.trust1": "Сертифікований технолог",
-  "hero.trust2": "100% еко-складники",
-  "hero.trust3": "Малі партії · Львів",
-  "hero.trust4": "Нова Пошта по Україні",
 
   // Home sections
   "home.bestsellersEyebrow": "Обране клієнтами",
@@ -31,31 +24,14 @@ const UK = {
   "home.viewAll": "Дивитись усі 11 засобів",
 
   "home.quizEyebrow": "Персональна діагностика",
-  "home.quizTitle": "Не знаєте, з чого почати? Складіть свій ритуал за 30 секунд",
-  "home.quizDesc":
-    "4 короткі запитання про стан шкіри — і система технолога підбере узгоджений ранковий та вечірній догляд зі знижкою −10% на набір.",
   "home.quizCta": "Пройти підбір догляду",
 
   "home.activesEyebrow": "Бібліотека активів",
-  "home.activesTitle": "Прозора наука у кожній краплі",
-  "home.activesSub":
-    "Оберіть активний компонент, щоб побачити його дію та формули Sophie Bilynska, де він працює.",
-
   "home.setsEyebrow": "Готові ритуали",
-  "home.setsTitle": "Подарункові набори Atelier",
-  "home.setsSub":
-    "Узгоджені комплекси у фірмовому чорно-бронзовому пакуванні — вигідніше до −12%.",
 
   "home.atelierEyebrow": "Філософія Sophie Bilynska",
-  "home.atelierTitle": "Кожна формула народжується руками сертифікованого технолога",
   "home.atelierBody":
     "Ми не працюємо за масовими шаблонами контрактних виробництв. У нашій львівській лабораторії Софія Білинська особисто створює рецептури, перевіряє кожну партію та обирає лише чисті сертифіковані активи з прозорим INCI.",
-  "home.atelierStat1Value": "100%",
-  "home.atelierStat1Label": "Еко-складники та прозорий INCI",
-  "home.atelierStat2Value": "16.5K+",
-  "home.atelierStat2Label": "Спільнота бренду @sb.cosm",
-  "home.atelierStat3Value": "4.9 ★",
-  "home.atelierStat3Label": "Середня оцінка засобів",
   "home.atelierCta": "Історія бренду та сертифікати",
 
   "home.journalEyebrow": "Журнал ательє",
@@ -93,7 +69,6 @@ const UK = {
 
   // PDP
   "pdp.volume": "Об'єм",
-  "pdp.quantity": "Кількість",
   "pdp.keyActives": "Ключові активи формули",
   "pdp.benefits": "Дія та переваги",
   "pdp.usage": "Спосіб застосування",
@@ -121,7 +96,6 @@ const UK = {
   "cart.shippingCalc": "За тарифами НП (~80 ₴)",
   "cart.total": "Разом до сплати",
   "cart.checkout": "Оформити замовлення",
-  "cart.continue": "Продовжити покупки",
 
   // Account & Auth (Apple + Google -> Email)
   "auth.title": "Особистий кабінет",
@@ -157,8 +131,6 @@ const UK = {
   "checkout.backCatalog": "Повернутись до каталогу",
 
   // Footer
-  "footer.tagline":
-    "Натуральна сертифікована косметика ручної роботи зі Львова. Створена сертифікованим технологом зі 100% еко-складників.",
   "footer.shop": "Магазин",
   "footer.brand": "Ательє",
   "footer.contact": "Контакти",
@@ -180,48 +152,24 @@ const EN: Record<TranslationKey, string> = {
   "nav.account": "Account",
   "nav.menu": "Menu",
 
-  "hero.eyebrow": "Botanical Skincare Atelier · Lviv",
-  "hero.titleLine1": "Pure botanicals,",
-  "hero.titleLine2": "crafted by a technologist.",
   "hero.subtitle":
     "Certified small-batch formulas built with CO₂ plant extracts, hyaluronic acid, and cold-pressed botanical oils.",
   "hero.ctaPrimary": "Explore Collection",
   "hero.ctaSecondary": "30-Sec Ritual Finder",
-  "hero.trust1": "Certified Technologist",
-  "hero.trust2": "100% Eco Ingredients",
-  "hero.trust3": "Small-Batch · Lviv",
-  "hero.trust4": "Nova Poshta Ukraine",
 
   "home.bestsellersEyebrow": "Client Favorites",
   "home.bestsellersTitle": "Signature Formulas",
   "home.viewAll": "View all 11 formulas",
 
   "home.quizEyebrow": "Personal Consultation",
-  "home.quizTitle": "Not sure where to begin? Build your ritual in 30 seconds",
-  "home.quizDesc":
-    "Answer 4 tactile questions about your skin and get a technologist-matched AM/PM protocol with −10% set savings.",
   "home.quizCta": "Start Ritual Finder",
 
   "home.activesEyebrow": "Actives Library",
-  "home.activesTitle": "Transparent Science in Every Drop",
-  "home.activesSub":
-    "Select a botanical active to explore how it works and which Sophie Bilynska formulas feature it.",
-
   "home.setsEyebrow": "Curated Rituals",
-  "home.setsTitle": "Atelier Gift Sets",
-  "home.setsSub":
-    "Harmonized routines in signature matte-black & bronze gift boxes — save up to −12%.",
 
   "home.atelierEyebrow": "The Sophie Bilynska Ethos",
-  "home.atelierTitle": "Every vessel is compounded by a certified cosmetic technologist",
   "home.atelierBody":
     "We never use white-label factory templates. Inside our Lviv laboratory, Sophie Bilynska personally formulates each recipe, verifies every small batch, and works exclusively with certified clean botanical actives.",
-  "home.atelierStat1Value": "100%",
-  "home.atelierStat1Label": "Eco actives & transparent INCI",
-  "home.atelierStat2Value": "16.5K+",
-  "home.atelierStat2Label": "Community on @sb.cosm",
-  "home.atelierStat3Value": "4.9 ★",
-  "home.atelierStat3Label": "Average client rating",
   "home.atelierCta": "Our Story & Certifications",
 
   "home.journalEyebrow": "Atelier Journal",
@@ -256,7 +204,6 @@ const EN: Record<TranslationKey, string> = {
   "catalog.reset": "Reset filters",
 
   "pdp.volume": "Volume",
-  "pdp.quantity": "Quantity",
   "pdp.keyActives": "Key Botanical Actives",
   "pdp.benefits": "Benefits",
   "pdp.usage": "How to Apply",
@@ -283,7 +230,6 @@ const EN: Record<TranslationKey, string> = {
   "cart.shippingCalc": "Standard NP rate (~₴80)",
   "cart.total": "Total",
   "cart.checkout": "Proceed to Checkout",
-  "cart.continue": "Continue Shopping",
 
   "auth.title": "Personal Account",
   "auth.subtitle":
@@ -316,8 +262,6 @@ const EN: Record<TranslationKey, string> = {
     "Your order has been saved to your Account history. Once backend integrations are connected, this step opens Monobank / Apple Pay checkout and generates a live Nova Poshta waybill.",
   "checkout.backCatalog": "Back to Collection",
 
-  "footer.tagline":
-    "Certified handmade botanical cosmetics from Lviv. Crafted by a certified technologist with 100% eco ingredients.",
   "footer.shop": "Shop",
   "footer.brand": "Atelier",
   "footer.contact": "Contact",

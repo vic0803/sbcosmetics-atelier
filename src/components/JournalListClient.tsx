@@ -22,12 +22,12 @@ export function JournalListClient() {
   return (
     <div className="pt-24 pb-24 lg:pt-32">
       <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
-        <div className="border-b border-sand pb-10">
-          <p className="eyebrow text-bronze-dark">{t("home.journalEyebrow")}</p>
-          <h1 className="mt-2 font-editorial text-5xl font-medium text-obsidian sm:text-6xl">
+        <div className="border-b border-line pb-10">
+          <p className="eyebrow text-accent">{t("home.journalEyebrow")}</p>
+          <h1 className="mt-2 font-display font-bold tracking-[-0.02em] text-5xl text-ink sm:text-6xl">
             {t("home.journalTitle")}
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-umber sm:text-base">
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">
             {lang === "uk"
               ? "Прості й доказові пояснення про активи, відновлення бар'єру та щоденні ритуали догляду від технолога бренду."
               : "Evidence-based notes on botanical actives, barrier repair, and mindful skincare rituals from our technologist."}
@@ -39,8 +39,8 @@ export function JournalListClient() {
               onClick={() => setSelectedCat("all")}
               className={`min-h-[40px] rounded-full border px-4 py-1.5 text-xs font-medium tracking-[0.12em] uppercase ${
                 selectedCat === "all"
-                  ? "border-obsidian bg-obsidian text-pearl"
-                  : "border-sand-dark bg-alabaster text-espresso"
+                  ? "border-ink bg-ink text-pearl"
+                  : "border-line-strong bg-surface text-ink-soft"
               }`}
             >
               {t("common.all")}
@@ -52,8 +52,8 @@ export function JournalListClient() {
                 onClick={() => setSelectedCat(cat)}
                 className={`min-h-[40px] rounded-full border px-4 py-1.5 text-xs font-medium tracking-[0.12em] uppercase ${
                   selectedCat === cat
-                    ? "border-obsidian bg-obsidian text-pearl"
-                    : "border-sand-dark bg-alabaster text-espresso"
+                    ? "border-ink bg-ink text-pearl"
+                    : "border-line-strong bg-surface text-ink-soft"
                 }`}
               >
                 {cat}
@@ -67,7 +67,7 @@ export function JournalListClient() {
             <Link
               key={article.slug}
               href={`/journal/${article.slug}`}
-              className="group flex flex-col overflow-hidden rounded-3xl border border-sand bg-alabaster transition-colors hover:border-bronze"
+              className="group flex flex-col overflow-hidden rounded-3xl border border-line bg-surface transition-colors hover:border-accent"
             >
               <div className="aspect-[16/10] overflow-hidden">
                 <img
@@ -77,19 +77,19 @@ export function JournalListClient() {
                 />
               </div>
               <div className="flex flex-1 flex-col p-7">
-                <div className="flex items-center justify-between text-[11px] font-medium tracking-[0.16em] text-bronze-dark uppercase">
+                <div className="flex items-center justify-between text-[11px] font-medium tracking-[0.16em] text-accent uppercase">
                   <span>{article.category[lang]}</span>
-                  <span className="text-umber">
+                  <span className="text-muted">
                     {article.date[lang]} · {article.readTime[lang]}
                   </span>
                 </div>
-                <h2 className="mt-3 font-editorial text-3xl leading-snug font-medium text-obsidian group-hover:text-bronze-dark">
+                <h2 className="mt-3 font-display font-bold tracking-[-0.02em] text-3xl leading-snug text-ink group-hover:text-accent">
                   {article.title[lang]}
                 </h2>
-                <p className="mt-3 text-sm leading-relaxed text-umber">
+                <p className="mt-3 text-sm leading-relaxed text-muted">
                   {article.excerpt[lang]}
                 </p>
-                <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-xs font-medium tracking-[0.16em] text-obsidian uppercase">
+                <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-xs font-medium tracking-[0.16em] text-ink uppercase">
                   <span>{t("common.readMore")}</span>
                   <ArrowUpRight className="h-4 w-4" />
                 </span>

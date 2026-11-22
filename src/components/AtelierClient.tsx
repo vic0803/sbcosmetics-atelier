@@ -52,19 +52,19 @@ export function AtelierClient() {
       {/* Intro Hero */}
       <section className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
         <div className="max-w-3xl">
-          <p className="eyebrow text-bronze-dark">{t("home.atelierEyebrow")}</p>
-          <h1 className="mt-3 font-editorial text-5xl leading-[1.05] font-medium text-obsidian sm:text-6xl lg:text-7xl">
+          <p className="eyebrow text-accent">{t("home.atelierEyebrow")}</p>
+          <h1 className="mt-3 font-display font-bold tracking-[-0.02em] text-5xl leading-[1.05] text-ink sm:text-6xl lg:text-7xl">
             {lang === "uk"
               ? "Ательє чесної ботанічної космецевтики у Львові"
               : "An Atelier of Honest Botanical Skincare in Lviv"}
           </h1>
-          <p className="mt-6 text-base leading-relaxed text-umber sm:text-lg">
+          <p className="mt-6 text-base leading-relaxed text-muted sm:text-lg">
             {t("home.atelierBody")}
           </p>
         </div>
 
         {/* Wide Lab Image */}
-        <div className="mt-12 overflow-hidden rounded-[32px] border border-sand">
+        <div className="mt-12 overflow-hidden rounded-[32px] border border-line">
           <img
             src={assetPath("/assets/editorial/campaign-atelier.jpg")}
             alt="Sophie Bilynska Lviv atelier"
@@ -77,16 +77,16 @@ export function AtelierClient() {
           {pillars.map((p) => (
             <div
               key={p.num}
-              className="rounded-3xl border border-sand bg-alabaster p-7 sm:p-9"
+              className="rounded-3xl border border-line bg-surface p-7 sm:p-9"
             >
               <div className="flex items-center justify-between">
-                <span className="eyebrow text-bronze-dark">{p.num}</span>
-                <p.icon className="h-5 w-5 text-bronze-dark" strokeWidth={1.5} />
+                <span className="eyebrow text-accent">{p.num}</span>
+                <p.icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
               </div>
-              <h2 className="mt-4 font-editorial text-3xl font-medium text-obsidian">
+              <h2 className="mt-4 font-display font-bold tracking-[-0.02em] text-3xl text-ink">
                 {p.title[lang]}
               </h2>
-              <p className="mt-3 text-sm leading-relaxed text-umber">
+              <p className="mt-3 text-sm leading-relaxed text-muted">
                 {p.desc[lang]}
               </p>
             </div>
@@ -94,24 +94,24 @@ export function AtelierClient() {
         </div>
 
         {/* Editorial Quote + CTA Band */}
-        <div className="mt-16 grid items-center gap-8 rounded-[32px] bg-obsidian p-8 text-pearl sm:p-12 lg:grid-cols-12 lg:p-16">
+        <div className="mt-16 grid items-center gap-8 rounded-[32px] bg-ink p-8 text-pearl sm:p-12 lg:grid-cols-12 lg:p-16">
           <div className="lg:col-span-8">
-            <p className="eyebrow text-bronze-light">
+            <p className="eyebrow text-accent">
               {lang === "uk" ? "Слово засновниці" : "Founder's Note"}
             </p>
-            <blockquote className="mt-4 font-editorial text-3xl leading-snug italic text-pearl sm:text-4xl">
+            <blockquote className="mt-4 font-display font-bold tracking-[-0.02em] text-3xl leading-snug italic text-pearl sm:text-4xl">
               {lang === "uk"
                 ? "«Справжній догляд не маскує шкіру — він повертає їй спокій, природний бар'єр і власне сяйво.»"
                 : "“True skincare never masks the skin — it restores calm, strengthens the barrier, and reveals your natural radiance.”"}
             </blockquote>
-            <p className="mt-4 text-xs font-medium tracking-[0.18em] text-bronze-light uppercase">
+            <p className="mt-4 text-xs font-medium tracking-[0.18em] text-accent uppercase">
               — Sophie Bilynska · {lang === "uk" ? "Сертифікований технолог" : "Certified Technologist"}
             </p>
           </div>
           <div className="flex flex-col gap-3 lg:col-span-4 lg:items-end">
             <Link
               href="/quiz"
-              className="btn-tactile inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-bronze px-6 py-3.5 text-xs font-semibold tracking-[0.16em] text-obsidian uppercase hover:bg-bronze-light lg:w-auto"
+              className="btn-tactile inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-xs font-semibold tracking-[0.16em] text-ink uppercase hover:bg-accent lg:w-auto"
             >
               <Sparkles className="h-4 w-4" />
               <span>{t("home.quizCta")}</span>

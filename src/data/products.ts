@@ -881,11 +881,6 @@ export function getProductById(id: string): Product | undefined {
   return PRODUCTS.find((p) => p.id === id);
 }
 
-export function getBestsellers(limit = 4): Product[] {
-  const best = PRODUCTS.filter((p) => p.badge === "bestseller");
-  return best.slice(0, limit);
-}
-
 export function getRitualPairings(product: Product): Product[] {
   const stepOrder: Record<RitualStep, RitualStep[]> = {
     cleanse: ["tone", "treat", "seal"],
@@ -893,7 +888,7 @@ export function getRitualPairings(product: Product): Product[] {
     treat: ["tone", "seal", "cleanse"],
     seal: ["tone", "treat", "cleanse"],
     body: ["body", "hair"],
-    hair: ["body", "face" as RitualStep],
+    hair: ["body", "treat"],
   };
   const desired = stepOrder[product.ritualStep] ?? ["treat", "seal"];
   const picked: Product[] = [];

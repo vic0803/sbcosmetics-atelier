@@ -81,7 +81,7 @@ export function SlideSheet({
 
             {/* Optional Sticky Footer */}
             {footer && (
-              <div className="border-t border-line bg-paper/75 px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
+              <div className="border-t border-line bg-paper/75 px-6 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
                 {footer}
               </div>
             )}

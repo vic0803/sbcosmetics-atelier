@@ -43,8 +43,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="uk" className={futura.variable}>
-      <body className="min-h-screen bg-paper text-ink antialiased">
+    <html lang="uk" className={futura.variable} suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <StoreProvider>
           <AppShell>{children}</AppShell>
         </StoreProvider>

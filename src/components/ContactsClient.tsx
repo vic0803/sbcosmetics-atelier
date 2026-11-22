@@ -29,13 +29,13 @@ export function ContactsClient() {
     <div className="pt-24 pb-24 lg:pt-32">
       <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
         <div className="max-w-3xl">
-          <p className="eyebrow text-bronze-dark">
+          <p className="eyebrow text-accent">
             {lang === "uk" ? "Зв'язок та доставка" : "Concierge & Delivery"}
           </p>
-          <h1 className="mt-2 font-editorial text-5xl font-medium text-obsidian sm:text-6xl">
+          <h1 className="mt-2 font-display font-bold tracking-[-0.02em] text-5xl text-ink sm:text-6xl">
             {lang === "uk" ? "Контакти ательє" : "Atelier Concierge"}
           </h1>
-          <p className="mt-3 text-base leading-relaxed text-umber">
+          <p className="mt-3 text-base leading-relaxed text-muted">
             {lang === "uk"
               ? "Допоможемо підібрати догляд під ваш тип шкіри, відповімо щодо замовлення або порадимо подарунковий набір."
               : "Need help choosing a routine, checking an order, or selecting a gift set? Reach our Lviv atelier directly."}
@@ -45,54 +45,54 @@ export function ContactsClient() {
         <div className="mt-12 grid gap-8 lg:grid-cols-12">
           {/* Left: Direct Contacts + Nova Poshta Info */}
           <div className="space-y-5 lg:col-span-5">
-            <div className="rounded-3xl border border-sand bg-alabaster p-7">
-              <p className="eyebrow text-bronze-dark">
+            <div className="rounded-3xl border border-line bg-surface p-7">
+              <p className="eyebrow text-accent">
                 {lang === "uk" ? "Прямий зв'язок" : "Direct Lines"}
               </p>
 
-              <ul className="mt-5 space-y-4 text-sm text-espresso">
+              <ul className="mt-5 space-y-4 text-sm text-ink-soft">
                 <li className="flex items-start gap-3">
-                  <Phone className="mt-0.5 h-4 w-4 shrink-0 text-bronze-dark" />
+                  <Phone className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                   <div>
                     <a
                       href="tel:+380631790642"
-                      className="text-base font-medium text-obsidian hover:text-bronze-dark"
+                      className="text-base font-medium text-ink hover:text-accent"
                     >
                       +380 (63) 179-06-42
                     </a>
-                    <p className="text-xs text-umber">Telegram · Viber · WhatsApp</p>
+                    <p className="text-xs text-muted">Telegram · Viber · WhatsApp</p>
                   </div>
                 </li>
 
                 <li className="flex items-start gap-3">
-                  <Mail className="mt-0.5 h-4 w-4 shrink-0 text-bronze-dark" />
+                  <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                   <a
                     href="mailto:sb.cosm@gmail.com"
-                    className="font-medium text-obsidian hover:text-bronze-dark"
+                    className="font-medium text-ink hover:text-accent"
                   >
                     sb.cosm@gmail.com
                   </a>
                 </li>
 
                 <li className="flex items-start gap-3">
-                  <Instagram className="mt-0.5 h-4 w-4 shrink-0 text-bronze-dark" />
+                  <Instagram className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                   <a
                     href="https://www.instagram.com/sb.cosm/"
                     target="_blank"
                     rel="noreferrer"
-                    className="font-medium text-obsidian hover:text-bronze-dark"
+                    className="font-medium text-ink hover:text-accent"
                   >
                     @sb.cosm (Instagram Direct)
                   </a>
                 </li>
 
                 <li className="flex items-start gap-3">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-bronze-dark" />
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                   <span>{lang === "uk" ? "Львів, Україна" : "Lviv, Ukraine"}</span>
                 </li>
 
                 <li className="flex items-start gap-3">
-                  <Clock className="mt-0.5 h-4 w-4 shrink-0 text-bronze-dark" />
+                  <Clock className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                   <span>
                     {lang === "uk"
                       ? "Пн–Пт 9:00–21:00 · Сб 10:00–16:00 · Нд 10:00–14:00"
@@ -102,8 +102,8 @@ export function ContactsClient() {
               </ul>
             </div>
 
-            <div className="rounded-3xl border border-sand bg-obsidian p-7 text-pearl">
-              <div className="flex items-center gap-2.5 text-bronze-light">
+            <div className="rounded-3xl border border-line bg-ink p-7 text-pearl">
+              <div className="flex items-center gap-2.5 text-accent">
                 <Truck className="h-5 w-5" strokeWidth={1.5} />
                 <span className="eyebrow">
                   {lang === "uk" ? "Доставка та оплата" : "Shipping & Payment"}
@@ -133,22 +133,22 @@ export function ContactsClient() {
           </div>
 
           {/* Right: Consultation Form */}
-          <div className="rounded-3xl border border-sand bg-alabaster p-7 sm:p-10 lg:col-span-7">
-            <p className="eyebrow text-bronze-dark">
+          <div className="rounded-3xl border border-line bg-surface p-7 sm:p-10 lg:col-span-7">
+            <p className="eyebrow text-accent">
               {lang === "uk" ? "Запитати технолога" : "Ask Our Technologist"}
             </p>
-            <h2 className="mt-2 font-editorial text-3xl font-medium text-obsidian">
+            <h2 className="mt-2 font-display font-bold tracking-[-0.02em] text-3xl text-ink">
               {lang === "uk" ? "Напишіть нам" : "Send Us a Note"}
             </h2>
 
             {sent ? (
-              <div className="mt-8 rounded-2xl border border-sage/30 bg-sage/10 p-6 text-sm text-espresso">
-                <p className="font-medium text-obsidian">
+              <div className="mt-8 rounded-2xl border border-sage/30 bg-sage/10 p-6 text-sm text-ink-soft">
+                <p className="font-medium text-ink">
                   {lang === "uk"
                     ? "Дякуємо! Ваше повідомлення отримано."
                     : "Thank you! Your message has been received."}
                 </p>
-                <p className="mt-1 text-umber">
+                <p className="mt-1 text-muted">
                   {lang === "uk"
                     ? "Ми відповімо вам у робочі години за вказаним контактом."
                     : "We will reply during atelier hours via your preferred contact."}
@@ -156,7 +156,7 @@ export function ContactsClient() {
                 <button
                   type="button"
                   onClick={() => setSent(false)}
-                  className="mt-4 text-xs font-medium tracking-[0.14em] text-obsidian uppercase underline"
+                  className="mt-4 text-xs font-medium tracking-[0.14em] text-ink uppercase underline"
                 >
                   {lang === "uk" ? "Надіслати ще одне" : "Send another"}
                 </button>
@@ -167,7 +167,7 @@ export function ContactsClient() {
                   <div>
                     <label
                       htmlFor="contact-name"
-                      className="mb-1.5 block text-xs font-medium text-espresso"
+                      className="mb-1.5 block text-xs font-medium text-ink-soft"
                     >
                       {lang === "uk" ? "Ваше ім'я" : "Your Name"}
                     </label>
@@ -178,13 +178,13 @@ export function ContactsClient() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder={lang === "uk" ? "Софія" : "Sophie"}
-                      className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-3 text-base text-obsidian"
+                      className="w-full rounded-xl border border-line bg-paper/60 px-4 py-3 text-base text-ink"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="contact-way"
-                      className="mb-1.5 block text-xs font-medium text-espresso"
+                      className="mb-1.5 block text-xs font-medium text-ink-soft"
                     >
                       {lang === "uk" ? "Email або Telegram / Телефон" : "Email or Phone / Telegram"}
                     </label>
@@ -195,7 +195,7 @@ export function ContactsClient() {
                       value={contact}
                       onChange={(e) => setContact(e.target.value)}
                       placeholder="+380... / email"
-                      className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-3 text-base text-obsidian"
+                      className="w-full rounded-xl border border-line bg-paper/60 px-4 py-3 text-base text-ink"
                     />
                   </div>
                 </div>
@@ -203,7 +203,7 @@ export function ContactsClient() {
                 <div>
                   <label
                     htmlFor="contact-msg"
-                    className="mb-1.5 block text-xs font-medium text-espresso"
+                    className="mb-1.5 block text-xs font-medium text-ink-soft"
                   >
                     {lang === "uk" ? "Ваше запитання" : "Your Message"}
                   </label>
@@ -218,13 +218,13 @@ export function ContactsClient() {
                         ? "Розкажіть про вашу шкіру або запитання щодо замовлення..."
                         : "Tell us about your skin or your question..."
                     }
-                    className="w-full rounded-xl border border-sand bg-travertine/60 px-4 py-3 text-base text-obsidian"
+                    className="w-full rounded-xl border border-line bg-paper/60 px-4 py-3 text-base text-ink"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="btn-tactile inline-flex min-h-[52px] items-center gap-2.5 rounded-full bg-obsidian px-8 py-3.5 text-xs font-medium tracking-[0.16em] text-pearl uppercase hover:bg-bronze hover:text-obsidian"
+                  className="btn-tactile inline-flex min-h-[52px] items-center gap-2.5 rounded-full bg-ink px-8 py-3.5 text-xs font-medium tracking-[0.16em] text-pearl uppercase hover:bg-accent hover:text-ink"
                 >
                   <Send className="h-4 w-4" />
                   <span>{lang === "uk" ? "Надіслати" : "Send Message"}</span>
