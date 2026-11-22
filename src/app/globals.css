@@ -1,35 +1,35 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Sophie Bilynska Signature Palette: Warm Cream + Crisp Charcoal + Glacial Cyan Accent */
-  --color-paper: #efe9df;
-  --color-surface: #ffffff;
-  --color-surface-soft: #f7f4ee;
-  --color-line: #ddd5c8;
-  --color-line-strong: #c7bdb0;
+  /* Sophie Bilynska Salon Palette: Warm Parchment + Smoked Charcoal + Velvet Espresso + Satin Gold (#B99A63) + Smoked Olive */
+  --color-paper: #efe4d4;
+  --color-surface: #fbf4ea;
+  --color-surface-soft: #f3e9db;
+  --color-line: #ded1be;
+  --color-line-strong: #c8b8a2;
 
-  --color-ink: #171a1c;
-  --color-ink-soft: #2d3031;
-  --color-muted: #5a6065;
+  --color-ink: #1a1816;
+  --color-ink-soft: #2e241d;
+  --color-muted: #66594d;
 
-  --color-accent: #31bdeb;
-  --color-accent-deep: #0b84b8;
-  --color-accent-soft: #e6f6fd;
+  --color-accent: #b99a63;
+  --color-accent-deep: #b99a63;
+  --color-accent-soft: #f2e8d6;
 
-  /* Backward-compatible semantic aliases pointing to the crisp new palette */
-  --color-travertine: #efe9df;
-  --color-alabaster: #ffffff;
-  --color-sand: #ddd5c8;
-  --color-sand-dark: #c7bdb0;
-  --color-obsidian: #171a1c;
-  --color-obsidian-soft: #22262a;
-  --color-espresso: #2d3031;
-  --color-umber: #5a6065;
-  --color-bronze: #31bdeb;
-  --color-bronze-light: #6fd3f4;
-  --color-bronze-dark: #0b84b8;
-  --color-sage: #0b84b8;
-  --color-pearl: #f6f3ee;
+  /* Backward-compatible semantic aliases */
+  --color-travertine: #efe4d4;
+  --color-alabaster: #fbf4ea;
+  --color-sand: #ded1be;
+  --color-sand-dark: #c8b8a2;
+  --color-obsidian: #1a1816;
+  --color-obsidian-soft: #2b2019;
+  --color-espresso: #2e241d;
+  --color-umber: #66594d;
+  --color-bronze: #b99a63;
+  --color-bronze-light: #b99a63;
+  --color-bronze-dark: #b99a63;
+  --color-sage: #3f4d37;
+  --color-pearl: #f6ede1;
 
   /* Official Brand Typography (logo guide.pdf): 100% Futura PT */
   --font-sans: var(--font-futura), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -129,6 +129,15 @@
 .atelier-scroll::-webkit-scrollbar-thumb {
   background: rgba(23, 26, 28, 0.22);
   border-radius: 999px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Safe area padding for mobile bottom bar */

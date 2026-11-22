@@ -50,7 +50,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
   };
 
   return (
-    <div className="pt-20 pb-28 lg:pt-28 lg:pb-24">
+    <div className="pt-28 pb-28 lg:pt-32 lg:pb-24">
       <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
         {/* Breadcrumbs */}
         <nav

@@ -65,7 +65,7 @@ export function CatalogClient() {
   ];
 
   return (
-    <div className="pt-24 pb-24 lg:pt-32">
+    <div className="pt-28 pb-24 lg:pt-36">
       <section className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
         {/* Header */}
         <div className="flex flex-col justify-between gap-5 border-b border-line pb-8 lg:flex-row lg:items-end lg:pb-10">
