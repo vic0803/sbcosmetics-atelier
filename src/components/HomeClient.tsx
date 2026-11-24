@@ -177,19 +177,34 @@ export function HomeClient() {
   const heroTextFilter = useMotionTemplate`blur(${heroTextBlur}px)`;
   const heroTextOpacity = useTransform(heroExit, [0.05, 0.55], [1, 0]);
   const heroTextY = useTransform(heroExit, [0, 0.6], [0, -56]);
-  const heroCtaX = useTransform(heroExit, [0, 0.38], [0, -180]);
-  const heroCtaOpacity = useTransform(heroExit, [0.04, 0.36], [1, 0]);
-  const heroLinkX = useTransform(heroExit, [0.06, 0.46], [0, -220]);
-  const heroLinkOpacity = useTransform(heroExit, [0.1, 0.44], [1, 0]);
+
+  // CTA buttons lift strictly upward and blur, completing slightly faster than text
+  const heroCtaBlur = useTransform(heroExit, [0, 0.38], [0, 14]);
+  const heroCtaFilter = useMotionTemplate`blur(${heroCtaBlur}px)`;
+  const heroCtaOpacity = useTransform(heroExit, [0.02, 0.38], [1, 0]);
+  const heroCtaY = useTransform(heroExit, [0, 0.45], [0, -50]);
+
+  const heroLinkBlur = useTransform(heroExit, [0.02, 0.40], [0, 14]);
+  const heroLinkFilter = useMotionTemplate`blur(${heroLinkBlur}px)`;
+  const heroLinkOpacity = useTransform(heroExit, [0.04, 0.40], [1, 0]);
+  const heroLinkY = useTransform(heroExit, [0, 0.48], [0, -52]);
+
   const heroProofOpacity = useTransform(heroExit, [0, 0.22], [1, 0]);
+  const heroProofY = useTransform(heroExit, [0, 0.25], [0, -20]);
   const heroVeilOpacity = useTransform(heroExit, [0.25, 1], [0, 0.22]);
 
   const heroTextStyle = prefersReducedMotion
     ? undefined
     : { filter: heroTextFilter, opacity: heroTextOpacity, y: heroTextY };
-  const heroCtaStyle = prefersReducedMotion ? undefined : { x: heroCtaX, opacity: heroCtaOpacity };
-  const heroLinkStyle = prefersReducedMotion ? undefined : { x: heroLinkX, opacity: heroLinkOpacity };
-  const heroProofStyle = prefersReducedMotion ? undefined : { opacity: heroProofOpacity };
+  const heroCtaStyle = prefersReducedMotion
+    ? undefined
+    : { filter: heroCtaFilter, opacity: heroCtaOpacity, y: heroCtaY };
+  const heroLinkStyle = prefersReducedMotion
+    ? undefined
+    : { filter: heroLinkFilter, opacity: heroLinkOpacity, y: heroLinkY };
+  const heroProofStyle = prefersReducedMotion
+    ? undefined
+    : { opacity: heroProofOpacity, y: heroProofY };
   // Act 2: Inline category showcase tab
   const [showcaseTab, setShowcaseTab] = useState<ShowcaseTab>("hits");
   // Act 4: Inline interactive quiz selection
@@ -393,8 +408,8 @@ export function HomeClient() {
                   transition={{ duration: 0.6, delay: 0.36, ease: LUXURY_EASE }}
                   className="mt-6 flex flex-col items-center gap-3.5 lg:mt-[min(56px,5.2svh)] lg:flex-row lg:items-center lg:gap-6 xl:gap-8"
                 >
-                  {/* Primary CTA slides out to the left on scroll */}
-                  <motion.div style={heroCtaStyle} className="flex w-full justify-center lg:w-auto">
+                  {/* Primary CTA lifts upward and blurs on scroll */}
+                  <motion.div style={heroCtaStyle} className="flex w-full justify-center will-change-[filter,opacity,transform] lg:w-auto">
                   <Link
                     href="/catalog"
                     className="btn-tactile inline-flex min-h-[54px] w-full max-w-[300px] shrink-0 items-center justify-center gap-3 whitespace-nowrap rounded-full bg-ink px-7 py-3.5 text-[13.2px] font-bold tracking-[0.16em] text-surface uppercase shadow-lg hover:bg-accent hover:text-ink lg:min-h-[62px] lg:w-auto lg:max-w-none lg:px-8 lg:py-4 lg:text-[16px] xl:px-10"
@@ -404,8 +419,8 @@ export function HomeClient() {
                   </Link>
                   </motion.div>
 
-                  {/* Secondary ritual link follows a beat later */}
-                  <motion.div style={heroLinkStyle} className="flex justify-center">
+                  {/* Secondary ritual link lifts upward and blurs */}
+                  <motion.div style={heroLinkStyle} className="flex justify-center will-change-[filter,opacity,transform]">
                   <a
                     href="#ritual-finder"
                     className="group inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap py-1 text-[13.2px] font-bold tracking-[0.14em] text-ink uppercase transition-colors hover:text-accent lg:py-2 lg:text-[15.5px]"
