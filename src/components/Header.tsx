@@ -173,14 +173,14 @@ export function Header() {
               <img
                 src={assetPath("/assets/logo/wordmark-black.png")}
                 alt="Sophie Bilynska Cosmetics"
-                className={`h-[33px] w-auto object-contain ${
+                className={`h-8 w-auto object-contain ${
                   isDarkTheme ? "hidden" : "block"
                 }`}
               />
               <img
                 src={assetPath("/assets/logo/wordmark-white.png")}
                 alt="Sophie Bilynska Cosmetics"
-                className={`h-[33px] w-auto object-contain ${
+                className={`h-8 w-auto object-contain ${
                   isDarkTheme ? "block" : "hidden"
                 }`}
               />
