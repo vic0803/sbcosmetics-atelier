@@ -8,10 +8,11 @@ import { useEffect, useState } from "react";
 import { useStore } from "@/context/StoreContext";
 import { assetPath } from "@/lib/assets";
 
-type HeaderTheme = "paper" | "surface" | "navy" | "sapphire";
+type HeaderTheme = "hero" | "paper" | "surface" | "navy" | "sapphire";
 
 const THEME_BAR_CLASS: Record<HeaderTheme, string> = {
-  paper: "bg-paper/68 text-ink backdrop-blur-md",
+  hero: "bg-transparent text-ink",
+  paper: "bg-paper/72 text-ink backdrop-blur-md",
   surface: "bg-surface/72 text-ink backdrop-blur-md",
   navy: "bg-ink/72 text-pearl backdrop-blur-md",
   sapphire: "bg-espresso/72 text-pearl backdrop-blur-md",
@@ -21,7 +22,7 @@ export function Header() {
   const pathname = usePathname();
   const { lang, setLang, t, cartCount, user, openOverlay } = useStore();
   const [scrolled, setScrolled] = useState(false);
-  const [sectionTheme, setSectionTheme] = useState<HeaderTheme>("paper");
+  const [sectionTheme, setSectionTheme] = useState<HeaderTheme>("hero");
 
   const isHome = pathname === "/";
 
@@ -34,7 +35,7 @@ export function Header() {
 
       const sampleY = 66; // vertical midpoint of the 68px nav bar below the 32px announcement bar
       const sections = document.querySelectorAll<HTMLElement>("[data-header-theme]");
-      let detected: HeaderTheme = "paper";
+      let detected: HeaderTheme = isHome ? "hero" : "paper";
 
       // The Home hero is sticky and later sections slide over it, so several themed
       // elements can overlap the nav bar. Later DOM nodes paint on top: keep the last match.
@@ -66,9 +67,9 @@ export function Header() {
       window.removeEventListener("scroll", scheduleSample);
       window.removeEventListener("resize", scheduleSample);
     };
-  }, [pathname]);
+  }, [pathname, isHome]);
 
-  const isDarkTheme = scrolled && (sectionTheme === "navy" || sectionTheme === "sapphire");
+  const isDarkTheme = sectionTheme === "navy" || sectionTheme === "sapphire";
 
   // Primary nav links on desktop: Catalog, Ritual, Atelier & Journal
   const navLinks = [
@@ -78,11 +79,13 @@ export function Header() {
     { href: "/journal", label: t("nav.journal"), match: (p: string) => p.startsWith("/journal") },
   ];
 
-  const navBarClass = scrolled
-    ? THEME_BAR_CLASS[sectionTheme]
-    : isHome
-      ? "bg-transparent text-ink"
-      : THEME_BAR_CLASS.paper;
+  const navBarClass = isHome && sectionTheme === "hero"
+    ? "bg-transparent text-ink"
+    : scrolled
+      ? THEME_BAR_CLASS[sectionTheme]
+      : isHome
+        ? "bg-transparent text-ink"
+        : THEME_BAR_CLASS.paper;
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">

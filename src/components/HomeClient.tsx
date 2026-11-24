@@ -235,7 +235,7 @@ export function HomeClient() {
       {/* ==================== ACT 1: HERO — STICKY 100SVH FULL-BLEED EDITORIAL PORTRAIT (next sections slide over it) ==================== */}
       <section
         ref={heroSectionRef}
-        data-header-theme="paper"
+        data-header-theme="hero"
         className="sticky top-[min(0px,calc(100svh-680px))] z-0 h-[100svh] min-h-[680px] overflow-hidden bg-paper"
       >
         {/* Mobile Full-Height Sculptural Portrait: flush inset-0 so top edge never detaches or exposes a gap on scroll */}
