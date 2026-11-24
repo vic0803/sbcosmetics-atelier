@@ -33,23 +33,6 @@ export function Footer() {
               className="h-20 w-auto max-w-[85vw] object-contain sm:h-24 sm:max-w-none lg:h-32 xl:h-36"
             />
           </Link>
-
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-semibold tracking-[0.2em] text-accent uppercase sm:mt-6">
-            <span>Botanical Skincare Atelier</span>
-            <span>·</span>
-            <span>{t("footer.city")}</span>
-            <span>·</span>
-            <a
-              href="https://www.instagram.com/sb.cosm/"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 hover:text-pearl"
-            >
-              <Instagram className="h-3.5 w-3.5" />
-              <span>@sb.cosm · 16.5K</span>
-              <ArrowUpRight className="h-3 w-3" />
-            </a>
-          </div>
         </div>
 
         {/* 4 Clean Columns */}
@@ -167,8 +150,26 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Atelier Location & Instagram Status */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-semibold tracking-[0.2em] text-accent uppercase sm:mt-12">
+          <span>Botanical Skincare Atelier</span>
+          <span>·</span>
+          <span>{t("footer.city")}</span>
+          <span>·</span>
+          <a
+            href="https://www.instagram.com/sb.cosm/"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 hover:text-pearl"
+          >
+            <Instagram className="h-3.5 w-3.5" />
+            <span>@sb.cosm · 16.5K</span>
+            <ArrowUpRight className="h-3 w-3" />
+          </a>
+        </div>
+
         {/* Bottom Payment & Copyright Strip */}
-        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-pearl/10 pt-6 text-xs text-pearl/55 sm:flex-row sm:items-center">
+        <div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-pearl/10 pt-6 text-xs text-pearl/55 sm:flex-row sm:items-center">
           <p>© {new Date().getFullYear()} Sophie Bilynska Cosmetics®. {t("footer.rights")}</p>
           <div className="flex flex-wrap items-center gap-3 text-[11px] font-semibold tracking-[0.12em] text-pearl/70 uppercase">
             <span>Нова Пошта</span>
