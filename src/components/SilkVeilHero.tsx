@@ -355,6 +355,12 @@ export function SilkVeilHero({
     const start = performance.now();
 
     const render = (now: number) => {
+      // Sticky hero stays mounted under the page: skip GPU work once later sections fully cover it
+      if (!reduceMotion && window.scrollY > window.innerHeight * 1.05) {
+        rafId = requestAnimationFrame(render);
+        return;
+      }
+
       const elapsed = reduceMotion ? 1.4 : (now - start) * 0.001;
 
       // Smooth pointer inertia

@@ -8,7 +8,10 @@ export function Footer() {
   const { t, lang, openOverlay } = useStore();
 
   return (
-    <footer className="border-t border-surface/10 bg-ink text-pearl pb-safe-nav">
+    <footer
+      data-header-theme="navy"
+      className="border-t border-surface/10 bg-ink text-pearl pb-safe-nav"
+    >
       <div className="mx-auto max-w-[1440px] px-5 pt-14 pb-12 sm:px-8 lg:px-12 lg:pt-20">
         {/* Magazine-scale full-width wordmark */}
         <div className="border-b border-pearl/12 pb-10 lg:pb-14">

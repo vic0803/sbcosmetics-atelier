@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -141,6 +142,9 @@ function writeJSON(key: string, value: unknown): void {
   }
 }
 
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   const [lang, setLangState] = useState<Lang>("uk");
@@ -155,14 +159,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
+  // Restore saved language synchronously before first browser paint so EN reloads never flash UA
+  useIsomorphicLayoutEffect(() => {
+    let targetLang: Lang = "uk";
     try {
       const savedLang = window.localStorage.getItem(STORAGE_KEYS.lang);
       if (savedLang === "en" || savedLang === "uk") {
-        setLangState(savedLang);
+        targetLang = savedLang;
       }
     } catch {
       // ignore
+    }
+
+    if (targetLang !== "uk") {
+      setLangState(targetLang);
+    } else {
+      delete document.documentElement.dataset.langReady;
     }
 
     setCartItems(readJSON<CartItem[]>(STORAGE_KEYS.cart, []));
@@ -173,16 +185,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setHydrated(true);
   }, []);
 
-  useEffect(() => {
+  // Reveal body synchronously once the committed DOM matches the saved language
+  useIsomorphicLayoutEffect(() => {
     document.documentElement.lang = lang;
-    if (hydrated) {
-      try {
-        window.localStorage.setItem(STORAGE_KEYS.lang, lang);
-      } catch {
-        // ignore
+    if (!hydrated) return;
+    try {
+      const savedLang = window.localStorage.getItem(STORAGE_KEYS.lang);
+      if (!savedLang || savedLang === lang) {
+        delete document.documentElement.dataset.langReady;
       }
+    } catch {
+      delete document.documentElement.dataset.langReady;
     }
   }, [lang, hydrated]);
+
+  // Keep language synced across open browser tabs
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEYS.lang && (e.newValue === "en" || e.newValue === "uk")) {
+        setLangState(e.newValue);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   useEffect(() => {
     if (hydrated) writeJSON(STORAGE_KEYS.cart, cartItems);
@@ -229,7 +255,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const setLang = useCallback((next: Lang) => setLangState(next), []);
+  const setLang = useCallback((next: Lang) => {
+    try {
+      window.localStorage.setItem(STORAGE_KEYS.lang, next);
+    } catch {
+      // ignore
+    }
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = next;
+      delete document.documentElement.dataset.langReady;
+    }
+    setLangState(next);
+  }, []);
   const t = useCallback((key: TranslationKey) => I18N[lang][key], [lang]);
 
   const addProductToCart = useCallback(

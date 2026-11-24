@@ -1,21 +1,21 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Sophie Bilynska Palette: Warm Mineral Cream + Deep Bordeaux (#561E1F) + Velvet Oxblood + Crisp White + Champagne Gold (#B69A6D) */
-  --color-paper: #f4e6d8;
-  --color-surface: #fffaf5;
-  --color-surface-soft: #eedcd0;
-  --color-line: #e2cbb9;
-  --color-line-strong: #cca992;
+  /* Sophie Bilynska Palette: Deep Slate Navy (#16212C) + Midnight Sapphire (#0E161E) + Warm Porcelain (#F4EFE9) + Satin Gold (#C0A16A) */
+  --color-paper: #f4efe9;
+  --color-surface: #ffffff;
+  --color-surface-soft: #eae3da;
+  --color-line: #dfd7cd;
+  --color-line-strong: #c6bcb0;
 
-  --color-ink: #561e1f;
-  --color-ink-soft: #6e2b2d;
-  --color-espresso: #3b1315;
-  --color-muted: #7c5654;
+  --color-ink: #16212c;
+  --color-ink-soft: #243445;
+  --color-espresso: #0e161e;
+  --color-muted: #5b656e;
 
-  --color-accent: #b69a6d;
-  --color-accent-soft: #f5ebe0;
-  --color-sage: #4a5741;
+  --color-accent: #c0a16a;
+  --color-accent-soft: #f3ede2;
+  --color-sage: #3f5246;
   --color-pearl: #ffffff;
 
   /* Official Brand Typography (logo guide.pdf): 100% Futura PT */
@@ -25,7 +25,13 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    overscroll-behavior-y: none;
+    background-color: var(--color-paper);
+  }
+
+  /* Prevent flash of default Ukrainian HTML when user has selected English before hydration commits */
+  html[data-lang-ready="pending"] body {
+    opacity: 0;
   }
 
   body {
@@ -34,6 +40,7 @@
     background-color: var(--color-paper);
     color: var(--color-ink);
     overflow-x: clip;
+    overscroll-behavior-y: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -51,12 +58,6 @@
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-  }
 }
 
 @layer components {
@@ -66,6 +67,19 @@
     font-weight: 600;
     letter-spacing: 0.18em;
     text-transform: uppercase;
+  }
+
+  /* Editorial hollow outline display text (1.35px stroke on mobile, 2px on desktop) */
+  .text-outline-ink {
+    color: transparent;
+    -webkit-text-stroke: 1.35px var(--color-ink);
+    paint-order: stroke fill;
+  }
+
+  @media (min-width: 1024px) {
+    .text-outline-ink {
+      -webkit-text-stroke: 2px var(--color-ink);
+    }
   }
 
   /* Tactile press micro-interaction */
@@ -92,7 +106,7 @@
   }
 
   .atelier-scroll::-webkit-scrollbar-thumb {
-    background: rgba(86, 30, 31, 0.25);
+    background: rgba(22, 33, 44, 0.24);
     border-radius: 999px;
   }
 

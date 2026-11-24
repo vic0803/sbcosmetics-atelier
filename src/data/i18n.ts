@@ -14,7 +14,7 @@ const UK = {
 
   // Hero
   "hero.subtitle":
-    "Сертифіковані формули малих партій на основі CO₂-екстрактів, гіалуронової кислоти та холоднопресованих рослинних олій.",
+    "Ми поєднуємо рослинні екстракти та натуральні олії у формулах для щоденного догляду за шкірою.",
   "hero.ctaPrimary": "Відкрити каталог",
   "hero.ctaSecondary": "Підібрати ритуал за 30 с",
 
@@ -64,7 +64,7 @@ const UK = {
   "catalog.sortPopular": "Популярні",
   "catalog.sortPriceAsc": "Спочатку дешевші",
   "catalog.sortPriceDesc": "Спочатку дорожчі",
-  "catalog.empty": "За обраним фільтром засобів не знайдено.",
+  "catalog.empty": "За обраним фільтром засобів не знайдено",
   "catalog.reset": "Скинути фільтри",
 
   // PDP
@@ -136,7 +136,7 @@ const UK = {
   "footer.contact": "Контакти",
   "footer.hours": "Пн–Пт 9:00–21:00 · Сб 10:00–16:00 · Нд 10:00–14:00",
   "footer.city": "Львів, Україна",
-  "footer.rights": "Усі права захищено.",
+  "footer.rights": "Усі права захищено",
 } as const;
 
 export type TranslationKey = keyof typeof UK;
@@ -153,7 +153,7 @@ const EN: Record<TranslationKey, string> = {
   "nav.menu": "Menu",
 
   "hero.subtitle":
-    "Certified small-batch formulas built with CO₂ plant extracts, hyaluronic acid, and cold-pressed botanical oils.",
+    "We blend botanical extracts and natural oils into our everyday skincare formulas.",
   "hero.ctaPrimary": "Explore Collection",
   "hero.ctaSecondary": "30-Sec Ritual Finder",
 
@@ -200,7 +200,7 @@ const EN: Record<TranslationKey, string> = {
   "catalog.sortPopular": "Most Popular",
   "catalog.sortPriceAsc": "Price: Low to High",
   "catalog.sortPriceDesc": "Price: High to Low",
-  "catalog.empty": "No formulas match this filter yet.",
+  "catalog.empty": "No formulas match this filter yet",
   "catalog.reset": "Reset filters",
 
   "pdp.volume": "Volume",
@@ -267,7 +267,7 @@ const EN: Record<TranslationKey, string> = {
   "footer.contact": "Contact",
   "footer.hours": "Mon–Fri 9:00–21:00 · Sat 10:00–16:00 · Sun 10:00–14:00",
   "footer.city": "Lviv, Ukraine",
-  "footer.rights": "All rights reserved.",
+  "footer.rights": "All rights reserved",
 };
 
 export const I18N: Record<Lang, Record<TranslationKey, string>> = {

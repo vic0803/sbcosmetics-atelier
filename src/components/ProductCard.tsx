@@ -1,12 +1,10 @@
 "use client";
 
 import { Heart, Plus } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
 import { getStepLabel, type Product } from "@/data/products";
 import { formatPrice } from "@/lib/format";
-import { LUXURY_EASE } from "./MotionPrimitives";
 
 interface ProductCardProps {
   product: Product;
@@ -17,20 +15,13 @@ interface ProductCardProps {
 export function ProductCard({
   product,
   variant = "light",
-  index = 0,
 }: ProductCardProps) {
   const { lang, t, addProductToCart, toggleWishlist, isWishlisted } = useStore();
   const liked = isWishlisted(product.id);
   const dark = variant === "dark";
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: "some" }}
-      transition={{ duration: 0.55, delay: (index % 4) * 0.06, ease: LUXURY_EASE }}
-      className="group flex h-full flex-col"
-    >
+    <article className="group flex h-full flex-col">
       {/* Crisp 3:4 Studio Frame */}
       <div
         className={`relative aspect-[3/4] w-full overflow-hidden rounded-2xl border transition-all duration-300 ${
@@ -161,6 +152,6 @@ export function ProductCard({
           </span>
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }

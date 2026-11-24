@@ -41,9 +41,14 @@ export const metadata: Metadata = {
   },
 };
 
+const LANG_BOOT_SCRIPT = `try{var l=localStorage.getItem("sb_atelier_lang");if(l==="en"){document.documentElement.lang="en";document.documentElement.dataset.langReady="pending";setTimeout(function(){delete document.documentElement.dataset.langReady;},1500);}}catch(e){}`;
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="uk" className={futura.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: LANG_BOOT_SCRIPT }} />
+      </head>
       <body suppressHydrationWarning>
         <StoreProvider>
           <AppShell>{children}</AppShell>

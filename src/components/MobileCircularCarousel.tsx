@@ -95,7 +95,7 @@ export function MobileCircularCarousel<T>({
         )}
 
         {/* Single Centered Draggable Card */}
-        <div className="w-full max-w-[292px] overflow-hidden">
+        <div className="w-full max-w-[276px] overflow-hidden">
           <AnimatePresence initial={false} custom={direction} mode="popLayout">
             <motion.div
               key={getKey(currentItem)}

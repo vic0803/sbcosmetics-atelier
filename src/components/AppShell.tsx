@@ -14,17 +14,17 @@ import { Toast } from "./Toast";
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <MotionConfig reducedMotion="user">
-      <div className="flex min-h-screen flex-col">
-        <ScrollProgressBar />
-        <Header />
-        <main className="flex-1">{children}</main>
+      <ScrollProgressBar />
+      <Header />
+      <div className="grid min-h-screen grid-cols-1 grid-rows-[1fr_auto]">
+        <main className="min-w-0">{children}</main>
         <Footer />
-        <MobileBottomBar />
-        <MobileMenuDrawer />
-        <CartDrawer />
-        <AccountDrawer />
-        <Toast />
       </div>
+      <MobileBottomBar />
+      <MobileMenuDrawer />
+      <CartDrawer />
+      <AccountDrawer />
+      <Toast />
     </MotionConfig>
   );
 }

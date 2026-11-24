@@ -24,8 +24,6 @@ export function ScrollProgressBar() {
 
 export function Reveal({
   children,
-  delay = 0,
-  y = 22,
   className = "",
 }: {
   children: ReactNode;
@@ -33,17 +31,7 @@ export function Reveal({
   y?: number;
   className?: string;
 }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: "some" }}
-      transition={{ duration: 0.65, delay, ease: LUXURY_EASE }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 export function LineReveal({
@@ -56,7 +44,7 @@ export function LineReveal({
   className?: string;
 }) {
   return (
-    <span className="block overflow-hidden">
+    <span className="block overflow-y-clip">
       <motion.span
         initial={{ y: "105%", opacity: 0 }}
         animate={{ y: "0%", opacity: 1 }}
@@ -81,12 +69,11 @@ export function ParallaxMedia({
     target: ref,
     offset: ["start end", "end start"],
   });
-  const y = useTransform(scrollYProgress, [0, 1], ["-5%", "5%"]);
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.06, 1.01, 1.06]);
+  const y = useTransform(scrollYProgress, [0, 1], ["-3.5%", "3.5%"]);
 
   return (
     <div ref={ref} className={`overflow-hidden ${className}`}>
-      <motion.div style={{ y, scale }} className="h-full w-full will-change-transform">
+      <motion.div style={{ y }} className="h-full w-full scale-[1.07] will-change-transform">
         {children}
       </motion.div>
     </div>
