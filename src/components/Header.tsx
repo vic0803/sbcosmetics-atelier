@@ -149,14 +149,14 @@ export function Header() {
               <img
                 src={assetPath("/assets/logo/wordmark-black.png")}
                 alt="Sophie Bilynska Cosmetics"
-                className={`h-8 w-auto object-contain transition-opacity duration-300 group-hover:opacity-90 ${
+                className={`h-[38px] w-auto object-contain transition-opacity duration-300 group-hover:opacity-90 ${
                   isDarkTheme ? "hidden" : "block"
                 }`}
               />
               <img
                 src={assetPath("/assets/logo/wordmark-white.png")}
                 alt="Sophie Bilynska Cosmetics"
-                className={`h-8 w-auto object-contain transition-opacity duration-300 group-hover:opacity-90 ${
+                className={`h-[38px] w-auto object-contain transition-opacity duration-300 group-hover:opacity-90 ${
                   isDarkTheme ? "block" : "hidden"
                 }`}
               />
@@ -173,14 +173,14 @@ export function Header() {
               <img
                 src={assetPath("/assets/logo/wordmark-black.png")}
                 alt="Sophie Bilynska Cosmetics"
-                className={`h-[25px] w-auto object-contain ${
+                className={`h-[30px] w-auto object-contain ${
                   isDarkTheme ? "hidden" : "block"
                 }`}
               />
               <img
                 src={assetPath("/assets/logo/wordmark-white.png")}
                 alt="Sophie Bilynska Cosmetics"
-                className={`h-[25px] w-auto object-contain ${
+                className={`h-[30px] w-auto object-contain ${
                   isDarkTheme ? "block" : "hidden"
                 }`}
               />
