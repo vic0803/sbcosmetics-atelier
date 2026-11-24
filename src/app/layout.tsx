@@ -29,7 +29,11 @@ export const metadata: Metadata = {
   description:
     "Сертифікована натуральна косметика ручної роботи зі Львова. Створена сертифікованим технологом зі 100% еко-складників та прозорим INCI.",
   icons: {
-    icon: assetPath("/assets/logo/monogram.png"),
+    icon: [
+      { url: assetPath("/favicon.svg"), type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "48x48" },
+    ],
+    apple: "/apple-icon.png",
   },
   openGraph: {
     type: "website",

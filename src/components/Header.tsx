@@ -144,33 +144,19 @@ export function Header() {
             <Link
               href="/"
               aria-label="Sophie Bilynska Atelier"
-              className="group hidden items-center gap-3 lg:flex"
+              className="group hidden items-center lg:flex"
             >
-              <img
-                src={assetPath("/assets/logo/monogram-black.png")}
-                alt="Sophie Bilynska monogram"
-                className={`h-8 w-8 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105 ${
-                  isDarkTheme ? "hidden" : "block"
-                }`}
-              />
-              <img
-                src={assetPath("/assets/logo/monogram-white.png")}
-                alt="Sophie Bilynska monogram"
-                className={`h-8 w-8 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105 ${
-                  isDarkTheme ? "block" : "hidden"
-                }`}
-              />
               <img
                 src={assetPath("/assets/logo/wordmark-black.png")}
                 alt="Sophie Bilynska Cosmetics"
-                className={`h-7 w-auto object-contain transition-opacity duration-300 group-hover:opacity-90 ${
+                className={`h-8 w-auto object-contain transition-opacity duration-300 group-hover:opacity-90 ${
                   isDarkTheme ? "hidden" : "block"
                 }`}
               />
               <img
                 src={assetPath("/assets/logo/wordmark-white.png")}
                 alt="Sophie Bilynska Cosmetics"
-                className={`h-7 w-auto object-contain transition-opacity duration-300 group-hover:opacity-90 ${
+                className={`h-8 w-auto object-contain transition-opacity duration-300 group-hover:opacity-90 ${
                   isDarkTheme ? "block" : "hidden"
                 }`}
               />
@@ -182,33 +168,19 @@ export function Header() {
             <Link
               href="/"
               aria-label="Sophie Bilynska Atelier"
-              className="flex items-center gap-2 lg:hidden"
+              className="flex items-center lg:hidden"
             >
-              <img
-                src={assetPath("/assets/logo/monogram-black.png")}
-                alt="Sophie Bilynska monogram"
-                className={`h-7 w-7 shrink-0 object-contain ${
-                  isDarkTheme ? "hidden" : "block"
-                }`}
-              />
-              <img
-                src={assetPath("/assets/logo/monogram-white.png")}
-                alt="Sophie Bilynska monogram"
-                className={`h-7 w-7 shrink-0 object-contain ${
-                  isDarkTheme ? "block" : "hidden"
-                }`}
-              />
               <img
                 src={assetPath("/assets/logo/wordmark-black.png")}
                 alt="Sophie Bilynska Cosmetics"
-                className={`h-[22px] w-auto object-contain ${
+                className={`h-[25px] w-auto object-contain ${
                   isDarkTheme ? "hidden" : "block"
                 }`}
               />
               <img
                 src={assetPath("/assets/logo/wordmark-white.png")}
                 alt="Sophie Bilynska Cosmetics"
-                className={`h-[22px] w-auto object-contain ${
+                className={`h-[25px] w-auto object-contain ${
                   isDarkTheme ? "block" : "hidden"
                 }`}
               />
