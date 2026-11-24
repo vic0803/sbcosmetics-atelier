@@ -14,23 +14,23 @@ export function Footer() {
       className="border-t border-surface/10 bg-ink text-pearl pb-safe-nav"
     >
       <div className="mx-auto max-w-[1440px] px-5 pt-14 pb-12 sm:px-8 lg:px-12 lg:pt-20">
-        {/* Brand Crest & Wordmark Logo in White */}
+        {/* Brand Crest & Wordmark Logo in White (Horizontal Sequence: Emblem Left + Wordmark Right) */}
         <div className="flex flex-col items-center border-b border-pearl/12 pb-10 text-center lg:pb-14">
           <Link
             href="/"
-            className="group inline-flex flex-col items-center transition-opacity hover:opacity-90"
+            className="group inline-flex flex-col items-center justify-center gap-4 transition-opacity hover:opacity-90 sm:flex-row sm:gap-6 lg:gap-8"
           >
-            {/* Circular Botanical Monogram Emblem */}
+            {/* Circular Botanical Monogram Emblem (enlarged +50%) */}
             <img
               src={assetPath("/assets/logo/monogram-white.png")}
               alt="Sophie Bilynska Monogram"
-              className="h-16 w-16 object-contain transition-transform duration-300 group-hover:scale-105 sm:h-20 sm:w-20 lg:h-24 lg:w-24"
+              className="h-24 w-24 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105 sm:h-28 sm:w-28 lg:h-36 lg:w-36"
             />
-            {/* Official Brand Wordmark Logo */}
+            {/* Official Brand Wordmark Logo (enlarged 3x) */}
             <img
               src={assetPath("/assets/logo/wordmark-white.png")}
               alt="Sophie Bilynska Cosmetics"
-              className="mt-4 h-8 w-auto object-contain sm:mt-5 sm:h-10 lg:mt-6 lg:h-12"
+              className="h-20 w-auto max-w-[85vw] object-contain sm:h-24 sm:max-w-none lg:h-32 xl:h-36"
             />
           </Link>
 
