@@ -70,11 +70,12 @@ export function Header() {
 
   const isDarkTheme = scrolled && (sectionTheme === "navy" || sectionTheme === "sapphire");
 
-  // 3 essential primary nav links on desktop: Catalog, Ritual & Atelier
+  // Primary nav links on desktop: Catalog, Ritual, Atelier & Journal
   const navLinks = [
     { href: "/catalog", label: t("nav.catalog"), match: (p: string) => p === "/catalog" },
     { href: "/quiz", label: t("nav.quiz"), match: (p: string) => p.startsWith("/quiz") },
     { href: "/atelier", label: t("nav.atelier"), match: (p: string) => p.startsWith("/atelier") },
+    { href: "/journal", label: t("nav.journal"), match: (p: string) => p.startsWith("/journal") },
   ];
 
   const navBarClass = scrolled
