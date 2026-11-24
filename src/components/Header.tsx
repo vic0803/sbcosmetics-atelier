@@ -70,15 +70,10 @@ export function Header() {
 
   const isDarkTheme = scrolled && (sectionTheme === "navy" || sectionTheme === "sapphire");
 
-  // Only 4 clean primary nav links on desktop for maximum luxury breathing room
+  // 3 essential primary nav links on desktop: Catalog, Ritual & Atelier
   const navLinks = [
     { href: "/catalog", label: t("nav.catalog"), match: (p: string) => p === "/catalog" },
     { href: "/quiz", label: t("nav.quiz"), match: (p: string) => p.startsWith("/quiz") },
-    {
-      href: "/catalog?category=sets",
-      label: t("common.sets"),
-      match: () => false,
-    },
     { href: "/atelier", label: t("nav.atelier"), match: (p: string) => p.startsWith("/atelier") },
   ];
 
