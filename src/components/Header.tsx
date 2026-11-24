@@ -143,16 +143,37 @@ export function Header() {
 
             <Link
               href="/"
-              className="group hidden items-center gap-2.5 lg:flex"
+              aria-label="Sophie Bilynska Atelier"
+              className="group hidden items-center gap-3 lg:flex"
             >
               <img
-                src={assetPath("/assets/logo/monogram.png")}
+                src={assetPath("/assets/logo/monogram-black.png")}
                 alt="Sophie Bilynska monogram"
-                className="h-8 w-8 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105"
+                className={`h-8 w-8 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105 ${
+                  isDarkTheme ? "hidden" : "block"
+                }`}
               />
-              <span className="whitespace-nowrap text-[19px] font-bold tracking-[0.15em] uppercase">
-                Sophie Bilynska
-              </span>
+              <img
+                src={assetPath("/assets/logo/monogram-white.png")}
+                alt="Sophie Bilynska monogram"
+                className={`h-8 w-8 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105 ${
+                  isDarkTheme ? "block" : "hidden"
+                }`}
+              />
+              <img
+                src={assetPath("/assets/logo/wordmark-black.png")}
+                alt="Sophie Bilynska Cosmetics"
+                className={`h-7 w-auto object-contain transition-opacity duration-300 group-hover:opacity-90 ${
+                  isDarkTheme ? "hidden" : "block"
+                }`}
+              />
+              <img
+                src={assetPath("/assets/logo/wordmark-white.png")}
+                alt="Sophie Bilynska Cosmetics"
+                className={`h-7 w-auto object-contain transition-opacity duration-300 group-hover:opacity-90 ${
+                  isDarkTheme ? "block" : "hidden"
+                }`}
+              />
             </Link>
           </div>
 
@@ -160,9 +181,37 @@ export function Header() {
           <div className="flex justify-center">
             <Link
               href="/"
-              className="whitespace-nowrap text-[16px] font-bold tracking-[0.15em] uppercase lg:hidden"
+              aria-label="Sophie Bilynska Atelier"
+              className="flex items-center gap-2 lg:hidden"
             >
-              Sophie Bilynska
+              <img
+                src={assetPath("/assets/logo/monogram-black.png")}
+                alt="Sophie Bilynska monogram"
+                className={`h-7 w-7 shrink-0 object-contain ${
+                  isDarkTheme ? "hidden" : "block"
+                }`}
+              />
+              <img
+                src={assetPath("/assets/logo/monogram-white.png")}
+                alt="Sophie Bilynska monogram"
+                className={`h-7 w-7 shrink-0 object-contain ${
+                  isDarkTheme ? "block" : "hidden"
+                }`}
+              />
+              <img
+                src={assetPath("/assets/logo/wordmark-black.png")}
+                alt="Sophie Bilynska Cosmetics"
+                className={`h-[22px] w-auto object-contain ${
+                  isDarkTheme ? "hidden" : "block"
+                }`}
+              />
+              <img
+                src={assetPath("/assets/logo/wordmark-white.png")}
+                alt="Sophie Bilynska Cosmetics"
+                className={`h-[22px] w-auto object-contain ${
+                  isDarkTheme ? "block" : "hidden"
+                }`}
+              />
             </Link>
 
             <nav
