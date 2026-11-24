@@ -173,25 +173,26 @@ export function HomeClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const heroTextBlur = useTransform(heroExit, [0, 0.5], [0, 14]);
+  // Uniform upward lift from scroll 0; fade/blur starts only when next section covers 1/3 screen (heroExit >= 0.33)
+  const heroTextY = useTransform(heroExit, [0, 0.70], [0, -96]);
+  const heroTextBlur = useTransform(heroExit, [0.46, 0.70], [0, 14]);
   const heroTextFilter = useMotionTemplate`blur(${heroTextBlur}px)`;
-  const heroTextOpacity = useTransform(heroExit, [0.05, 0.55], [1, 0]);
-  const heroTextY = useTransform(heroExit, [0, 0.6], [0, -56]);
+  const heroTextOpacity = useTransform(heroExit, [0.46, 0.70], [1, 0]);
 
-  // CTA buttons lift strictly upward and blur, completing slightly faster than text
-  const heroCtaBlur = useTransform(heroExit, [0, 0.38], [0, 14]);
+  // Buttons lift together with text from scroll 0, begin fading/blurring strictly at 1/3 screen cover (0.33)
+  const heroCtaY = useTransform(heroExit, [0, 0.60], [0, -84]);
+  const heroCtaBlur = useTransform(heroExit, [0.33, 0.52], [0, 14]);
   const heroCtaFilter = useMotionTemplate`blur(${heroCtaBlur}px)`;
-  const heroCtaOpacity = useTransform(heroExit, [0.02, 0.38], [1, 0]);
-  const heroCtaY = useTransform(heroExit, [0, 0.45], [0, -50]);
+  const heroCtaOpacity = useTransform(heroExit, [0.33, 0.52], [1, 0]);
 
-  const heroLinkBlur = useTransform(heroExit, [0.02, 0.40], [0, 14]);
+  const heroLinkY = useTransform(heroExit, [0, 0.60], [0, -84]);
+  const heroLinkBlur = useTransform(heroExit, [0.34, 0.53], [0, 14]);
   const heroLinkFilter = useMotionTemplate`blur(${heroLinkBlur}px)`;
-  const heroLinkOpacity = useTransform(heroExit, [0.04, 0.40], [1, 0]);
-  const heroLinkY = useTransform(heroExit, [0, 0.48], [0, -52]);
+  const heroLinkOpacity = useTransform(heroExit, [0.34, 0.53], [1, 0]);
 
-  const heroProofOpacity = useTransform(heroExit, [0, 0.22], [1, 0]);
-  const heroProofY = useTransform(heroExit, [0, 0.25], [0, -20]);
-  const heroVeilOpacity = useTransform(heroExit, [0.25, 1], [0, 0.22]);
+  const heroProofOpacity = useTransform(heroExit, [0.15, 0.32], [1, 0]);
+  const heroProofY = useTransform(heroExit, [0, 0.33], [0, -30]);
+  const heroVeilOpacity = useTransform(heroExit, [0.30, 1], [0, 0.22]);
 
   const heroTextStyle = prefersReducedMotion
     ? undefined
