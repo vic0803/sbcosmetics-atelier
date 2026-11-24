@@ -173,43 +173,69 @@ export function HomeClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 1:1 synchronous upward scroll lift locked to the incoming lower section
-  const heroScrollLift = useTransform(scrollY, (s) => -s);
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
-  // 1. Eyebrow "Handmade Eco Cosmetics · Lviv" dissolves softly right at the start of scroll [0, 0.18]
-  const heroEyebrowBlur = useTransform(heroExit, [0, 0.18], [0, 8]);
-  const heroEyebrowFilter = useMotionTemplate`blur(${heroEyebrowBlur}px)`;
-  const heroEyebrowOpacity = useTransform(heroExit, [0, 0.18], [1, 0]);
-  const heroEyebrowY = useTransform(heroExit, [0, 0.20], [0, -20]);
+  // --- DESKTOP ANIMATION: subtle float upward (-56px/-50px) with immediate fade/blur on scroll ---
+  const desktopTextBlur = useTransform(heroExit, [0, 0.50], [0, 14]);
+  const desktopTextFilter = useMotionTemplate`blur(${desktopTextBlur}px)`;
+  const desktopTextOpacity = useTransform(heroExit, [0.05, 0.55], [1, 0]);
+  const desktopTextY = useTransform(heroExit, [0, 0.60], [0, -56]);
 
-  // 2. Buttons lift 1:1 with lower section, begin fading/blurring strictly when lower section covers 25% (heroExit >= 0.25)
-  const heroCtaBlur = useTransform(heroExit, [0.25, 0.42], [0, 14]);
-  const heroCtaFilter = useMotionTemplate`blur(${heroCtaBlur}px)`;
-  const heroCtaOpacity = useTransform(heroExit, [0.25, 0.42], [1, 0]);
+  const desktopCtaBlur = useTransform(heroExit, [0, 0.38], [0, 14]);
+  const desktopCtaFilter = useMotionTemplate`blur(${desktopCtaBlur}px)`;
+  const desktopCtaOpacity = useTransform(heroExit, [0.02, 0.38], [1, 0]);
+  const desktopCtaY = useTransform(heroExit, [0, 0.45], [0, -50]);
 
-  // 3. Main title lifts 1:1 with lower section, begins fading/blurring after buttons (heroExit >= 0.38)
-  const heroTitleBlur = useTransform(heroExit, [0.38, 0.58], [0, 14]);
-  const heroTitleFilter = useMotionTemplate`blur(${heroTitleBlur}px)`;
-  const heroTitleOpacity = useTransform(heroExit, [0.38, 0.58], [1, 0]);
+  // --- MOBILE ANIMATION: 1:1 synchronous upward scroll lift, fading strictly at 25% (buttons) and 38% (title) ---
+  const mobileScrollLift = useTransform(scrollY, (s) => -s);
+
+  const mobileEyebrowBlur = useTransform(heroExit, [0, 0.18], [0, 8]);
+  const mobileEyebrowFilter = useMotionTemplate`blur(${mobileEyebrowBlur}px)`;
+  const mobileEyebrowOpacity = useTransform(heroExit, [0, 0.18], [1, 0]);
+  const mobileEyebrowY = useTransform(heroExit, [0, 0.20], [0, -20]);
+
+  const mobileCtaBlur = useTransform(heroExit, [0.25, 0.42], [0, 14]);
+  const mobileCtaFilter = useMotionTemplate`blur(${mobileCtaBlur}px)`;
+  const mobileCtaOpacity = useTransform(heroExit, [0.25, 0.42], [1, 0]);
+
+  const mobileTitleBlur = useTransform(heroExit, [0.38, 0.58], [0, 14]);
+  const mobileTitleFilter = useMotionTemplate`blur(${mobileTitleBlur}px)`;
+  const mobileTitleOpacity = useTransform(heroExit, [0.38, 0.58], [1, 0]);
 
   const heroProofOpacity = useTransform(heroExit, [0, 0.20], [1, 0]);
   const heroVeilOpacity = useTransform(heroExit, [0.25, 1], [0, 0.22]);
 
+  // Combined styles conditionally bound to viewport mode
   const heroEyebrowStyle = prefersReducedMotion
     ? undefined
-    : { filter: heroEyebrowFilter, opacity: heroEyebrowOpacity, y: heroEyebrowY };
+    : isDesktop
+      ? { filter: desktopTextFilter, opacity: desktopTextOpacity, y: desktopTextY }
+      : { filter: mobileEyebrowFilter, opacity: mobileEyebrowOpacity, y: mobileEyebrowY };
 
   const heroTitleStyle = prefersReducedMotion
     ? undefined
-    : { filter: heroTitleFilter, opacity: heroTitleOpacity, y: heroScrollLift };
+    : isDesktop
+      ? { filter: desktopTextFilter, opacity: desktopTextOpacity, y: desktopTextY }
+      : { filter: mobileTitleFilter, opacity: mobileTitleOpacity, y: mobileScrollLift };
 
   const heroCtaStyle = prefersReducedMotion
     ? undefined
-    : { filter: heroCtaFilter, opacity: heroCtaOpacity, y: heroScrollLift };
+    : isDesktop
+      ? { filter: desktopCtaFilter, opacity: desktopCtaOpacity, y: desktopCtaY }
+      : { filter: mobileCtaFilter, opacity: mobileCtaOpacity, y: mobileScrollLift };
 
   const heroProofStyle = prefersReducedMotion
     ? undefined
-    : { opacity: heroProofOpacity, y: heroScrollLift };
+    : isDesktop
+      ? { opacity: heroProofOpacity, y: desktopTextY }
+      : { opacity: heroProofOpacity, y: mobileScrollLift };
   // Act 2: Inline category showcase tab
   const [showcaseTab, setShowcaseTab] = useState<ShowcaseTab>("hits");
   // Act 4: Inline interactive quiz selection
