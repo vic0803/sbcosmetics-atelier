@@ -3,6 +3,7 @@
 import { ArrowUpRight, Instagram, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
+import { assetPath } from "@/lib/assets";
 
 export function Footer() {
   const { t, lang, openOverlay } = useStore();
@@ -13,15 +14,27 @@ export function Footer() {
       className="border-t border-surface/10 bg-ink text-pearl pb-safe-nav"
     >
       <div className="mx-auto max-w-[1440px] px-5 pt-14 pb-12 sm:px-8 lg:px-12 lg:pt-20">
-        {/* Magazine-scale full-width wordmark */}
-        <div className="border-b border-pearl/12 pb-10 lg:pb-14">
+        {/* Brand Crest & Wordmark Logo in White */}
+        <div className="flex flex-col items-center border-b border-pearl/12 pb-10 text-center lg:pb-14">
           <Link
             href="/"
-            className="block text-center font-display text-[clamp(2rem,8.4vw,7.4rem)] leading-[0.9] font-bold tracking-[0.06em] text-pearl uppercase transition-colors hover:text-accent"
+            className="group inline-flex flex-col items-center transition-opacity hover:opacity-90"
           >
-            Sophie Bilynska
+            {/* Circular Botanical Monogram Emblem */}
+            <img
+              src={assetPath("/assets/logo/monogram-white.png")}
+              alt="Sophie Bilynska Monogram"
+              className="h-16 w-16 object-contain transition-transform duration-300 group-hover:scale-105 sm:h-20 sm:w-20 lg:h-24 lg:w-24"
+            />
+            {/* Official Brand Wordmark Logo */}
+            <img
+              src={assetPath("/assets/logo/wordmark-white.png")}
+              alt="Sophie Bilynska Cosmetics"
+              className="mt-4 h-8 w-auto object-contain sm:mt-5 sm:h-10 lg:mt-6 lg:h-12"
+            />
           </Link>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-semibold tracking-[0.2em] text-accent uppercase">
+
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-semibold tracking-[0.2em] text-accent uppercase sm:mt-6">
             <span>Botanical Skincare Atelier</span>
             <span>·</span>
             <span>{t("footer.city")}</span>
