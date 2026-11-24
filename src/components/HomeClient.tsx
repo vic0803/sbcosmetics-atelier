@@ -173,39 +173,43 @@ export function HomeClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Uniform upward lift from scroll 0; fade/blur starts only when next section covers 1/3 screen (heroExit >= 0.33)
-  const heroTextY = useTransform(heroExit, [0, 0.70], [0, -96]);
-  const heroTextBlur = useTransform(heroExit, [0.46, 0.70], [0, 14]);
-  const heroTextFilter = useMotionTemplate`blur(${heroTextBlur}px)`;
-  const heroTextOpacity = useTransform(heroExit, [0.46, 0.70], [1, 0]);
+  // 1:1 synchronous upward scroll lift locked to the incoming lower section
+  const heroScrollLift = useTransform(scrollY, (s) => -s);
 
-  // Buttons lift together with text from scroll 0, begin fading/blurring strictly at 1/3 screen cover (0.33)
-  const heroCtaY = useTransform(heroExit, [0, 0.60], [0, -84]);
-  const heroCtaBlur = useTransform(heroExit, [0.33, 0.52], [0, 14]);
+  // 1. Eyebrow "Handmade Eco Cosmetics · Lviv" dissolves softly right at the start of scroll [0, 0.18]
+  const heroEyebrowBlur = useTransform(heroExit, [0, 0.18], [0, 8]);
+  const heroEyebrowFilter = useMotionTemplate`blur(${heroEyebrowBlur}px)`;
+  const heroEyebrowOpacity = useTransform(heroExit, [0, 0.18], [1, 0]);
+  const heroEyebrowY = useTransform(heroExit, [0, 0.20], [0, -20]);
+
+  // 2. Buttons lift 1:1 with lower section, begin fading/blurring strictly when lower section covers 25% (heroExit >= 0.25)
+  const heroCtaBlur = useTransform(heroExit, [0.25, 0.42], [0, 14]);
   const heroCtaFilter = useMotionTemplate`blur(${heroCtaBlur}px)`;
-  const heroCtaOpacity = useTransform(heroExit, [0.33, 0.52], [1, 0]);
+  const heroCtaOpacity = useTransform(heroExit, [0.25, 0.42], [1, 0]);
 
-  const heroLinkY = useTransform(heroExit, [0, 0.60], [0, -84]);
-  const heroLinkBlur = useTransform(heroExit, [0.34, 0.53], [0, 14]);
-  const heroLinkFilter = useMotionTemplate`blur(${heroLinkBlur}px)`;
-  const heroLinkOpacity = useTransform(heroExit, [0.34, 0.53], [1, 0]);
+  // 3. Main title lifts 1:1 with lower section, begins fading/blurring after buttons (heroExit >= 0.38)
+  const heroTitleBlur = useTransform(heroExit, [0.38, 0.58], [0, 14]);
+  const heroTitleFilter = useMotionTemplate`blur(${heroTitleBlur}px)`;
+  const heroTitleOpacity = useTransform(heroExit, [0.38, 0.58], [1, 0]);
 
-  const heroProofOpacity = useTransform(heroExit, [0.15, 0.32], [1, 0]);
-  const heroProofY = useTransform(heroExit, [0, 0.33], [0, -30]);
-  const heroVeilOpacity = useTransform(heroExit, [0.30, 1], [0, 0.22]);
+  const heroProofOpacity = useTransform(heroExit, [0, 0.20], [1, 0]);
+  const heroVeilOpacity = useTransform(heroExit, [0.25, 1], [0, 0.22]);
 
-  const heroTextStyle = prefersReducedMotion
+  const heroEyebrowStyle = prefersReducedMotion
     ? undefined
-    : { filter: heroTextFilter, opacity: heroTextOpacity, y: heroTextY };
+    : { filter: heroEyebrowFilter, opacity: heroEyebrowOpacity, y: heroEyebrowY };
+
+  const heroTitleStyle = prefersReducedMotion
+    ? undefined
+    : { filter: heroTitleFilter, opacity: heroTitleOpacity, y: heroScrollLift };
+
   const heroCtaStyle = prefersReducedMotion
     ? undefined
-    : { filter: heroCtaFilter, opacity: heroCtaOpacity, y: heroCtaY };
-  const heroLinkStyle = prefersReducedMotion
-    ? undefined
-    : { filter: heroLinkFilter, opacity: heroLinkOpacity, y: heroLinkY };
+    : { filter: heroCtaFilter, opacity: heroCtaOpacity, y: heroScrollLift };
+
   const heroProofStyle = prefersReducedMotion
     ? undefined
-    : { opacity: heroProofOpacity, y: heroProofY };
+    : { opacity: heroProofOpacity, y: heroScrollLift };
   // Act 2: Inline category showcase tab
   const [showcaseTab, setShowcaseTab] = useState<ShowcaseTab>("hits");
   // Act 4: Inline interactive quiz selection
@@ -298,7 +302,7 @@ export function HomeClient() {
           {/* Copy Column: Mobile = centered eyebrow + left-edge title + centered CTAs; Desktop = flush-aligned to the "S" of SOPHIE BILYNSKA (lg: 32+32+10=74px, xl: 40+32+10=82px) */}
           <div className="pointer-events-auto relative z-10 flex h-full min-h-0 flex-col justify-between px-5 pb-[86px] pt-[100px] text-ink sm:px-8 lg:col-span-6 lg:items-start lg:pb-6 lg:pl-[74px] lg:pr-4 lg:pt-[112px] xl:pl-[82px] 2xl:pb-10 2xl:pt-[136px]">
             {/* Mobile-only top masthead eyebrow centered cleanly beneath the header */}
-            <motion.div style={heroTextStyle} className="flex justify-center lg:hidden">
+            <motion.div style={heroEyebrowStyle} className="flex justify-center will-change-[filter,opacity,transform] lg:hidden">
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -317,122 +321,119 @@ export function HomeClient() {
             <div className="w-full max-w-[640px] lg:flex lg:h-full lg:flex-col lg:justify-between">
               {/* Top Editorial Group: Desktop Eyebrow + Monumental Stacked Headline + Desktop Subtitle */}
               <div>
-                {/* Text group blurs, lifts and dissolves as the next section rises over the hero */}
-                <motion.div style={heroTextStyle} className="will-change-[filter,opacity,transform]">
-                {/* Desktop eyebrow (aligned above headline with signature gold rule) */}
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease: LUXURY_EASE }}
-                  className="eyebrow hidden items-center gap-2.5 text-ink/75 lg:inline-flex"
-                >
-                  <span className="h-[1.5px] w-7 bg-accent" />
-                  <span>
-                    {lang === "uk"
-                      ? "Еко-косметика ручної роботи · Львів"
-                      : "Handmade Eco Cosmetics · Lviv"}
-                  </span>
-                </motion.p>
-
-                {/* Editorial Vertical Stacked Headline (One Unified Size Scale across UA & EN: 2.55rem Mobile, clamp(3.4rem,min(6.8vw,9.4svh),9rem) Desktop) */}
-                <h1
-                  className={`font-display text-[2.55rem] leading-[1.06] font-bold uppercase lg:mt-4 lg:text-[clamp(3.4rem,min(6.8vw,9.4svh),9rem)] lg:leading-[0.96] ${
-                    lang === "uk" ? "tracking-[-0.005em]" : "tracking-[-0.015em]"
-                  }`}
-                >
-                  {lang === "uk" ? (
-                    <>
-                      <LineReveal delay={0.06} className="text-ink">
-                        Ніжність
-                      </LineReveal>
-                      <LineReveal delay={0.11} className="text-ink">
-                        природи
-                      </LineReveal>
-                      <LineReveal delay={0.16} className="text-ink">
-                        у
-                      </LineReveal>
-                      <LineReveal
-                        delay={0.21}
-                        className="text-outline-ink mt-[0.06em] px-[2px] -mx-[2px] py-[0.02em] tracking-[0.045em]"
-                      >
-                        кожному
-                      </LineReveal>
-                      <LineReveal
-                        delay={0.26}
-                        className="text-outline-ink mt-[0.06em] px-[2px] -mx-[2px] py-[0.02em] tracking-[0.045em]"
-                      >
-                        дотику
-                      </LineReveal>
-                    </>
-                  ) : (
-                    <>
-                      <LineReveal delay={0.06} className="text-ink">
-                        Nature
-                      </LineReveal>
-                      <LineReveal delay={0.11} className="text-ink">
-                        in
-                      </LineReveal>
-                      <LineReveal delay={0.16} className="text-ink">
-                        every
-                      </LineReveal>
-                      <LineReveal
-                        delay={0.21}
-                        className="text-outline-ink mt-[0.06em] px-[2px] -mx-[2px] py-[0.02em] tracking-[0.03em]"
-                      >
-                        gentle
-                      </LineReveal>
-                      <LineReveal
-                        delay={0.26}
-                        className="text-outline-ink mt-[0.06em] px-[2px] -mx-[2px] py-[0.02em] tracking-[0.03em]"
-                      >
-                        touch
-                      </LineReveal>
-                    </>
-                  )}
-                </h1>
-
-                {/* Subtitle shown on desktop: 24–27px, 450px measure, 2x vertical breathing room (40px top, 56px bottom to CTAs) */}
-                <motion.p
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.28, ease: LUXURY_EASE }}
-                  className="mt-5 hidden max-w-[450px] text-[24px] leading-[1.35] text-ink-soft lg:mt-[min(40px,4svh)] lg:block xl:text-[27px]"
-                >
-                  {t("hero.subtitle")}
-                </motion.p>
+                {/* Desktop eyebrow (dissolves softly at start of scroll) */}
+                <motion.div style={heroEyebrowStyle} className="hidden will-change-[filter,opacity,transform] lg:block">
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: LUXURY_EASE }}
+                    className="eyebrow hidden items-center gap-2.5 text-ink/75 lg:inline-flex"
+                  >
+                    <span className="h-[1.5px] w-7 bg-accent" />
+                    <span>
+                      {lang === "uk"
+                        ? "Еко-косметика ручної роботи · Львів"
+                        : "Handmade Eco Cosmetics · Lviv"}
+                    </span>
+                  </motion.p>
                 </motion.div>
 
-                {/* Primary CTA + Ritual Link: 56px below subtitle on tall desktops (compresses on short laptop screens), +30% larger desktop button type (16px / 15.5px) & +10% larger mobile type (13.2px) */}
-                <motion.div
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.36, ease: LUXURY_EASE }}
-                  className="mt-6 flex flex-col items-center gap-3.5 lg:mt-[min(56px,5.2svh)] lg:flex-row lg:items-center lg:gap-6 xl:gap-8"
-                >
-                  {/* Primary CTA lifts upward and blurs on scroll */}
-                  <motion.div style={heroCtaStyle} className="flex w-full justify-center will-change-[filter,opacity,transform] lg:w-auto">
-                  <Link
-                    href="/catalog"
-                    className="btn-tactile inline-flex min-h-[54px] w-full max-w-[300px] shrink-0 items-center justify-center gap-3 whitespace-nowrap rounded-full bg-ink px-7 py-3.5 text-[13.2px] font-bold tracking-[0.16em] text-surface uppercase shadow-lg hover:bg-accent hover:text-ink lg:min-h-[62px] lg:w-auto lg:max-w-none lg:px-8 lg:py-4 lg:text-[16px] xl:px-10"
+                {/* Main Headline & Subtitle lift 1:1 with lower section, dissolving past 25% */}
+                <motion.div style={heroTitleStyle} className="will-change-[filter,opacity,transform]">
+                  <h1
+                    className={`font-display text-[2.55rem] leading-[1.06] font-bold uppercase lg:mt-4 lg:text-[clamp(3.4rem,min(6.8vw,9.4svh),9rem)] lg:leading-[0.96] ${
+                      lang === "uk" ? "tracking-[-0.005em]" : "tracking-[-0.015em]"
+                    }`}
                   >
-                    <span>{lang === "uk" ? "Обрати догляд" : "Explore Collection"}</span>
-                    <ArrowRight className="h-4 w-4 shrink-0 lg:h-5 lg:w-5" strokeWidth={2.2} />
-                  </Link>
-                  </motion.div>
+                    {lang === "uk" ? (
+                      <>
+                        <LineReveal delay={0.06} className="text-ink">
+                          Ніжність
+                        </LineReveal>
+                        <LineReveal delay={0.11} className="text-ink">
+                          природи
+                        </LineReveal>
+                        <LineReveal delay={0.16} className="text-ink">
+                          у
+                        </LineReveal>
+                        <LineReveal
+                          delay={0.21}
+                          className="text-outline-ink mt-[0.06em] px-[2px] -mx-[2px] py-[0.02em] tracking-[0.045em]"
+                        >
+                          кожному
+                        </LineReveal>
+                        <LineReveal
+                          delay={0.26}
+                          className="text-outline-ink mt-[0.06em] px-[2px] -mx-[2px] py-[0.02em] tracking-[0.045em]"
+                        >
+                          дотику
+                        </LineReveal>
+                      </>
+                    ) : (
+                      <>
+                        <LineReveal delay={0.06} className="text-ink">
+                          Nature
+                        </LineReveal>
+                        <LineReveal delay={0.11} className="text-ink">
+                          in
+                        </LineReveal>
+                        <LineReveal delay={0.16} className="text-ink">
+                          every
+                        </LineReveal>
+                        <LineReveal
+                          delay={0.21}
+                          className="text-outline-ink mt-[0.06em] px-[2px] -mx-[2px] py-[0.02em] tracking-[0.03em]"
+                        >
+                          gentle
+                        </LineReveal>
+                        <LineReveal
+                          delay={0.26}
+                          className="text-outline-ink mt-[0.06em] px-[2px] -mx-[2px] py-[0.02em] tracking-[0.03em]"
+                        >
+                          touch
+                        </LineReveal>
+                      </>
+                    )}
+                  </h1>
 
-                  {/* Secondary ritual link lifts upward and blurs */}
-                  <motion.div style={heroLinkStyle} className="flex justify-center will-change-[filter,opacity,transform]">
-                  <a
-                    href="#ritual-finder"
-                    className="group inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap py-1 text-[13.2px] font-bold tracking-[0.14em] text-ink uppercase transition-colors hover:text-accent lg:py-2 lg:text-[15.5px]"
+                  {/* Subtitle shown on desktop: 24–27px */}
+                  <motion.p
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.28, ease: LUXURY_EASE }}
+                    className="mt-5 hidden max-w-[450px] text-[24px] leading-[1.35] text-ink-soft lg:mt-[min(40px,4svh)] lg:block xl:text-[27px]"
                   >
-                    <Sparkles className="h-4 w-4 text-accent lg:h-[18px] lg:w-[18px]" strokeWidth={2} />
-                    <span className="border-b border-ink/40 pb-0.5 group-hover:border-accent">
-                      {lang === "uk" ? "Пройти підбір за 30 с" : "30-Sec Ritual Finder"}
-                    </span>
-                    <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 lg:h-[18px] lg:w-[18px]" />
-                  </a>
-                  </motion.div>
+                    {t("hero.subtitle")}
+                  </motion.p>
+                </motion.div>
+
+                {/* Primary CTA + Ritual Link: lift synchronously with bottom section, begin fading at 25% */}
+                <motion.div
+                  style={heroCtaStyle}
+                  className="mt-6 flex flex-col items-center gap-3.5 will-change-[filter,opacity,transform] lg:mt-[min(56px,5.2svh)] lg:flex-row lg:items-center lg:gap-6 xl:gap-8"
+                >
+                  <div className="flex w-full justify-center lg:w-auto">
+                    <Link
+                      href="/catalog"
+                      className="btn-tactile inline-flex min-h-[54px] w-full max-w-[300px] shrink-0 items-center justify-center gap-3 whitespace-nowrap rounded-full bg-ink px-7 py-3.5 text-[13.2px] font-bold tracking-[0.16em] text-surface uppercase shadow-lg hover:bg-accent hover:text-ink lg:min-h-[62px] lg:w-auto lg:max-w-none lg:px-8 lg:py-4 lg:text-[16px] xl:px-10"
+                    >
+                      <span>{lang === "uk" ? "Обрати догляд" : "Explore Collection"}</span>
+                      <ArrowRight className="h-4 w-4 shrink-0 lg:h-5 lg:w-5" strokeWidth={2.2} />
+                    </Link>
+                  </div>
+
+                  <div className="flex justify-center">
+                    <a
+                      href="#ritual-finder"
+                      className="group inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap py-1 text-[13.2px] font-bold tracking-[0.14em] text-ink uppercase transition-colors hover:text-accent lg:py-2 lg:text-[15.5px]"
+                    >
+                      <Sparkles className="h-4 w-4 text-accent lg:h-[18px] lg:w-[18px]" strokeWidth={2} />
+                      <span className="border-b border-ink/40 pb-0.5 group-hover:border-accent">
+                        {lang === "uk" ? "Пройти підбір за 30 с" : "30-Sec Ritual Finder"}
+                      </span>
+                      <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 lg:h-[18px] lg:w-[18px]" />
+                    </a>
+                  </div>
                 </motion.div>
               </div>
 
