@@ -274,7 +274,7 @@ export function Header() {
               type="button"
               onClick={() => openOverlay("account")}
               aria-label={t("nav.account")}
-              className={`btn-tactile relative hidden h-10 w-10 items-center justify-center rounded-full lg:flex ${
+              className={`btn-tactile relative hidden h-10 w-10 items-center justify-center rounded-none lg:flex ${
                 isDarkTheme
                   ? "text-pearl hover:bg-pearl/10"
                   : "text-ink hover:bg-ink/5"
@@ -284,29 +284,29 @@ export function Header() {
               {user && (
                 <span
                   aria-hidden="true"
-                  className={`absolute right-2 top-2 h-2 w-2 rounded-full bg-accent ring-2 ${
+                  className={`absolute right-2 top-2 h-2 w-2 rounded-none bg-accent ring-2 ${
                     isDarkTheme ? "ring-ink" : "ring-surface"
                   }`}
                 />
               )}
             </button>
 
-            {/* Desktop Cart trigger (mobile already has Bag in MobileBottomBar) */}
+            {/* Desktop Cart trigger (sharp 90° architectural button matching global design system) */}
             <button
               type="button"
               onClick={() => openOverlay("cart")}
               aria-label={t("nav.cart")}
-              className={`btn-tactile relative hidden h-10 items-center gap-2 rounded-full px-4 lg:flex ${
+              className={`btn-tactile group relative hidden h-10 items-center gap-2.5 rounded-none border px-4 lg:flex ${
                 isDarkTheme
-                  ? "bg-pearl text-ink hover:bg-accent hover:text-ink"
-                  : "bg-ink text-surface hover:bg-accent hover:text-ink"
+                  ? "border-pearl/25 bg-transparent text-pearl hover:border-accent hover:bg-accent hover:text-ink"
+                  : "border-ink bg-ink text-surface hover:border-accent hover:bg-accent hover:text-ink"
               }`}
             >
-              <ShoppingBag className="h-[16px] w-[16px]" strokeWidth={1.8} />
+              <ShoppingBag className="h-[15px] w-[15px]" strokeWidth={1.8} />
               <span className="text-[12px] font-semibold tracking-[0.12em] uppercase">
                 {t("nav.cart")}
               </span>
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[10px] font-bold text-ink">
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-none bg-accent px-1.5 text-[10px] font-bold text-ink transition-colors group-hover:bg-ink group-hover:text-pearl">
                 {cartCount}
               </span>
             </button>
