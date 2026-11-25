@@ -12,9 +12,9 @@ export function Footer() {
     <footer
       data-header-theme="navy"
       data-hide-mobile-header="true"
-      className="flex min-h-[100svh] flex-col border-t border-pearl/10 bg-ink text-pearl pb-safe-nav lg:block lg:min-h-0"
+      className="flex min-h-[100svh] flex-col border-t border-pearl/10 bg-ink pb-[calc(56px+env(safe-area-inset-bottom,0px))] text-pearl lg:block lg:min-h-0 lg:pb-0"
     >
-      <div className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col justify-between px-8 pt-12 pb-5 sm:px-10 lg:block lg:px-12 lg:pt-16 lg:pb-12">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col justify-between px-8 pt-8 pb-7 sm:px-10 lg:block lg:px-12 lg:pt-16 lg:pb-12">
         <div>
           {/* Top Concierge Band: Personal Technologist + Message on Telegram */}
           <div className="flex flex-col items-start justify-between gap-4 border-b border-pearl/12 pb-6 lg:flex-row lg:items-center lg:gap-8 lg:pb-12">
@@ -45,15 +45,15 @@ export function Footer() {
           </div>
 
           {/* Brand Crest & Wordmark Logo in White (Centered Stacked on Mobile, Horizontal on sm+) */}
-          <div className="flex flex-col items-center border-b border-pearl/12 pt-3 pb-6 text-center lg:py-12">
+          <div className="flex flex-col items-center border-b border-pearl/12 py-5 text-center lg:py-12">
             <Link
               href="/"
-              className="group inline-flex flex-col items-center justify-center gap-3 transition-opacity hover:opacity-90 sm:flex-row sm:gap-6 lg:gap-8"
+              className="group inline-flex flex-col items-center justify-center gap-5 transition-opacity hover:opacity-90 sm:flex-row sm:gap-6 lg:gap-8"
             >
               <img
                 src={assetPath("/assets/logo/monogram-white.png")}
                 alt="Sophie Bilynska Monogram"
-                className="h-24 w-24 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105 sm:h-28 sm:w-28 lg:h-36 lg:w-36"
+                className="h-[172px] w-[172px] shrink-0 object-contain transition-transform duration-300 group-hover:scale-105 sm:h-36 sm:w-36 lg:h-36 lg:w-36"
               />
               <img
                 src={assetPath("/assets/logo/wordmark-white.png")}
@@ -64,11 +64,13 @@ export function Footer() {
           </div>
         </div>
 
-        {/* 4 Clean Columns (Compact on Mobile) */}
-        <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4 lg:mt-12 lg:gap-12">
+        {/* 4 Clean Columns (Balanced 4+4 / 3+3 on Mobile, 16px Headings, 18px Links) */}
+        <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4 lg:mt-12 lg:gap-12">
           <div>
-            <p className="eyebrow text-accent">{t("footer.shop")}</p>
-            <ul className="mt-2 space-y-1.5 text-[13px] text-pearl/75 sm:text-sm lg:mt-4 lg:space-y-2.5">
+            <p className="text-[16px] leading-none font-semibold tracking-[0.14em] text-accent uppercase lg:text-[0.72rem] lg:tracking-[0.18em]">
+              {t("footer.shop")}
+            </p>
+            <ul className="mt-2 space-y-1 text-[18px] leading-[1.2] text-pearl/85 lg:mt-4 lg:space-y-2.5 lg:text-sm lg:leading-normal">
               <li>
                 <Link href="/catalog" className="hover:text-pearl">
                   {t("nav.catalog")}
@@ -89,20 +91,14 @@ export function Footer() {
                   {lang === "uk" ? "Волосся" : "Hair"}
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/catalog?category=sets"
-                  className="text-accent hover:text-pearl"
-                >
-                  {t("common.sets")}
-                </Link>
-              </li>
             </ul>
           </div>
 
           <div>
-            <p className="eyebrow text-accent">{t("footer.brand")}</p>
-            <ul className="mt-2 space-y-1.5 text-[13px] text-pearl/75 sm:text-sm lg:mt-4 lg:space-y-2.5">
+            <p className="text-[16px] leading-none font-semibold tracking-[0.14em] text-accent uppercase lg:text-[0.72rem] lg:tracking-[0.18em]">
+              {t("footer.brand")}
+            </p>
+            <ul className="mt-2 space-y-1 text-[18px] leading-[1.2] text-pearl/85 lg:mt-4 lg:space-y-2.5 lg:text-sm lg:leading-normal">
               <li>
                 <Link href="/atelier" className="hover:text-pearl">
                   {t("nav.atelier")}
@@ -127,10 +123,10 @@ export function Footer() {
           </div>
 
           <div>
-            <p className="eyebrow text-accent">
+            <p className="text-[16px] leading-none font-semibold tracking-[0.14em] text-accent uppercase lg:text-[0.72rem] lg:tracking-[0.18em]">
               {lang === "uk" ? "Клієнтам" : "Client Care"}
             </p>
-            <ul className="mt-2 space-y-1.5 text-[13px] text-pearl/75 sm:text-sm lg:mt-4 lg:space-y-2.5">
+            <ul className="mt-2 space-y-1 text-[18px] leading-[1.2] text-pearl/85 lg:mt-4 lg:space-y-2.5 lg:text-sm lg:leading-normal">
               <li>
                 <button
                   type="button"
@@ -158,42 +154,44 @@ export function Footer() {
           </div>
 
           <div>
-            <p className="eyebrow text-accent">{t("footer.contact")}</p>
-            <ul className="mt-2 space-y-1.5 text-[13px] text-pearl/75 sm:text-sm lg:mt-4 lg:space-y-3">
+            <p className="text-[16px] leading-none font-semibold tracking-[0.14em] text-accent uppercase lg:text-[0.72rem] lg:tracking-[0.18em]">
+              {t("footer.contact")}
+            </p>
+            <ul className="mt-2 space-y-1 text-[18px] leading-[1.2] text-pearl/85 lg:mt-4 lg:space-y-3 lg:text-sm lg:leading-normal">
               <li className="flex items-center gap-2">
                 <Phone
-                  className="h-3.5 w-3.5 shrink-0 text-accent sm:h-4 sm:w-4"
+                  className="h-4 w-4 shrink-0 text-accent"
                   strokeWidth={1.6}
                 />
                 <a
                   href="tel:+380631790642"
-                  className="whitespace-nowrap hover:text-pearl"
+                  className="text-[17px] whitespace-nowrap hover:text-pearl lg:text-sm"
                 >
                   +380 (63) 179-06-42
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <Instagram
-                  className="h-3.5 w-3.5 shrink-0 text-accent sm:h-4 sm:w-4"
+                  className="h-4 w-4 shrink-0 text-accent"
                   strokeWidth={1.6}
                 />
                 <a
                   href="https://www.instagram.com/sb.cosm/"
                   target="_blank"
                   rel="noreferrer"
-                  className="whitespace-nowrap hover:text-pearl"
+                  className="hover:text-pearl"
                 >
                   @sb.cosm
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <Mail
-                  className="h-3.5 w-3.5 shrink-0 text-accent sm:h-4 sm:w-4"
+                  className="h-4 w-4 shrink-0 text-accent"
                   strokeWidth={1.6}
                 />
                 <a
                   href="mailto:sb.cosm@gmail.com"
-                  className="whitespace-nowrap hover:text-pearl"
+                  className="hover:text-pearl"
                 >
                   sb.cosm@gmail.com
                 </a>
@@ -203,7 +201,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Strip: Working Hours (single line) & Copyright */}
-        <div className="mt-5 flex flex-col items-start justify-between gap-1.5 border-t border-pearl/10 pt-3.5 text-xs text-pearl/55 sm:flex-row sm:items-center lg:mt-12 lg:pt-6">
+        <div className="mt-3 flex flex-col items-start justify-between gap-1 border-t border-pearl/10 pt-3 text-xs text-pearl/55 sm:flex-row sm:items-center lg:mt-12 lg:gap-1.5 lg:pt-6">
           <p className="text-[11px] tracking-[0.04em] text-pearl/70 sm:text-xs">
             {t("footer.hours")}
           </p>
