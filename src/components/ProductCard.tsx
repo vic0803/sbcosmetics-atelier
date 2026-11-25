@@ -10,6 +10,7 @@ interface ProductCardProps {
   product: Product;
   variant?: "light" | "dark";
   layout?: "classic" | "editorial";
+  density?: "default" | "compact";
   fillHeight?: boolean;
   heightClassName?: string;
   index?: number;
@@ -19,6 +20,7 @@ export function ProductCard({
   product,
   variant = "light",
   layout = "classic",
+  density = "default",
   fillHeight = false,
   heightClassName,
 }: ProductCardProps) {
@@ -27,6 +29,7 @@ export function ProductCard({
   const dark = variant === "dark";
 
   if (layout === "editorial") {
+    const compact = density === "compact";
     const resolvedHeightClass =
       heightClassName ??
       (fillHeight ? "h-[58svh] min-h-[480px] max-h-[600px]" : "aspect-[3/4]");
@@ -62,9 +65,19 @@ export function ProductCard({
         </Link>
 
         {/* TOP ZONE: High-contrast Dark Navy Editorial Badge + Bare Heart */}
-        <div className="pointer-events-none relative z-10 flex items-center justify-between gap-2 p-4 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] sm:p-5 lg:-translate-y-3 lg:p-6 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
+        <div
+          className={`pointer-events-none relative z-10 flex items-center justify-between gap-2 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] lg:-translate-y-3 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100 ${
+            compact ? "p-4 sm:p-5" : "p-4 sm:p-5 lg:p-6"
+          }`}
+        >
           {product.badge ? (
-            <span className="border-l-2 border-accent bg-ink/95 px-3.5 py-1.5 text-[13px] leading-none font-bold tracking-[0.18em] text-accent uppercase">
+            <span
+              className={`border-l-2 border-accent bg-ink/95 leading-none font-bold text-accent uppercase ${
+                compact
+                  ? "px-3 py-1.5 text-[11px] tracking-[0.16em] sm:text-[12px]"
+                  : "px-3.5 py-1.5 text-[13px] tracking-[0.18em]"
+              }`}
+            >
               {product.badge === "bestseller"
                 ? lang === "uk"
                   ? "Хіт"
@@ -72,7 +85,13 @@ export function ProductCard({
                 : "New"}
             </span>
           ) : (
-            <span className="bg-ink/85 px-3.5 py-1.5 text-[12px] leading-none font-semibold tracking-[0.14em] text-pearl/90 uppercase">
+            <span
+              className={`bg-ink/85 leading-none font-semibold text-pearl/90 uppercase ${
+                compact
+                  ? "px-3 py-1.5 text-[11px] tracking-[0.14em]"
+                  : "px-3.5 py-1.5 text-[12px] tracking-[0.14em]"
+              }`}
+            >
               {product.variants[0]?.label[lang]}
             </span>
           )}
@@ -94,7 +113,11 @@ export function ProductCard({
         </div>
 
         {/* BOTTOM ZONE: White Name + Aqua Price (turns white on desktop hover); Step & Tagline lift cleanly higher on hover */}
-        <div className="pointer-events-none relative z-10 mt-auto p-4 sm:p-5 lg:p-6">
+        <div
+          className={`pointer-events-none relative z-10 mt-auto ${
+            compact ? "p-4 sm:p-5" : "p-4 sm:p-5 lg:p-6"
+          }`}
+        >
           {/* Step & Volume (expands smoothly above title on desktop hover) */}
           <div className="grid grid-rows-[1fr] transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] lg:grid-rows-[0fr] lg:opacity-0 lg:group-hover:grid-rows-[1fr] lg:group-hover:opacity-100">
             <div className="overflow-hidden">
@@ -105,13 +128,15 @@ export function ProductCard({
             </div>
           </div>
 
-          {/* Product Name (always crisp white, 32px semibold on desktop) */}
+          {/* Product Name (always crisp white, semibold) */}
           <Link
             href={`/product/${product.id}`}
             className={`pointer-events-auto block line-clamp-2 font-display leading-[1.08] font-semibold text-pearl transition-colors ${
-              fillHeight
-                ? "text-2xl sm:text-2xl lg:text-[32px]"
-                : "text-xl sm:text-2xl lg:text-[32px]"
+              compact
+                ? "text-2xl sm:text-[22px] lg:text-[24px] xl:text-[26px]"
+                : fillHeight
+                  ? "text-2xl sm:text-2xl lg:text-[32px]"
+                  : "text-xl sm:text-2xl lg:text-[32px]"
             }`}
           >
             {product.line ? product.line[lang] : product.name[lang]}
@@ -120,19 +145,31 @@ export function ProductCard({
           {/* Short Tagline (expands smoothly below title and lifts text block generously above price on desktop hover) */}
           <div className="grid grid-rows-[1fr] transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] lg:grid-rows-[0fr] lg:opacity-0 lg:delay-75 lg:group-hover:grid-rows-[1fr] lg:group-hover:opacity-100">
             <div className="overflow-hidden">
-              <p className="mt-1.5 mb-2 line-clamp-2 text-xs leading-relaxed text-pearl/82 lg:mb-7 lg:text-[13px]">
+              <p
+                className={`mt-1.5 mb-2 line-clamp-2 text-xs leading-relaxed text-pearl/82 lg:text-[13px] ${
+                  compact ? "lg:mb-6" : "lg:mb-7"
+                }`}
+              >
                 {product.shortTagline[lang]}
               </p>
             </div>
           </div>
 
-          {/* Price (aqua at rest, transitions to white on desktop hover; flush bottom-left 24px) + Two Equal 40x40 Square Buttons */}
+          {/* Price (aqua at rest, transitions to white on desktop hover) + Two Equal 40x40 Square Buttons */}
           <div className="mt-1.5 flex items-end justify-between gap-3">
-            <span className="text-lg leading-none font-semibold tracking-wide text-accent transition-colors duration-300 lg:text-xl lg:group-hover:text-pearl">
+            <span
+              className={`leading-none font-semibold tracking-wide text-accent transition-colors duration-300 lg:group-hover:text-pearl ${
+                compact ? "text-lg lg:text-[19px]" : "text-lg lg:text-xl"
+              }`}
+            >
               {formatPrice(product.price, lang)}
             </span>
 
-            <div className="pointer-events-auto flex items-center gap-2 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] lg:absolute lg:right-6 lg:bottom-6 lg:translate-y-3 lg:opacity-0 lg:delay-75 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
+            <div
+              className={`pointer-events-auto flex items-center gap-2 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] lg:absolute lg:translate-y-3 lg:opacity-0 lg:delay-75 lg:group-hover:translate-y-0 lg:group-hover:opacity-100 ${
+                compact ? "lg:right-5 lg:bottom-5" : "lg:right-6 lg:bottom-6"
+              }`}
+            >
               <button
                 type="button"
                 onClick={() => addProductToCart(product.id, 1, 0)}
