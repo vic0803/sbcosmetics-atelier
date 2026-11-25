@@ -61,10 +61,10 @@ export function ProductCard({
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-ink/96 via-ink/72 to-transparent transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:opacity-0 lg:group-hover:opacity-100" />
         </Link>
 
-        {/* TOP ZONE: Editorial Badge (no pill) + Bare Heart (no circle) — glides down on desktop hover */}
+        {/* TOP ZONE: High-contrast Dark Navy Editorial Badge + Bare Heart */}
         <div className="pointer-events-none relative z-10 flex items-center justify-between gap-2 p-4 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] sm:p-5 lg:-translate-y-3 lg:p-6 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
           {product.badge ? (
-            <span className="border-l-2 border-accent pl-2.5 text-[11px] font-bold tracking-[0.2em] text-accent uppercase">
+            <span className="border-l-2 border-accent bg-ink/95 px-3.5 py-1.5 text-[13px] leading-none font-bold tracking-[0.18em] text-accent uppercase">
               {product.badge === "bestseller"
                 ? lang === "uk"
                   ? "Хіт"
@@ -72,7 +72,7 @@ export function ProductCard({
                 : "New"}
             </span>
           ) : (
-            <span className="border-l border-pearl/35 pl-2.5 text-[10px] font-semibold tracking-[0.16em] text-pearl/85 uppercase">
+            <span className="bg-ink/85 px-3.5 py-1.5 text-[12px] leading-none font-semibold tracking-[0.14em] text-pearl/90 uppercase">
               {product.variants[0]?.label[lang]}
             </span>
           )}
@@ -81,19 +81,19 @@ export function ProductCard({
             type="button"
             onClick={() => toggleWishlist(product.id)}
             aria-label={liked ? t("common.removedFromWishlist") : t("common.savedToWishlist")}
-            className={`btn-tactile pointer-events-auto flex h-9 w-9 items-center justify-center transition-colors ${
-              liked ? "text-accent" : "text-pearl/85 hover:text-accent"
+            className={`btn-tactile pointer-events-auto flex h-9 w-9 items-center justify-center drop-shadow-[0_1px_4px_rgba(14,22,30,0.5)] transition-colors ${
+              liked ? "text-accent" : "text-pearl hover:text-accent"
             }`}
           >
             <Heart
               className="h-5 w-5"
-              strokeWidth={1.7}
+              strokeWidth={1.75}
               fill={liked ? "currentColor" : "none"}
             />
           </button>
         </div>
 
-        {/* BOTTOM ZONE: Name + Price always visible; Step, Tagline & Equal 40x40 Square Buttons smoothly expand on desktop hover */}
+        {/* BOTTOM ZONE: White Name + Aqua Price (turns white on desktop hover); Step & Tagline lift cleanly higher on hover */}
         <div className="pointer-events-none relative z-10 mt-auto p-4 sm:p-5 lg:p-6">
           {/* Step & Volume (expands smoothly above title on desktop hover) */}
           <div className="grid grid-rows-[1fr] transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] lg:grid-rows-[0fr] lg:opacity-0 lg:group-hover:grid-rows-[1fr] lg:group-hover:opacity-100">
@@ -105,10 +105,10 @@ export function ProductCard({
             </div>
           </div>
 
-          {/* Product Name (always visible, 32px semibold in glacial aqua on desktop) */}
+          {/* Product Name (always crisp white, 32px semibold on desktop) */}
           <Link
             href={`/product/${product.id}`}
-            className={`pointer-events-auto block line-clamp-2 font-display leading-[1.08] font-semibold text-accent transition-colors hover:text-pearl ${
+            className={`pointer-events-auto block line-clamp-2 font-display leading-[1.08] font-semibold text-pearl transition-colors ${
               fillHeight
                 ? "text-2xl sm:text-2xl lg:text-[32px]"
                 : "text-xl sm:text-2xl lg:text-[32px]"
@@ -117,18 +117,18 @@ export function ProductCard({
             {product.line ? product.line[lang] : product.name[lang]}
           </Link>
 
-          {/* Short Tagline (expands smoothly below title on desktop hover) */}
+          {/* Short Tagline (expands smoothly below title and lifts text block generously above price on desktop hover) */}
           <div className="grid grid-rows-[1fr] transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] lg:grid-rows-[0fr] lg:opacity-0 lg:delay-75 lg:group-hover:grid-rows-[1fr] lg:group-hover:opacity-100">
             <div className="overflow-hidden">
-              <p className="mt-1.5 mb-2 line-clamp-2 text-xs leading-relaxed text-pearl/80 lg:text-[13px]">
+              <p className="mt-1.5 mb-2 line-clamp-2 text-xs leading-relaxed text-pearl/82 lg:mb-7 lg:text-[13px]">
                 {product.shortTagline[lang]}
               </p>
             </div>
           </div>
 
-          {/* Price (flush bottom-left so left & bottom inset are identical 24px) + Two Equal 40x40 Square Buttons */}
+          {/* Price (aqua at rest, transitions to white on desktop hover; flush bottom-left 24px) + Two Equal 40x40 Square Buttons */}
           <div className="mt-1.5 flex items-end justify-between gap-3">
-            <span className="text-lg leading-none font-semibold tracking-wide text-pearl lg:text-xl">
+            <span className="text-lg leading-none font-semibold tracking-wide text-accent transition-colors duration-300 lg:text-xl lg:group-hover:text-pearl">
               {formatPrice(product.price, lang)}
             </span>
 

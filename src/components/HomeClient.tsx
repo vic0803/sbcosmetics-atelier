@@ -1149,22 +1149,22 @@ export function HomeClient() {
                             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[36%] bg-gradient-to-t from-ink/90 via-ink/45 to-transparent" />
                             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-ink/96 via-ink/72 to-transparent opacity-0 transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100" />
 
-                            {/* Top badge glides down on hover */}
+                            {/* Top badge glides down on hover (dark navy high-contrast tag) */}
                             <div className="relative z-10 flex -translate-y-3 items-center justify-between p-6 opacity-0 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100">
-                              <span className="border-l-2 border-accent pl-2.5 text-[11px] font-bold tracking-[0.2em] text-accent uppercase">
+                              <span className="border-l-2 border-accent bg-ink/95 px-3.5 py-1.5 text-[13px] leading-none font-bold tracking-[0.18em] text-accent uppercase">
                                 {bundle.badge[lang]}
                               </span>
                             </div>
 
-                            {/* Bottom zone: Name (32px semibold aqua) + Price (flush bottom-left) always visible; Description + Square 40x40 + button smoothly reveal on hover */}
+                            {/* Bottom zone: White Name + Aqua Price (turns white on hover); Description lifts generously on hover */}
                             <div className="relative z-10 mt-auto p-6">
-                              <h3 className="line-clamp-2 font-display text-[32px] leading-[1.08] font-semibold text-accent">
+                              <h3 className="line-clamp-2 font-display text-[32px] leading-[1.08] font-semibold text-pearl">
                                 {bundle.name[lang]}
                               </h3>
 
                               <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-400 delay-75 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:grid-rows-[1fr] group-hover:opacity-100">
                                 <div className="overflow-hidden">
-                                  <p className="mt-1.5 mb-2 line-clamp-2 text-[13px] leading-relaxed text-pearl/80">
+                                  <p className="mt-1.5 mb-7 line-clamp-2 text-[13px] leading-relaxed text-pearl/82">
                                     {bundle.subtitle[lang]}
                                   </p>
                                 </div>
@@ -1172,7 +1172,7 @@ export function HomeClient() {
 
                               <div className="mt-1.5 flex items-end justify-between gap-3">
                                 <div className="flex items-baseline gap-2 leading-none">
-                                  <span className="text-xl leading-none font-semibold text-pearl">
+                                  <span className="text-xl leading-none font-semibold text-accent transition-colors duration-300 group-hover:text-pearl">
                                     {formatPrice(bundle.bundlePrice, lang)}
                                   </span>
                                   <span className="text-xs leading-none text-pearl/50 line-through">
