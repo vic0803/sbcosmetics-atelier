@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Plus } from "lucide-react";
+import { ArrowUpRight, Heart, Plus } from "lucide-react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
 import { getStepLabel, type Product } from "@/data/products";
@@ -9,16 +9,152 @@ import { formatPrice } from "@/lib/format";
 interface ProductCardProps {
   product: Product;
   variant?: "light" | "dark";
+  layout?: "classic" | "editorial";
+  fillHeight?: boolean;
+  heightClassName?: string;
   index?: number;
 }
 
 export function ProductCard({
   product,
   variant = "light",
+  layout = "classic",
+  fillHeight = false,
+  heightClassName,
 }: ProductCardProps) {
   const { lang, t, addProductToCart, toggleWishlist, isWishlisted } = useStore();
   const liked = isWishlisted(product.id);
   const dark = variant === "dark";
+
+  if (layout === "editorial") {
+    const resolvedHeightClass =
+      heightClassName ??
+      (fillHeight ? "h-[58svh] min-h-[480px] max-h-[600px]" : "aspect-[3/4]");
+
+    return (
+      <article
+        className={`group relative flex w-full flex-col justify-between overflow-hidden rounded-none border-0 bg-espresso ${resolvedHeightClass}`}
+      >
+        {/* Full-bleed clickable photo backdrop: always crisp (zero blur), subtle editorial zoom on hover */}
+        <Link
+          href={`/product/${product.id}`}
+          aria-label={product.name[lang]}
+          draggable={false}
+          className="absolute inset-0 z-0 block overflow-hidden"
+        >
+          <img
+            src={product.image}
+            alt={product.name[lang]}
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            className="h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] lg:group-hover:scale-[1.04]"
+          />
+
+          {/* Top subtle vignette (always on mobile; fades in on desktop hover for badge/heart legibility) */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-ink/45 via-ink/15 to-transparent transition-opacity duration-400 lg:opacity-0 lg:group-hover:opacity-100" />
+
+          {/* Resting short bottom scrim (keeps Name + Price crisp while leaving upper ~70% of photo bright) */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[36%] bg-gradient-to-t from-ink/90 via-ink/45 to-transparent" />
+
+          {/* Expanded hover bottom scrim (always on mobile; smoothly deepens on desktop hover for tagline & buttons) */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-ink/96 via-ink/72 to-transparent transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:opacity-0 lg:group-hover:opacity-100" />
+        </Link>
+
+        {/* TOP ZONE: Editorial Badge (no pill) + Bare Heart (no circle) — glides down on desktop hover */}
+        <div className="pointer-events-none relative z-10 flex items-center justify-between gap-2 p-4 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] sm:p-5 lg:-translate-y-3 lg:p-6 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
+          {product.badge ? (
+            <span className="border-l-2 border-accent pl-2.5 text-[11px] font-bold tracking-[0.2em] text-accent uppercase">
+              {product.badge === "bestseller"
+                ? lang === "uk"
+                  ? "Хіт"
+                  : "Hit"
+                : "New"}
+            </span>
+          ) : (
+            <span className="border-l border-pearl/35 pl-2.5 text-[10px] font-semibold tracking-[0.16em] text-pearl/85 uppercase">
+              {product.variants[0]?.label[lang]}
+            </span>
+          )}
+
+          <button
+            type="button"
+            onClick={() => toggleWishlist(product.id)}
+            aria-label={liked ? t("common.removedFromWishlist") : t("common.savedToWishlist")}
+            className={`btn-tactile pointer-events-auto flex h-9 w-9 items-center justify-center transition-colors ${
+              liked ? "text-accent" : "text-pearl/85 hover:text-accent"
+            }`}
+          >
+            <Heart
+              className="h-5 w-5"
+              strokeWidth={1.7}
+              fill={liked ? "currentColor" : "none"}
+            />
+          </button>
+        </div>
+
+        {/* BOTTOM ZONE: Name + Price always visible; Step, Tagline & Equal 40x40 Square Buttons smoothly expand on desktop hover */}
+        <div className="pointer-events-none relative z-10 mt-auto p-4 sm:p-5 lg:p-6">
+          {/* Step & Volume (expands smoothly above title on desktop hover) */}
+          <div className="grid grid-rows-[1fr] transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] lg:grid-rows-[0fr] lg:opacity-0 lg:group-hover:grid-rows-[1fr] lg:group-hover:opacity-100">
+            <div className="overflow-hidden">
+              <p className="mb-1.5 truncate text-[10px] font-semibold tracking-[0.16em] text-accent uppercase lg:text-[11px]">
+                {getStepLabel(product.ritualStep, lang)}
+                {product.variants[0] ? ` · ${product.variants[0].label[lang]}` : ""}
+              </p>
+            </div>
+          </div>
+
+          {/* Product Name (always visible, 32px semibold in glacial aqua on desktop) */}
+          <Link
+            href={`/product/${product.id}`}
+            className={`pointer-events-auto block line-clamp-2 font-display leading-[1.08] font-semibold text-accent transition-colors hover:text-pearl ${
+              fillHeight
+                ? "text-2xl sm:text-2xl lg:text-[32px]"
+                : "text-xl sm:text-2xl lg:text-[32px]"
+            }`}
+          >
+            {product.line ? product.line[lang] : product.name[lang]}
+          </Link>
+
+          {/* Short Tagline (expands smoothly below title on desktop hover) */}
+          <div className="grid grid-rows-[1fr] transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] lg:grid-rows-[0fr] lg:opacity-0 lg:delay-75 lg:group-hover:grid-rows-[1fr] lg:group-hover:opacity-100">
+            <div className="overflow-hidden">
+              <p className="mt-1.5 mb-2 line-clamp-2 text-xs leading-relaxed text-pearl/80 lg:text-[13px]">
+                {product.shortTagline[lang]}
+              </p>
+            </div>
+          </div>
+
+          {/* Price (flush bottom-left so left & bottom inset are identical 24px) + Two Equal 40x40 Square Buttons */}
+          <div className="mt-1.5 flex items-end justify-between gap-3">
+            <span className="text-lg leading-none font-semibold tracking-wide text-pearl lg:text-xl">
+              {formatPrice(product.price, lang)}
+            </span>
+
+            <div className="pointer-events-auto flex items-center gap-2 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] lg:absolute lg:right-6 lg:bottom-6 lg:translate-y-3 lg:opacity-0 lg:delay-75 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
+              <button
+                type="button"
+                onClick={() => addProductToCart(product.id, 1, 0)}
+                aria-label={t("common.addToCart")}
+                className="btn-tactile flex h-10 w-10 shrink-0 items-center justify-center rounded-none border border-pearl/35 bg-transparent text-pearl hover:border-accent hover:bg-accent hover:text-ink"
+              >
+                <Plus className="h-[18px] w-[18px]" strokeWidth={1.9} />
+              </button>
+
+              <Link
+                href={`/product/${product.id}`}
+                aria-label={t("common.details")}
+                className="btn-tactile flex h-10 w-10 shrink-0 items-center justify-center rounded-none bg-surface text-ink transition-colors hover:bg-accent"
+              >
+                <ArrowUpRight className="h-[18px] w-[18px]" strokeWidth={1.9} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article className="group flex h-full flex-col">
@@ -38,6 +174,7 @@ export function ProductCard({
             src={product.image}
             alt={product.name[lang]}
             loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
           />
         </Link>

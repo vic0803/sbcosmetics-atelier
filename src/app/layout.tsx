@@ -31,9 +31,9 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: assetPath("/favicon.svg"), type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "48x48" },
+      { url: assetPath("/favicon.ico"), sizes: "48x48" },
     ],
-    apple: "/apple-icon.png",
+    apple: assetPath("/apple-icon.png"),
   },
   openGraph: {
     type: "website",

@@ -69,11 +69,11 @@ export function ParallaxMedia({
     target: ref,
     offset: ["start end", "end start"],
   });
-  const y = useTransform(scrollYProgress, [0, 1], ["-3.5%", "3.5%"]);
+  const y = useTransform(scrollYProgress, [0, 1], [-16, 16]);
 
   return (
     <div ref={ref} className={`overflow-hidden ${className}`}>
-      <motion.div style={{ y }} className="h-full w-full scale-[1.07] will-change-transform">
+      <motion.div style={{ y }} className="h-full w-full scale-[1.06] will-change-transform">
         {children}
       </motion.div>
     </div>

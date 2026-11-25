@@ -28,18 +28,26 @@ export function Header() {
 
   useEffect(() => {
     let rafId = 0;
+    let cachedSections: HTMLElement[] = [];
+
+    const refreshSections = () => {
+      cachedSections = Array.from(document.querySelectorAll<HTMLElement>("[data-header-theme]"));
+    };
 
     const sampleHeaderState = () => {
       rafId = 0;
-      setScrolled(window.scrollY > 24);
+      const isScrolledNow = window.scrollY > 24;
+      setScrolled((prev) => (prev === isScrolledNow ? prev : isScrolledNow));
 
+      if (cachedSections.length === 0 || !cachedSections.every((el) => el.isConnected)) {
+        refreshSections();
+      }
       const sampleY = 66; // vertical midpoint of the 68px nav bar below the 32px announcement bar
-      const sections = document.querySelectorAll<HTMLElement>("[data-header-theme]");
       let detected: HeaderTheme = isHome ? "hero" : "paper";
 
       // The Home hero is sticky and later sections slide over it, so several themed
       // elements can overlap the nav bar. Later DOM nodes paint on top: keep the last match.
-      for (const el of sections) {
+      for (const el of cachedSections) {
         const rect = el.getBoundingClientRect();
         if (rect.top <= sampleY && rect.bottom > sampleY) {
           const val = el.dataset.headerTheme as HeaderTheme | undefined;
@@ -58,14 +66,20 @@ export function Header() {
       }
     };
 
+    const onResize = () => {
+      refreshSections();
+      scheduleSample();
+    };
+
+    refreshSections();
     sampleHeaderState();
     window.addEventListener("scroll", scheduleSample, { passive: true });
-    window.addEventListener("resize", scheduleSample, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
       if (rafId) window.cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", scheduleSample);
-      window.removeEventListener("resize", scheduleSample);
+      window.removeEventListener("resize", onResize);
     };
   }, [pathname, isHome]);
 

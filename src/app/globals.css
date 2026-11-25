@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Sophie Bilynska Palette: Deep Slate Navy (#16212C) + Midnight Sapphire (#0E161E) + Warm Porcelain (#F4EFE9) + Satin Gold (#C0A16A) */
+  /* Sophie Bilynska Palette: Deep Slate Navy (#16212C) + Midnight Sapphire (#0E161E) + Warm Porcelain (#F4EFE9) + Mineral Aqua (#2B849E / #7CCBE0) */
   --color-paper: #f4efe9;
   --color-surface: #ffffff;
   --color-surface-soft: #eae3da;
@@ -13,8 +13,8 @@
   --color-espresso: #0e161e;
   --color-muted: #5b656e;
 
-  --color-accent: #c0a16a;
-  --color-accent-soft: #f3ede2;
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
   --color-sage: #3f5246;
   --color-pearl: #ffffff;
 
@@ -24,6 +24,22 @@
 }
 
 @layer base {
+  :root {
+    --accent: #2b849e;
+    --accent-soft: #e8f3f6;
+  }
+
+  /* Adaptive luminous glacial aqua (#7CCBE0) on dark navy/espresso sections & bars */
+  [data-header-theme="navy"],
+  [data-header-theme="sapphire"],
+  .bg-ink,
+  .bg-espresso,
+  .bg-ink\/72,
+  .bg-espresso\/72 {
+    --accent: #7ccbe0;
+    --accent-soft: rgba(124, 203, 224, 0.14);
+  }
+
   html {
     overscroll-behavior-y: none;
     background-color: var(--color-paper);

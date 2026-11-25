@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useSpring } from "motion/react";
+import { motion, type MotionValue } from "motion/react";
 import { useEffect, useRef } from "react";
 import { LUXURY_EASE } from "./MotionPrimitives";
 
@@ -13,8 +13,8 @@ interface SilkVeilHeroProps {
   objectPosition?: [number, number];
   /** Minimum texture X (0..1) where 3D sunlight shimmer activates (keeps text zone clean on wide full-bleed heroes) */
   shimmerMinX?: number;
-  /** Optional ref to the enclosing hero section to track scroll sweep */
-  scrollTargetRef?: React.RefObject<HTMLElement | null>;
+  /** Shared 0..1 hero exit progress MotionValue (avoids duplicate useScroll/useSpring listeners) */
+  scrollProgress?: MotionValue<number>;
 }
 
 const VERT_SRC = `
@@ -193,49 +193,59 @@ export function SilkVeilHero({
   imgClassName = "",
   objectPosition = [0.5, 0.2],
   shimmerMinX = 0,
-  scrollTargetRef,
+  scrollProgress,
 }: SilkVeilHeroProps) {
   const objPosX = objectPosition[0];
   const objPosY = objectPosition[1];
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const scrollTargetValRef = useRef(0);
   const scrollValRef = useRef(0);
   const mouseTargetRef = useRef({ x: 0.62, y: 0.48 });
   const mouseCurrRef = useRef({ x: 0.62, y: 0.48 });
 
-  // Track hero scroll progress smoothly with spring physics for sunlight sweep only (no portrait zoom)
-  const { scrollYProgress } = useScroll({
-    target: scrollTargetRef ?? containerRef,
-    offset: ["start start", "end start"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 26,
-    restDelta: 0.0005,
-  });
-
   useEffect(() => {
-    return smoothProgress.on("change", (v) => {
-      scrollValRef.current = v;
+    if (!scrollProgress) return;
+    scrollTargetValRef.current = scrollProgress.get();
+    return scrollProgress.on("change", (v) => {
+      scrollTargetValRef.current = v;
     });
-  }, [smoothProgress]);
+  }, [scrollProgress]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // The hero renders a mobile and a desktop instance (one is display:none). Defer all GPU
+    // work until this canvas is actually laid out, so the hidden twin never spins a WebGL loop.
+    let teardown: (() => void) | null = null;
+    const tryInit = () => {
+      if (teardown || canvas.clientWidth === 0 || canvas.clientHeight === 0) return;
+      teardown = initVeil(canvas);
+    };
+    const visibilityRo = new ResizeObserver(tryInit);
+    visibilityRo.observe(canvas);
+    tryInit();
+
+    return () => {
+      visibilityRo.disconnect();
+      teardown?.();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [src, objPosX, objPosY, shimmerMinX]);
+
+  function initVeil(canvas: HTMLCanvasElement): (() => void) | null {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const gl = canvas.getContext("webgl", {
       alpha: true,
       premultipliedAlpha: true,
-      antialias: true,
+      antialias: false,
       powerPreference: "high-performance",
     });
 
     if (!gl) {
       canvas.dataset.veilState = "no-webgl";
-      return;
+      return null;
     }
 
     const compile = (type: number, source: string) => {
@@ -255,18 +265,18 @@ export function SilkVeilHero({
     const fs = compile(gl.FRAGMENT_SHADER, FRAG_SRC);
     if (!vs || !fs) {
       canvas.dataset.veilState = "shader-error";
-      return;
+      return null;
     }
 
     const prog = gl.createProgram();
-    if (!prog) return;
+    if (!prog) return null;
     gl.attachShader(prog, vs);
     gl.attachShader(prog, fs);
     gl.linkProgram(prog);
     if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
       console.error("SilkVeilHero link error:", gl.getProgramInfoLog(prog));
       canvas.dataset.veilState = "link-error";
-      return;
+      return null;
     }
 
     gl.useProgram(prog);
@@ -309,13 +319,31 @@ export function SilkVeilHero({
     let disposed = false;
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload = () => {
+    img.decoding = "async";
+    img.onload = async () => {
       if (disposed) return;
       imgSize.w = img.naturalWidth || 682;
       imgSize.h = img.naturalHeight || 1024;
+      // The shader only needs soft luminance relief: upload a small, off-thread-decoded copy
+      // instead of the full-resolution portrait (avoids a long main-thread texture upload).
+      let source: TexImageSource = img;
+      try {
+        if (typeof createImageBitmap === "function") {
+          const targetW = Math.min(640, imgSize.w);
+          source = await createImageBitmap(img, {
+            resizeWidth: targetW,
+            resizeHeight: Math.round((imgSize.h / imgSize.w) * targetW),
+            resizeQuality: "medium",
+          });
+        }
+      } catch {
+        source = img;
+      }
+      if (disposed) return;
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+      if (source instanceof ImageBitmap) source.close();
     };
     img.src = src;
 
@@ -336,10 +364,11 @@ export function SilkVeilHero({
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
-      const rect = canvas.getBoundingClientRect();
-      const w = Math.max(1, Math.round(rect.width * dpr));
-      const h = Math.max(1, Math.round(rect.height * dpr));
+      // Soft caustic glow: render at reduced resolution and let the compositor upscale.
+      // Full-DPR full-bleed shading was the main per-frame GPU cost on scroll.
+      const scale = Math.min(window.devicePixelRatio || 1, 1) * 0.6;
+      const w = Math.max(1, Math.round(canvas.clientWidth * scale));
+      const h = Math.max(1, Math.round(canvas.clientHeight * scale));
       if (canvas.width !== w || canvas.height !== h) {
         canvas.width = w;
         canvas.height = h;
@@ -351,19 +380,32 @@ export function SilkVeilHero({
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
 
+    // Pause the loop whenever the hero is off-screen or the tab is hidden.
+    let inView = true;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inView = entry.isIntersecting;
+        if (inView && !rafId && !reduceMotion) rafId = requestAnimationFrame(render);
+      },
+      { threshold: 0 }
+    );
+    io.observe(canvas);
+
     let rafId = 0;
     const start = performance.now();
 
     const render = (now: number) => {
-      // Sticky hero stays mounted under the page: skip GPU work once later sections fully cover it
-      if (!reduceMotion && window.scrollY > window.innerHeight * 1.05) {
-        rafId = requestAnimationFrame(render);
+      rafId = 0;
+      // Sticky hero stays mounted under the page: stop GPU work once later sections cover it
+      if (!reduceMotion && (!inView || document.hidden || window.scrollY > window.innerHeight * 1.05)) {
+        if (inView) rafId = requestAnimationFrame(render);
         return;
       }
 
       const elapsed = reduceMotion ? 1.4 : (now - start) * 0.001;
 
-      // Smooth pointer inertia
+      // Smooth scroll & pointer inertia (zero Framer Motion useSpring overhead)
+      scrollValRef.current += (scrollTargetValRef.current - scrollValRef.current) * 0.1;
       mouseCurrRef.current.x += (mouseTargetRef.current.x - mouseCurrRef.current.x) * 0.07;
       mouseCurrRef.current.y += (mouseTargetRef.current.y - mouseCurrRef.current.y) * 0.07;
 
@@ -387,13 +429,14 @@ export function SilkVeilHero({
       disposed = true;
       cancelAnimationFrame(rafId);
       ro.disconnect();
+      io.disconnect();
       gl.deleteTexture(tex);
       gl.deleteBuffer(buf);
       gl.deleteProgram(prog);
       gl.deleteShader(vs);
       gl.deleteShader(fs);
     };
-  }, [src, objPosX, objPosY, shimmerMinX]);
+  }
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();

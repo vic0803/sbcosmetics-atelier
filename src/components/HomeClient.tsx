@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeft,
   ArrowRight,
   ArrowUpRight,
   Check,
@@ -15,7 +16,6 @@ import {
 import {
   AnimatePresence,
   motion,
-  useMotionTemplate,
   useMotionValue,
   useMotionValueEvent,
   useReducedMotion,
@@ -23,8 +23,7 @@ import {
   useTransform,
 } from "motion/react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { MobileCircularCarousel } from "@/components/MobileCircularCarousel";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   LineReveal,
   LUXURY_EASE,
@@ -143,6 +142,187 @@ const INLINE_QUIZ_GOALS: {
   },
 ];
 
+/** Native horizontal full-screen snap-scroll deck for mobile Act 2 (zero arrows, live progress pill/lines). */
+function MobileSwipeDeck<T>({
+  items,
+  getKey,
+  renderItem,
+  resetKey,
+}: {
+  items: T[];
+  getKey: (item: T) => string;
+  renderItem: (item: T, idx: number) => ReactNode;
+  resetKey: string;
+}) {
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    setActiveIdx(0);
+    if (scrollerRef.current) {
+      scrollerRef.current.scrollTo({ left: 0, behavior: "instant" as ScrollBehavior });
+    }
+  }, [resetKey]);
+
+  const syncIndexFromScroll = () => {
+    const el = scrollerRef.current;
+    if (!el || el.clientWidth === 0) return;
+    const next = Math.round(el.scrollLeft / el.clientWidth);
+    const clamped = Math.max(0, Math.min(items.length - 1, next));
+    setActiveIdx((prev) => (prev === clamped ? prev : clamped));
+  };
+
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.55) {
+            const idxAttr = entry.target.getAttribute("data-slide-idx");
+            if (idxAttr !== null) {
+              const parsed = Number(idxAttr);
+              if (!Number.isNaN(parsed)) {
+                setActiveIdx((prev) => (prev === parsed ? prev : parsed));
+              }
+            }
+          }
+        }
+      },
+      { root, threshold: 0.55 }
+    );
+
+    slideRefs.current.forEach((node) => {
+      if (node) observer.observe(node);
+    });
+
+    return () => observer.disconnect();
+  }, [items.length, resetKey]);
+
+  const scrollToSlide = (idx: number) => {
+    setActiveIdx(idx);
+    const target = slideRefs.current[idx];
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      return;
+    }
+    const el = scrollerRef.current;
+    if (el) {
+      el.scrollTo({ left: idx * el.clientWidth, behavior: "smooth" });
+    }
+  };
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col lg:hidden">
+      {/* Full-bleed horizontal snap container */}
+      <div
+        ref={scrollerRef}
+        onScroll={syncIndexFromScroll}
+        className="no-scrollbar flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto scroll-smooth"
+      >
+        {items.map((item, idx) => (
+          <div
+            key={getKey(item)}
+            ref={(node) => {
+              slideRefs.current[idx] = node;
+            }}
+            data-slide-idx={idx}
+            className="h-full w-full shrink-0 snap-center px-4 sm:px-8"
+          >
+            {renderItem(item, idx)}
+          </div>
+        ))}
+      </div>
+
+      {/* Minimalist swipe progress bar (expanding bronze line + subtle dots) */}
+      {items.length > 1 && (
+        <div
+          className="mt-4 flex shrink-0 items-center justify-center gap-1 px-4"
+          aria-label="Swipe progress"
+        >
+          {items.map((item, idx) => {
+            const isActive = idx === activeIdx;
+            return (
+              <button
+                key={getKey(item)}
+                type="button"
+                onClick={() => scrollToSlide(idx)}
+                aria-label={`Slide ${idx + 1} of ${items.length}`}
+                aria-current={isActive ? "true" : undefined}
+                className="flex h-6 min-w-[22px] items-center justify-center px-1"
+              >
+                <span
+                  className={`block h-[3px] rounded-none transition-all duration-300 ${
+                    isActive
+                      ? "w-8 bg-accent"
+                      : "w-2 bg-pearl/25 hover:bg-pearl/45"
+                  }`}
+                />
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Muted loop video: attaches source after hero entrance settles, then plays/pauses on scroll with zero React re-renders. */
+function LazyLoopVideo({ src, poster, className }: { src: string; poster: string; className?: string }) {
+  const ref = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+
+    let visible = false;
+    let loaded = false;
+
+    const ensureSource = () => {
+      if (loaded) return;
+      loaded = true;
+      video.src = src;
+      video.load();
+    };
+
+    // Defer video network load until after the hero entrance animation finishes
+    const idleTimer = window.setTimeout(ensureSource, 1200);
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible) {
+          ensureSource();
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { rootMargin: "250px 0px" }
+    );
+    io.observe(video);
+
+    return () => {
+      window.clearTimeout(idleTimer);
+      io.disconnect();
+    };
+  }, [src]);
+
+  return (
+    <video
+      ref={ref}
+      className={className}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      poster={poster}
+    />
+  );
+}
+
 export function HomeClient() {
   const {
     lang,
@@ -163,6 +343,15 @@ export function HomeClient() {
   const syncHeroExit = (y: number) => {
     const vh = window.innerHeight || 1;
     heroExit.set(Math.min(1, Math.max(0, y / vh)));
+    // Once Act 2 completely covers the sticky Hero, hide the Hero from the compositor
+    // so its WebGL/sticky layers can never bleed through or cause tile gaps below Act 2.
+    if (heroSectionRef.current) {
+      const shouldHide = y >= vh + 24;
+      const nextVis = shouldHide ? "hidden" : "visible";
+      if (heroSectionRef.current.style.visibility !== nextVis) {
+        heroSectionRef.current.style.visibility = nextVis;
+      }
+    }
   };
   useMotionValueEvent(scrollY, "change", syncHeroExit);
   useEffect(() => {
@@ -182,14 +371,16 @@ export function HomeClient() {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
+  const toBlurFilter = (v: number) => (v <= 0.15 ? "none" : `blur(${v.toFixed(1)}px)`);
+
   // --- DESKTOP ANIMATION: subtle float upward (-56px/-50px) with immediate fade/blur on scroll ---
   const desktopTextBlur = useTransform(heroExit, [0, 0.50], [0, 14]);
-  const desktopTextFilter = useMotionTemplate`blur(${desktopTextBlur}px)`;
+  const desktopTextFilter = useTransform(desktopTextBlur, toBlurFilter);
   const desktopTextOpacity = useTransform(heroExit, [0.05, 0.55], [1, 0]);
   const desktopTextY = useTransform(heroExit, [0, 0.60], [0, -56]);
 
   const desktopCtaBlur = useTransform(heroExit, [0, 0.38], [0, 14]);
-  const desktopCtaFilter = useMotionTemplate`blur(${desktopCtaBlur}px)`;
+  const desktopCtaFilter = useTransform(desktopCtaBlur, toBlurFilter);
   const desktopCtaOpacity = useTransform(heroExit, [0.02, 0.38], [1, 0]);
   const desktopCtaY = useTransform(heroExit, [0, 0.45], [0, -50]);
 
@@ -197,16 +388,16 @@ export function HomeClient() {
   const mobileScrollLift = useTransform(scrollY, (s) => -s);
 
   const mobileEyebrowBlur = useTransform(heroExit, [0, 0.18], [0, 8]);
-  const mobileEyebrowFilter = useMotionTemplate`blur(${mobileEyebrowBlur}px)`;
+  const mobileEyebrowFilter = useTransform(mobileEyebrowBlur, toBlurFilter);
   const mobileEyebrowOpacity = useTransform(heroExit, [0, 0.18], [1, 0]);
   const mobileEyebrowY = useTransform(heroExit, [0, 0.20], [0, -20]);
 
   const mobileCtaBlur = useTransform(heroExit, [0.25, 0.42], [0, 14]);
-  const mobileCtaFilter = useMotionTemplate`blur(${mobileCtaBlur}px)`;
+  const mobileCtaFilter = useTransform(mobileCtaBlur, toBlurFilter);
   const mobileCtaOpacity = useTransform(heroExit, [0.25, 0.42], [1, 0]);
 
   const mobileTitleBlur = useTransform(heroExit, [0.38, 0.58], [0, 14]);
-  const mobileTitleFilter = useMotionTemplate`blur(${mobileTitleBlur}px)`;
+  const mobileTitleFilter = useTransform(mobileTitleBlur, toBlurFilter);
   const mobileTitleOpacity = useTransform(heroExit, [0.38, 0.58], [1, 0]);
 
   const heroProofOpacity = useTransform(heroExit, [0, 0.20], [1, 0]);
@@ -247,13 +438,124 @@ export function HomeClient() {
 
   const showcaseProducts = (() => {
     if (showcaseTab === "face") {
-      return PRODUCTS.filter((p) => p.category === "face").slice(0, 4);
+      return PRODUCTS.filter((p) => p.category === "face").slice(0, 5);
     }
     if (showcaseTab === "body-hair") {
-      return PRODUCTS.filter((p) => p.category === "body" || p.category === "hair").slice(0, 4);
+      return PRODUCTS.filter((p) => p.category === "body" || p.category === "hair").slice(0, 5);
     }
-    return PRODUCTS.filter((p) => p.badge === "bestseller").slice(0, 4);
+    return PRODUCTS.filter((p) => p.badge === "bestseller").slice(0, 5);
   })();
+
+  // Desktop carousel scroll state for Act 2 (1 card = 100%, 2 cards = 2 equal, 3-5 cards = 2 visible + scroll)
+  const desktopCarouselRef = useRef<HTMLDivElement | null>(null);
+  const desktopDragRef = useRef({
+    active: false,
+    startX: 0,
+    startScrollLeft: 0,
+    moved: false,
+  });
+  const [isDesktopDragging, setIsDesktopDragging] = useState(false);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+  const [desktopSlideIdx, setDesktopSlideIdx] = useState(0);
+
+  const activeDesktopCount = showcaseTab === "sets" ? BUNDLES.length : showcaseProducts.length;
+  const desktopStepsCount = Math.max(1, activeDesktopCount - 1);
+  const showDesktopControls = activeDesktopCount > 2;
+
+  const syncDesktopCarouselControls = () => {
+    const el = desktopCarouselRef.current;
+    if (!el) return;
+    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+    setCanScrollPrev(el.scrollLeft > 4);
+    setCanScrollNext(el.scrollLeft < maxScroll - 4);
+    if (maxScroll > 0 && desktopStepsCount > 1) {
+      const progress = el.scrollLeft / maxScroll;
+      const idx = Math.round(progress * (desktopStepsCount - 1));
+      const clamped = Math.max(0, Math.min(desktopStepsCount - 1, idx));
+      setDesktopSlideIdx((prev) => (prev === clamped ? prev : clamped));
+    } else {
+      setDesktopSlideIdx(0);
+    }
+  };
+
+  useEffect(() => {
+    const el = desktopCarouselRef.current;
+    setDesktopSlideIdx(0);
+    if (!el) return;
+    el.scrollTo({ left: 0, behavior: "instant" as ScrollBehavior });
+    const raf = window.requestAnimationFrame(syncDesktopCarouselControls);
+    const onResize = () => syncDesktopCarouselControls();
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showcaseTab, lang, activeDesktopCount]);
+
+  const scrollDesktopByOneCard = (direction: -1 | 1) => {
+    const el = desktopCarouselRef.current;
+    if (!el) return;
+    const firstSlide = el.firstElementChild as HTMLElement | null;
+    const gapPx = 24; // gap-6
+    const step = firstSlide ? firstSlide.offsetWidth + gapPx : (el.clientWidth + gapPx) / 2;
+    el.scrollBy({ left: direction * step, behavior: "smooth" });
+  };
+
+  const scrollDesktopToStep = (stepIdx: number) => {
+    const el = desktopCarouselRef.current;
+    if (!el) return;
+    const firstSlide = el.firstElementChild as HTMLElement | null;
+    const gapPx = 24;
+    const step = firstSlide ? firstSlide.offsetWidth + gapPx : (el.clientWidth + gapPx) / 2;
+    el.scrollTo({ left: stepIdx * step, behavior: "smooth" });
+  };
+
+  const handleDesktopMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.button !== 0 || !showDesktopControls) return;
+    const el = desktopCarouselRef.current;
+    if (!el) return;
+    desktopDragRef.current = {
+      active: true,
+      startX: e.pageX,
+      startScrollLeft: el.scrollLeft,
+      moved: false,
+    };
+    setIsDesktopDragging(true);
+  };
+
+  const handleDesktopMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const drag = desktopDragRef.current;
+    if (!drag.active) return;
+    const el = desktopCarouselRef.current;
+    if (!el) return;
+    const dx = e.pageX - drag.startX;
+    if (Math.abs(dx) > 6) {
+      drag.moved = true;
+    }
+    if (drag.moved) {
+      e.preventDefault();
+      el.scrollLeft = drag.startScrollLeft - dx * 1.15;
+    }
+  };
+
+  const endDesktopMouseDrag = () => {
+    if (!desktopDragRef.current.active) return;
+    desktopDragRef.current.active = false;
+    setIsDesktopDragging(false);
+    syncDesktopCarouselControls();
+    window.setTimeout(() => {
+      desktopDragRef.current.moved = false;
+    }, 60);
+  };
+
+  const handleDesktopClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (desktopDragRef.current.moved) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
 
   const inlineProtocol = buildRitualRecommendation({
     skinType:
@@ -276,6 +578,82 @@ export function HomeClient() {
     { key: "sets", label: { uk: "Набори", en: "Sets" } },
   ];
 
+  const faceCount = PRODUCTS.filter((p) => p.category === "face").length;
+  const bodyCount = PRODUCTS.filter((p) => p.category === "body").length;
+  const hairCount = PRODUCTS.filter((p) => p.category === "hair").length;
+  const setsCount = BUNDLES.length;
+
+  const bentoCategories = [
+    {
+      key: "face",
+      href: "/catalog?category=face",
+      title: { uk: "Для обличчя", en: "Face Care" },
+      subtitle: {
+        uk: "Сироватки, тоніки та щоденне зволоження",
+        en: "Serums, toners & daily hydration",
+      },
+      count: {
+        uk: `${faceCount} формул`,
+        en: `${faceCount} formulas`,
+      },
+      image: "/assets/editorial/campaign-ritual.jpg",
+      imgPos: "object-[50%_22%]",
+      spanClass: "col-span-2 aspect-[4/3] lg:col-span-6 lg:row-span-2 lg:aspect-auto",
+      titleSize: "text-2xl sm:text-3xl lg:text-4xl",
+    },
+    {
+      key: "sets",
+      href: "/catalog?category=sets",
+      title: { uk: "Набори", en: "Gift Sets" },
+      subtitle: {
+        uk: "Готові ритуали у фірмовому пакуванні −10%",
+        en: "Curated rituals in signature box −10%",
+      },
+      count: {
+        uk: `${setsCount} набори`,
+        en: `${setsCount} sets`,
+      },
+      image: "/assets/editorial/campaign-giftset.jpg",
+      imgPos: "object-center",
+      spanClass: "col-span-2 aspect-[16/10] lg:col-span-6 lg:row-span-1 lg:aspect-auto",
+      titleSize: "text-xl sm:text-2xl lg:text-3xl",
+    },
+    {
+      key: "body",
+      href: "/catalog?category=body",
+      title: { uk: "Для тіла", en: "Body Care" },
+      subtitle: {
+        uk: "Оксамитові креми та делікатне очищення",
+        en: "Velvet creams & gentle cleansing",
+      },
+      count: {
+        uk: `${bodyCount} засоби`,
+        en: `${bodyCount} items`,
+      },
+      image: "/assets/products/body-cream.jpg",
+      imgPos: "object-center",
+      spanClass: "col-span-1 aspect-[4/5] lg:col-span-3 lg:row-span-1 lg:aspect-auto",
+      titleSize: "text-lg sm:text-xl lg:text-2xl",
+    },
+    {
+      key: "hair",
+      href: "/catalog?category=hair",
+      title: { uk: "Для волосся", en: "Hair Care" },
+      subtitle: {
+        uk: "Твердий шампунь та ботанічний блиск",
+        en: "Solid shampoo & botanical shine",
+      },
+      count: {
+        uk: `${hairCount} засіб`,
+        en: `${hairCount} item`,
+      },
+      image: "/assets/products/shampoo.jpg",
+      imgPos: "object-center",
+      spanClass: "col-span-1 aspect-[4/5] lg:col-span-3 lg:row-span-1 lg:aspect-auto",
+      titleSize: "text-lg sm:text-xl lg:text-2xl",
+    },
+  ];
+
   return (
     <div className="overflow-x-clip">
       {/* ==================== ACT 1: HERO — STICKY 100SVH FULL-BLEED EDITORIAL PORTRAIT (next sections slide over it) ==================== */}
@@ -293,7 +671,7 @@ export function HomeClient() {
                 ? "Порцелянова гладкість і сяйво шкіри Sophie Bilynska Cosmetics"
                 : "Porcelain smoothness and radiant skin with Sophie Bilynska Cosmetics"
             }
-            scrollTargetRef={heroSectionRef}
+            scrollProgress={heroExit}
             objectPosition={[0.22, 0.42]}
             className="h-full w-full"
             imgClassName="object-cover object-[22%_42%]"
@@ -309,7 +687,7 @@ export function HomeClient() {
                 ? "Порцелянова гладкість і сяйво шкіри Sophie Bilynska Cosmetics"
                 : "Porcelain smoothness and radiant skin with Sophie Bilynska Cosmetics"
             }
-            scrollTargetRef={heroSectionRef}
+            scrollProgress={heroExit}
             objectPosition={[1, 0.5]}
             shimmerMinX={0.44}
             className="h-full w-full"
@@ -328,7 +706,7 @@ export function HomeClient() {
           {/* Copy Column: Mobile = centered eyebrow + left-edge title + centered CTAs; Desktop = flush-aligned to the "S" of SOPHIE BILYNSKA (lg: 32+32+10=74px, xl: 40+32+10=82px) */}
           <div className="pointer-events-auto relative z-10 flex h-full min-h-0 flex-col justify-between px-5 pb-[86px] pt-[100px] text-ink sm:px-8 lg:col-span-6 lg:items-start lg:pb-6 lg:pl-[74px] lg:pr-4 lg:pt-[112px] xl:pl-[82px] 2xl:pb-10 2xl:pt-[136px]">
             {/* Mobile-only top masthead eyebrow centered cleanly beneath the header */}
-            <motion.div style={heroEyebrowStyle} className="flex justify-center will-change-[filter,opacity,transform] lg:hidden">
+            <motion.div style={heroEyebrowStyle} className="flex justify-center lg:hidden">
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -348,7 +726,7 @@ export function HomeClient() {
               {/* Top Editorial Group: Desktop Eyebrow + Monumental Stacked Headline + Desktop Subtitle */}
               <div>
                 {/* Desktop eyebrow (dissolves softly at start of scroll) */}
-                <motion.div style={heroEyebrowStyle} className="hidden will-change-[filter,opacity,transform] lg:block">
+                <motion.div style={heroEyebrowStyle} className="hidden lg:block">
                   <motion.p
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -365,7 +743,7 @@ export function HomeClient() {
                 </motion.div>
 
                 {/* Main Headline & Subtitle lift 1:1 with lower section, dissolving past 25% */}
-                <motion.div style={heroTitleStyle} className="will-change-[filter,opacity,transform]">
+                <motion.div style={heroTitleStyle}>
                   <h1
                     className={`font-display text-[2.55rem] leading-[1.06] font-bold uppercase lg:mt-4 lg:text-[clamp(3.4rem,min(6.8vw,9.4svh),9rem)] lg:leading-[0.96] ${
                       lang === "uk" ? "tracking-[-0.005em]" : "tracking-[-0.015em]"
@@ -436,12 +814,12 @@ export function HomeClient() {
                 {/* Primary CTA + Ritual Link: lift synchronously with bottom section, begin fading at 25% */}
                 <motion.div
                   style={heroCtaStyle}
-                  className="mt-6 flex flex-col items-center gap-3.5 will-change-[filter,opacity,transform] lg:mt-[min(56px,5.2svh)] lg:flex-row lg:items-center lg:gap-6 xl:gap-8"
+                  className="mt-6 flex flex-col items-center gap-3.5 lg:mt-[min(56px,5.2svh)] lg:flex-row lg:items-center lg:gap-6 xl:gap-8"
                 >
                   <div className="flex w-full justify-center lg:w-auto">
                     <Link
                       href="/catalog"
-                      className="btn-tactile inline-flex min-h-[54px] w-full max-w-[300px] shrink-0 items-center justify-center gap-3 whitespace-nowrap rounded-full bg-ink px-7 py-3.5 text-[13.2px] font-bold tracking-[0.16em] text-surface uppercase shadow-lg hover:bg-accent hover:text-ink lg:min-h-[62px] lg:w-auto lg:max-w-none lg:px-8 lg:py-4 lg:text-[16px] xl:px-10"
+                      className="btn-tactile inline-flex min-h-[54px] w-full max-w-[300px] shrink-0 items-center justify-center gap-3 whitespace-nowrap rounded-none bg-ink px-7 py-3.5 text-[13.2px] font-bold tracking-[0.16em] text-surface uppercase shadow-lg hover:bg-accent hover:text-ink lg:min-h-[62px] lg:w-auto lg:max-w-none lg:px-8 lg:py-4 lg:text-[16px] xl:px-10"
                     >
                       <span>{lang === "uk" ? "Обрати догляд" : "Explore Collection"}</span>
                       <ArrowRight className="h-4 w-4 shrink-0 lg:h-5 lg:w-5" strokeWidth={2.2} />
@@ -483,25 +861,25 @@ export function HomeClient() {
         </div>
       </section>
 
-      {/* Everything after the hero rides on an opaque layer that slides up over the sticky hero */}
-      <div className="relative z-10 bg-[#f4efe8] shadow-[0_-28px_60px_-12px_rgba(14,22,30,0.22)]">
+      {/* Everything after the hero rides on an isolated opaque GPU layer that slides up over the sticky hero */}
+      <div className="relative z-10 isolate bg-[#f4efe8] [transform:translate3d(0,0,0)]">
       {/* ==================== ACT 2: BESTSELLERS — DEEP SLATE NAVY GALLERY ==================== */}
       <section
+        id="signature-formulas"
         data-header-theme="navy"
-        className="relative overflow-hidden border-t border-accent/20 bg-ink pt-14 pb-12 text-pearl lg:pt-20 lg:pb-14"
+        className="relative flex h-[100svh] min-h-[680px] flex-col overflow-hidden border-t border-accent/20 bg-ink pt-[26px] pb-[76px] text-pearl shadow-[0_-24px_48px_-12px_rgba(14,22,30,0.22)] lg:block lg:h-auto lg:min-h-0 lg:py-20"
       >
-        <div className="relative mx-auto w-full max-w-[1440px] px-4 sm:px-8 lg:px-12">
-          <Reveal>
-            <div className="flex flex-col items-start justify-between gap-3 lg:flex-row lg:items-end lg:gap-5">
-              <div>
-                <p className="eyebrow text-accent">{t("home.bestsellersEyebrow")}</p>
-                <h2 className="mt-1 font-display text-2xl font-bold uppercase text-pearl sm:text-4xl lg:mt-1.5 lg:text-5xl">
-                  {t("home.bestsellersTitle")}
-                </h2>
-              </div>
+        <div className="relative mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col lg:block lg:px-12">
+          {/* DESKTOP TOP BAR: "ОБРАНО ВАМИ" (2x larger, left 1/3) aligned with Underline Filter Tabs (right 2/3) */}
+          <div className="hidden lg:mb-6 lg:grid lg:grid-cols-12 lg:items-center lg:gap-10 xl:gap-12">
+            <div className="lg:col-span-4">
+              <p className="text-xl font-bold tracking-[0.14em] text-accent uppercase xl:text-2xl">
+                {lang === "uk" ? "Обрано вами" : "Chosen by You"}
+              </p>
+            </div>
 
-              {/* Inline Interactive Spring Tabs (compact on mobile so all 4 tabs stay crisp without right-edge clipping) */}
-              <div className="no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto pb-1 sm:gap-1.5">
+            <div className="lg:col-span-8">
+              <div className="flex items-center gap-8">
                 {tabs.map((tab) => {
                   const active = showcaseTab === tab.key;
                   return (
@@ -509,168 +887,479 @@ export function HomeClient() {
                       key={tab.key}
                       type="button"
                       onClick={() => setShowcaseTab(tab.key)}
-                      className={`relative shrink-0 rounded-full px-2.5 py-1.5 text-[10px] font-bold tracking-[0.08em] uppercase transition-colors sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.12em] ${
-                        active ? "text-ink" : "text-pearl/60 hover:text-pearl"
+                      className={`relative pb-2 text-sm font-bold tracking-[0.15em] uppercase transition-colors xl:text-[15px] ${
+                        active ? "text-pearl" : "text-pearl/55 hover:text-pearl"
                       }`}
                     >
+                      <span>{tab.label[lang]}</span>
                       {active && (
                         <motion.span
-                          layoutId="home-showcase-tab"
+                          layoutId="home-showcase-tab-desktop"
                           transition={{ type: "spring", stiffness: 420, damping: 32 }}
-                          className="absolute inset-0 rounded-full bg-pearl"
+                          className="absolute inset-x-0 bottom-0 h-[2px] rounded-none bg-accent"
                         />
                       )}
-                      <span className="relative z-10">{tab.label[lang]}</span>
                     </button>
                   );
                 })}
               </div>
             </div>
-          </Reveal>
+          </div>
 
-          <AnimatePresence mode="wait" initial={false}>
-            {showcaseTab === "sets" ? (
-              <motion.div
-                key="sets"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                {/* Mobile: Centered single-card infinite circular carousel */}
-                <MobileCircularCarousel
-                  key={`mobile-sets-${lang}`}
-                  items={BUNDLES}
-                  getKey={(b) => b.id}
-                  prevLabel={lang === "uk" ? "Попередній набір" : "Previous set"}
-                  nextLabel={lang === "uk" ? "Наступний набір" : "Next set"}
-                  renderItem={(bundle) => (
-                    <div className="flex flex-col overflow-hidden rounded-2xl border border-pearl/12 bg-espresso">
-                      <div className="relative aspect-[4/3] overflow-hidden">
-                        <img
-                          src={bundle.image}
-                          alt={bundle.name[lang]}
-                          className="h-full w-full object-cover"
-                        />
-                        <span className="absolute left-3 top-3 rounded-full bg-ink/90 px-3 py-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
-                          {bundle.badge[lang]}
-                        </span>
-                      </div>
-                      <div className="flex flex-1 flex-col p-5">
-                        <h3 className="font-display text-xl font-bold text-pearl">
-                          {bundle.name[lang]}
-                        </h3>
-                        <p className="mt-1 text-xs text-pearl/65">{bundle.subtitle[lang]}</p>
-                        <div className="mt-auto flex items-center justify-between pt-4">
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-lg font-bold text-pearl">
-                              {formatPrice(bundle.bundlePrice, lang)}
-                            </span>
-                            <span className="text-xs text-pearl/45 line-through">
-                              {formatPrice(bundle.originalPrice, lang)}
-                            </span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              addBundleToCart(bundle.id);
-                              openOverlay("cart");
-                            }}
-                            className="btn-tactile rounded-full bg-accent px-4 py-2 text-[11px] font-bold tracking-[0.12em] text-ink uppercase hover:bg-pearl"
-                          >
-                            + {t("common.quickAdd")}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                />
+          {/* MOBILE HEADER: 2-line justified slogan tucked into the top scroll-in zone + "ОБРАНО ВАМИ" flush over "КУЛЬТОВІ" + Edge-to-Edge Title */}
+          <div className="shrink-0 px-4 sm:px-8 lg:hidden">
+            <p className="w-full text-[clamp(0.95rem,4.13vw,2.04rem)] leading-[1.3] font-normal tracking-[-0.015em] text-pearl/80">
+              {lang === "uk" ? (
+                <>
+                  <span className="block w-full text-justify [text-align-last:justify]">
+                    Формули, до яких повертаються з першого дотику. Чисті
+                  </span>
+                  <span className="block w-full text-justify [text-align-last:justify]">
+                    ботанічні активи для природного сяйва шкіри щодня.
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="block w-full text-justify [text-align-last:justify]">
+                    Formulas you return to from the very first touch. Pure
+                  </span>
+                  <span className="block w-full text-justify [text-align-last:justify]">
+                    botanical actives for natural skin radiance every day.
+                  </span>
+                </>
+              )}
+            </p>
 
-                {/* Desktop: 3-column grid */}
-                <div className="mt-10 hidden lg:grid lg:grid-cols-3 lg:gap-6">
-                  {BUNDLES.map((bundle) => (
-                    <div
-                      key={bundle.id}
-                      className="flex flex-col overflow-hidden rounded-2xl border border-pearl/12 bg-espresso"
+            <p className="mt-[30px] w-fit whitespace-nowrap text-[clamp(1.05rem,4.7vw,1.45rem)] leading-none font-bold tracking-[0.12em] text-accent uppercase">
+              {lang === "uk" ? "Обрано вами" : "Chosen by You"}
+            </p>
+            <h2 className="mt-1 w-full whitespace-nowrap font-display text-[clamp(2.05rem,9.3vw,3.15rem)] leading-[0.96] font-bold tracking-[-0.02em] uppercase text-pearl">
+              {t("home.bestsellersTitle")}
+            </h2>
+
+            <div className="mt-3 flex w-full items-center justify-between gap-0.5 rounded-none border border-pearl/12 bg-espresso/90 p-1">
+              {tabs.map((tab) => {
+                const active = showcaseTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setShowcaseTab(tab.key)}
+                    className={`relative flex flex-auto items-center justify-center whitespace-nowrap rounded-none px-2 py-2 text-center text-[10px] leading-none font-bold tracking-[0.04em] uppercase transition-colors sm:px-4 sm:text-xs ${
+                      active ? "text-ink" : "text-pearl/65 hover:text-pearl"
+                    }`}
+                  >
+                    {active && (
+                      <motion.span
+                        layoutId="home-showcase-tab-mobile"
+                        transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                        className="absolute inset-0 rounded-none bg-pearl"
+                      />
+                    )}
+                    <span className="relative z-10">{tab.label[lang]}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* MAIN 2-COLUMN BODY (Desktop: Left 1/3 flush-top with Right 2/3 cards | Mobile: Full-height swipe card) */}
+          <div className="mt-4 flex min-h-0 flex-1 flex-col lg:mt-0 lg:grid lg:grid-cols-12 lg:items-start lg:gap-10 xl:gap-12">
+            {/* DESKTOP LEFT COLUMN (1/3): Monumental Title (+10%), 2x Larger Slogan, Bottom "Увесь каталог" (2x) + Side Nav Arrows & Progress */}
+            <div className="hidden lg:col-span-4 lg:flex lg:h-[520px] lg:flex-col lg:justify-between xl:h-[560px]">
+              <div>
+                <h2 className="-mt-[0.08em] font-display text-[3.85rem] leading-[0.92] font-bold tracking-[-0.015em] uppercase text-pearl xl:text-[4.65rem]">
+                  {t("home.bestsellersTitle")}
+                </h2>
+                <p className="mt-5 max-w-[380px] text-[22px] leading-[1.35] font-normal text-pearl/78 xl:mt-6 xl:text-[25px]">
+                  {lang === "uk"
+                    ? "Формули, до яких повертаються з першого дотику. Чисті активи для природного сяйва щодня."
+                    : "Formulas you return to from the very first touch. Pure actives for natural radiance every day."}
+                </p>
+              </div>
+
+              {/* Bottom of Left Column: "Увесь каталог" (2x larger) + Carousel Arrows & Progress right underneath */}
+              <div className="pt-4">
+                <Link
+                  href="/catalog"
+                  className="group inline-flex items-center gap-3 text-xl font-bold tracking-[0.1em] text-pearl uppercase transition-colors hover:text-accent xl:text-2xl"
+                >
+                  <span>{lang === "uk" ? "Увесь каталог" : "Full Catalog"}</span>
+                  <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1.5 xl:h-6 xl:w-6" />
+                </Link>
+
+                {showDesktopControls && (
+                  <div className="mt-4 flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => scrollDesktopByOneCard(-1)}
+                      disabled={!canScrollPrev}
+                      aria-label={lang === "uk" ? "Попередня картка" : "Previous card"}
+                      className="flex h-8 w-8 items-center justify-center text-pearl/75 transition-colors hover:text-accent disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:text-pearl/75"
                     >
-                      <div className="relative aspect-[4/3] overflow-hidden">
-                        <img
-                          src={bundle.image}
-                          alt={bundle.name[lang]}
-                          className="h-full w-full object-cover"
-                        />
-                        <span className="absolute left-3 top-3 rounded-full bg-ink/90 px-3 py-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
-                          {bundle.badge[lang]}
-                        </span>
-                      </div>
-                      <div className="flex flex-1 flex-col p-5">
-                        <h3 className="font-display text-xl font-bold text-pearl">
-                          {bundle.name[lang]}
-                        </h3>
-                        <p className="mt-1 text-xs text-pearl/65">{bundle.subtitle[lang]}</p>
-                        <div className="mt-auto flex items-center justify-between pt-4">
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-lg font-bold text-pearl">
-                              {formatPrice(bundle.bundlePrice, lang)}
-                            </span>
-                            <span className="text-xs text-pearl/45 line-through">
-                              {formatPrice(bundle.originalPrice, lang)}
+                      <ArrowLeft className="h-5 w-5" strokeWidth={1.75} />
+                    </button>
+
+                    <div
+                      className="flex items-center gap-2"
+                      aria-label="Carousel progress"
+                    >
+                      {Array.from({ length: desktopStepsCount }).map((_, idx) => {
+                        const isActive = idx === desktopSlideIdx;
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => scrollDesktopToStep(idx)}
+                            aria-label={`Position ${idx + 1} of ${desktopStepsCount}`}
+                            aria-current={isActive ? "true" : undefined}
+                            className="flex h-6 items-center justify-center px-0.5"
+                          >
+                            <span
+                              className={`block h-[2.5px] rounded-none transition-all duration-300 ${
+                                isActive
+                                  ? "w-10 bg-accent"
+                                  : "w-5 bg-pearl/25 hover:bg-pearl/50"
+                              }`}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => scrollDesktopByOneCard(1)}
+                      disabled={!canScrollNext}
+                      aria-label={lang === "uk" ? "Наступна картка" : "Next card"}
+                      className="flex h-8 w-8 items-center justify-center text-pearl/75 transition-colors hover:text-accent disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:text-pearl/75"
+                    >
+                      <ArrowRight className="h-5 w-5" strokeWidth={1.75} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN (2/3 on desktop, swipe deck on mobile): Constant-height single-row carousel with mouse drag + trackpad scroll */}
+            <div className="flex min-h-0 flex-1 flex-col lg:col-span-8 lg:block">
+              <AnimatePresence mode="wait" initial={false}>
+                {showcaseTab === "sets" ? (
+                  <motion.div
+                    key="sets"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    onAnimationComplete={syncDesktopCarouselControls}
+                    className="flex min-h-0 flex-1 flex-col lg:block"
+                  >
+                    {/* Mobile: Full-screen single-card horizontal swipe deck */}
+                    <MobileSwipeDeck
+                      items={BUNDLES}
+                      getKey={(b) => b.id}
+                      resetKey={`sets-${lang}`}
+                      renderItem={(bundle) => (
+                        <article className="group relative flex h-full min-h-[340px] w-full flex-col justify-between overflow-hidden rounded-none border-0 bg-espresso">
+                          <img
+                            loading="lazy"
+                            decoding="async"
+                            src={bundle.image}
+                            alt={bundle.name[lang]}
+                            className="absolute inset-0 h-full w-full object-cover"
+                          />
+                          <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-ink/50 via-ink/18 to-transparent" />
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[66%] bg-gradient-to-t from-ink/96 via-ink/68 to-transparent" />
+
+                          <div className="relative z-10 flex items-start justify-between p-4">
+                            <span className="rounded-none border border-pearl/15 bg-ink/75 px-3 py-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase backdrop-blur-md">
+                              {bundle.badge[lang]}
                             </span>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              addBundleToCart(bundle.id);
-                              openOverlay("cart");
-                            }}
-                            className="btn-tactile rounded-full bg-accent px-4 py-2 text-[11px] font-bold tracking-[0.12em] text-ink uppercase hover:bg-pearl"
-                          >
-                            + {t("common.quickAdd")}
-                          </button>
+
+                          <div className="relative z-10 mt-auto p-5">
+                            <h3 className="font-display text-2xl leading-tight font-bold text-pearl">
+                              {bundle.name[lang]}
+                            </h3>
+                            <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-pearl/80">
+                              {bundle.subtitle[lang]}
+                            </p>
+
+                            <div className="mt-4 flex items-center justify-between gap-3">
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-lg font-bold text-pearl">
+                                  {formatPrice(bundle.bundlePrice, lang)}
+                                </span>
+                                <span className="text-xs text-pearl/50 line-through">
+                                  {formatPrice(bundle.originalPrice, lang)}
+                                </span>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  addBundleToCart(bundle.id);
+                                  openOverlay("cart");
+                                }}
+                                className="btn-tactile inline-flex items-center gap-1.5 rounded-none bg-surface px-4 py-2.5 text-[11px] font-bold tracking-[0.12em] text-ink uppercase shadow-md hover:bg-accent"
+                              >
+                                <Plus className="h-3.5 w-3.5" strokeWidth={2.4} />
+                                <span>{t("common.quickAdd")}</span>
+                              </button>
+                            </div>
+                          </div>
+                        </article>
+                      )}
+                    />
+
+                    {/* Desktop: Fixed-height single-row horizontal carousel with mouse drag + trackpad */}
+                    <div
+                      ref={desktopCarouselRef}
+                      onScroll={syncDesktopCarouselControls}
+                      onMouseDown={handleDesktopMouseDown}
+                      onMouseMove={handleDesktopMouseMove}
+                      onMouseUp={endDesktopMouseDrag}
+                      onMouseLeave={endDesktopMouseDrag}
+                      onClickCapture={handleDesktopClickCapture}
+                      className={`no-scrollbar hidden select-none lg:flex lg:h-[520px] lg:flex-nowrap lg:gap-6 lg:overflow-x-auto xl:h-[560px] ${
+                        showDesktopControls
+                          ? isDesktopDragging
+                            ? "cursor-grabbing"
+                            : "cursor-grab lg:scroll-smooth lg:snap-x lg:snap-mandatory"
+                          : ""
+                      }`}
+                    >
+                      {BUNDLES.map((bundle) => (
+                        <div
+                          key={bundle.id}
+                          className={`h-full shrink-0 snap-start ${
+                            BUNDLES.length === 1 ? "w-full" : "w-[calc((100%-1.5rem)/2)]"
+                          }`}
+                        >
+                          <article className="group relative flex h-full w-full flex-col justify-between overflow-hidden rounded-none border-0 bg-espresso">
+                            <img
+                              loading="lazy"
+                              decoding="async"
+                              draggable={false}
+                              src={bundle.image}
+                              alt={bundle.name[lang]}
+                              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                            />
+                            <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-ink/45 via-ink/15 to-transparent opacity-0 transition-opacity duration-400 group-hover:opacity-100" />
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[36%] bg-gradient-to-t from-ink/90 via-ink/45 to-transparent" />
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-ink/96 via-ink/72 to-transparent opacity-0 transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100" />
+
+                            {/* Top badge glides down on hover */}
+                            <div className="relative z-10 flex -translate-y-3 items-center justify-between p-6 opacity-0 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100">
+                              <span className="border-l-2 border-accent pl-2.5 text-[11px] font-bold tracking-[0.2em] text-accent uppercase">
+                                {bundle.badge[lang]}
+                              </span>
+                            </div>
+
+                            {/* Bottom zone: Name (32px semibold aqua) + Price (flush bottom-left) always visible; Description + Square 40x40 + button smoothly reveal on hover */}
+                            <div className="relative z-10 mt-auto p-6">
+                              <h3 className="line-clamp-2 font-display text-[32px] leading-[1.08] font-semibold text-accent">
+                                {bundle.name[lang]}
+                              </h3>
+
+                              <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-400 delay-75 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:grid-rows-[1fr] group-hover:opacity-100">
+                                <div className="overflow-hidden">
+                                  <p className="mt-1.5 mb-2 line-clamp-2 text-[13px] leading-relaxed text-pearl/80">
+                                    {bundle.subtitle[lang]}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="mt-1.5 flex items-end justify-between gap-3">
+                                <div className="flex items-baseline gap-2 leading-none">
+                                  <span className="text-xl leading-none font-semibold text-pearl">
+                                    {formatPrice(bundle.bundlePrice, lang)}
+                                  </span>
+                                  <span className="text-xs leading-none text-pearl/50 line-through">
+                                    {formatPrice(bundle.originalPrice, lang)}
+                                  </span>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    addBundleToCart(bundle.id);
+                                    openOverlay("cart");
+                                  }}
+                                  aria-label={t("common.quickAdd")}
+                                  className="btn-tactile absolute right-6 bottom-6 flex h-10 w-10 shrink-0 translate-y-3 items-center justify-center rounded-none bg-surface text-ink opacity-0 transition-all duration-400 delay-75 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-accent group-hover:translate-y-0 group-hover:opacity-100"
+                                >
+                                  <Plus className="h-[18px] w-[18px]" strokeWidth={1.9} />
+                                </button>
+                              </div>
+                            </div>
+                          </article>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key={showcaseTab}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                {/* Mobile: Centered single-card infinite circular carousel */}
-                <MobileCircularCarousel
-                  key={`mobile-${showcaseTab}`}
-                  items={showcaseProducts}
-                  getKey={(p) => p.id}
-                  prevLabel={lang === "uk" ? "Попередній засіб" : "Previous formula"}
-                  nextLabel={lang === "uk" ? "Наступний засіб" : "Next formula"}
-                  renderItem={(product, idx) => (
-                    <ProductCard product={product} variant="dark" index={idx} />
-                  )}
-                />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={showcaseTab}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    onAnimationComplete={syncDesktopCarouselControls}
+                    className="flex min-h-0 flex-1 flex-col lg:block"
+                  >
+                    {/* Mobile: Full-screen single-card horizontal swipe deck */}
+                    <MobileSwipeDeck
+                      items={showcaseProducts}
+                      getKey={(p) => p.id}
+                      resetKey={`${showcaseTab}-${lang}`}
+                      renderItem={(product, idx) => (
+                        <ProductCard
+                          product={product}
+                          variant="dark"
+                          layout="editorial"
+                          heightClassName="h-full min-h-[340px]"
+                          fillHeight
+                          index={idx}
+                        />
+                      )}
+                    />
 
-                {/* Desktop: 4-column studio gallery grid */}
-                <div className="mt-10 hidden lg:grid lg:grid-cols-4 lg:gap-6">
-                  {showcaseProducts.map((product, idx) => (
-                    <ProductCard key={product.id} product={product} variant="dark" index={idx} />
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    {/* Desktop: Fixed-height single-row horizontal carousel with mouse drag + trackpad */}
+                    <div
+                      ref={desktopCarouselRef}
+                      onScroll={syncDesktopCarouselControls}
+                      onMouseDown={handleDesktopMouseDown}
+                      onMouseMove={handleDesktopMouseMove}
+                      onMouseUp={endDesktopMouseDrag}
+                      onMouseLeave={endDesktopMouseDrag}
+                      onClickCapture={handleDesktopClickCapture}
+                      className={`no-scrollbar hidden select-none lg:flex lg:h-[520px] lg:flex-nowrap lg:gap-6 lg:overflow-x-auto xl:h-[560px] ${
+                        showDesktopControls
+                          ? isDesktopDragging
+                            ? "cursor-grabbing"
+                            : "cursor-grab lg:scroll-smooth lg:snap-x lg:snap-mandatory"
+                          : ""
+                      }`}
+                    >
+                      {showcaseProducts.map((product, idx) => (
+                        <div
+                          key={product.id}
+                          className={`h-full shrink-0 snap-start ${
+                            showcaseProducts.length === 1
+                              ? "w-full"
+                              : "w-[calc((100%-1.5rem)/2)]"
+                          }`}
+                        >
+                          <ProductCard
+                            product={product}
+                            variant="dark"
+                            layout="editorial"
+                            heightClassName="h-full"
+                            index={idx}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
 
-          <div className="mt-8 flex justify-center lg:justify-end">
+          {/* Mobile-only bottom link */}
+          <div className="mt-3 flex shrink-0 justify-center px-4 sm:px-8 lg:hidden">
             <Link
               href="/catalog"
-              className="group inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-pearl/85 uppercase hover:text-accent"
+              className="group inline-flex items-center gap-2 text-sm font-bold tracking-[0.14em] text-pearl/90 uppercase hover:text-accent"
             >
-              <span>{t("home.viewAll")}</span>
+              <span>{lang === "uk" ? "Увесь каталог" : "Full Catalog"}</span>
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== ACT 2.5: EDITORIAL BENTO — SHOP BY CATEGORY ==================== */}
+      <section
+        data-header-theme="paper"
+        className="relative overflow-hidden bg-[#f4efe8] pt-14 pb-12 lg:pt-20 lg:pb-16"
+      >
+        <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-8 lg:px-12">
+          <Reveal>
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="eyebrow text-accent">
+                  {lang === "uk" ? "Напрямки догляду" : "Shop by Category"}
+                </p>
+                <h2 className="mt-1 font-display text-3xl leading-[1.02] font-bold uppercase text-ink sm:text-4xl lg:mt-1.5 lg:text-5xl">
+                  {lang === "uk" ? "Обрати догляд" : "Choose Your Ritual"}
+                </h2>
+              </div>
+
+              <Link
+                href="/catalog"
+                className="group inline-flex shrink-0 items-center gap-1.5 pb-1 text-[11px] font-bold tracking-[0.14em] text-ink uppercase transition-colors hover:text-accent sm:text-xs"
+              >
+                <span>{lang === "uk" ? "Увесь каталог" : "Full Catalog"}</span>
+                <ArrowUpRight
+                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  strokeWidth={2.2}
+                />
+              </Link>
+            </div>
+          </Reveal>
+
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:mt-8 lg:h-[600px] lg:grid-cols-12 lg:grid-rows-2 lg:gap-4 xl:h-[660px]">
+            {bentoCategories.map((cat) => (
+              <Link
+                key={cat.key}
+                href={cat.href}
+                className={`group relative flex flex-col justify-between overflow-hidden rounded-none bg-espresso shadow-[0_6px_26px_rgba(18,16,14,0.08)] transition-shadow duration-500 hover:shadow-[0_18px_44px_rgba(18,16,14,0.16)] ${cat.spanClass}`}
+              >
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  src={assetPath(cat.image)}
+                  alt={cat.title[lang]}
+                  className={`absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05] ${cat.imgPos}`}
+                />
+                {/* Soft top & bottom editorial scrims for guaranteed contrast on every crop */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-ink/35 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-ink/85 via-ink/35 to-transparent transition-opacity duration-500 group-hover:from-ink/90" />
+
+                {/* Top pill count */}
+                <div className="relative z-10 flex items-center justify-between p-3.5 sm:p-4 lg:p-5">
+                  <span className="rounded-none border border-pearl/20 bg-ink/45 px-2.5 py-1 text-[9px] font-bold tracking-[0.14em] text-pearl/90 uppercase backdrop-blur-md sm:px-3 sm:text-[10px]">
+                    {cat.count[lang]}
+                  </span>
+                </div>
+
+                {/* Bottom title + floating arrow pill */}
+                <div className="relative z-10 mt-auto flex items-end justify-between gap-3 p-3.5 sm:p-5 lg:p-6">
+                  <div className="min-w-0">
+                    <h3
+                      className={`font-display leading-[1.04] font-bold text-pearl transition-colors group-hover:text-accent ${cat.titleSize}`}
+                    >
+                      {cat.title[lang]}
+                    </h3>
+                    <p className="mt-1 hidden line-clamp-1 text-xs text-pearl/75 sm:block">
+                      {cat.subtitle[lang]}
+                    </p>
+                  </div>
+
+                  <span
+                    aria-hidden="true"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-surface text-ink shadow-md transition-all duration-300 group-hover:scale-105 group-hover:bg-accent sm:h-10 sm:w-11 lg:h-11 lg:w-12"
+                  >
+                    <ArrowUpRight
+                      className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 sm:h-[18px] sm:w-[18px]"
+                      strokeWidth={2.2}
+                    />
+                  </span>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -683,18 +1372,12 @@ export function HomeClient() {
         <div className="relative mx-auto grid w-full max-w-[1440px] items-center gap-8 px-4 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:px-12">
           {/* Left: Portrait Video Canvas */}
           <div className="mx-auto w-full max-w-[440px] lg:col-span-6 lg:max-w-[520px]">
-            <ParallaxMedia className="aspect-[4/5] w-full rounded-[24px] border border-line bg-surface shadow-[0_8px_32px_rgba(23,26,28,0.06)] lg:rounded-[28px]">
-              <video
+            <ParallaxMedia className="aspect-[4/5] w-full rounded-none border border-line bg-surface shadow-[0_8px_32px_rgba(23,26,28,0.06)] ">
+              <LazyLoopVideo
                 className="h-full w-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
                 poster={assetPath("/assets/hero/ice-bloom-poster.jpg")}
-              >
-                <source src={assetPath("/assets/hero/ice-bloom.mp4")} type="video/mp4" />
-              </video>
+                src={assetPath("/assets/hero/ice-bloom.mp4")}
+              />
             </ParallaxMedia>
           </div>
 
@@ -704,7 +1387,7 @@ export function HomeClient() {
               <span className="eyebrow text-accent">
                 {lang === "uk" ? "Флагман у русі · Хіт №1" : "Flagship in Motion · No. 1 Hit"}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full border border-line bg-surface/60 px-2.5 py-0.5 text-[10px] font-semibold text-ink lg:px-3 lg:py-1 lg:text-[11px]">
+              <span className="inline-flex items-center gap-1 rounded-none border border-line bg-surface/60 px-2.5 py-0.5 text-[10px] font-semibold text-ink lg:px-3 lg:py-1 lg:text-[11px]">
                 <Star className="h-3 w-3 fill-accent text-accent" />
                 4.95 · 131 {t("pdp.reviewsLabel")}
               </span>
@@ -784,7 +1467,7 @@ export function HomeClient() {
                   addProductToCart("serum-gel", 1, 0);
                   openOverlay("cart");
                 }}
-                className="btn-tactile inline-flex min-h-[46px] items-center justify-center gap-2.5 rounded-full bg-ink px-6 py-3 text-xs font-bold tracking-[0.16em] text-surface uppercase hover:bg-accent hover:text-ink lg:min-h-[54px] lg:px-7 lg:py-4"
+                className="btn-tactile inline-flex min-h-[46px] items-center justify-center gap-2.5 rounded-none bg-ink px-6 py-3 text-xs font-bold tracking-[0.16em] text-surface uppercase hover:bg-accent hover:text-ink lg:min-h-[54px] lg:px-7 lg:py-4"
               >
                 <ShoppingBag className="h-4 w-4" />
                 <span>
@@ -837,7 +1520,7 @@ export function HomeClient() {
           </div>
         </Reveal>
 
-        {/* 2x2 Mobile / 4-Col Desktop Tactile Goal Tiles */}
+        {/* 2x2 Mobile / 4-Col Desktop Full-Bleed Editorial Goal Tiles */}
         <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:mt-8 lg:grid-cols-4">
           {INLINE_QUIZ_GOALS.map((item) => {
             const active = selectedGoal === item.goal;
@@ -846,35 +1529,52 @@ export function HomeClient() {
                 key={item.goal}
                 type="button"
                 onClick={() => setSelectedGoal(item.goal)}
-                className={`btn-tactile group relative flex flex-col overflow-hidden rounded-2xl border p-3 text-left sm:p-4 ${
+                className={`btn-tactile group relative flex aspect-[4/5] flex-col justify-between overflow-hidden rounded-none text-left transition-all duration-300 sm:aspect-[4/4] ${
                   active
-                    ? "border-ink bg-ink text-pearl shadow-lg"
-                    : "border-line bg-surface text-ink hover:border-accent"
+                    ? "ring-2 ring-accent ring-offset-2 ring-offset-[#f4efe8] shadow-[0_14px_34px_rgba(18,16,14,0.2)]"
+                    : "border border-line/70 shadow-[0_4px_16px_rgba(18,16,14,0.06)] hover:shadow-[0_12px_28px_rgba(18,16,14,0.14)]"
                 }`}
               >
-                <div className="aspect-[16/10] w-full overflow-hidden rounded-xl">
-                  <img
-                    src={assetPath(item.image)}
-                    alt={item.title[lang]}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <p className="mt-2.5 font-display text-sm leading-tight font-bold sm:text-base lg:mt-3 lg:text-lg">
-                  {item.title[lang]}
-                </p>
-                <p
-                  className={`mt-1 text-[11px] leading-snug sm:text-xs ${
-                    active ? "text-pearl/70" : "text-muted"
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  src={assetPath(item.image)}
+                  alt={item.title[lang]}
+                  className={`absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    active ? "scale-[1.04]" : "group-hover:scale-[1.06]"
                   }`}
-                >
-                  {item.hint[lang]}
-                </p>
-                {active && (
-                  <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase lg:mt-2.5">
-                    <Check className="h-3 w-3" />
-                    {lang === "uk" ? "Обрано" : "Selected"}
-                  </span>
-                )}
+                />
+                <div
+                  className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${
+                    active
+                      ? "bg-gradient-to-t from-ink/92 via-ink/45 to-ink/15"
+                      : "bg-gradient-to-t from-ink/88 via-ink/38 to-transparent group-hover:from-ink/92"
+                  }`}
+                />
+
+                {/* Top active indicator */}
+                <div className="relative z-10 flex justify-end p-2.5 sm:p-3.5">
+                  {active ? (
+                    <span className="inline-flex items-center gap-1 rounded-none bg-accent px-2.5 py-1 text-[9px] font-bold tracking-[0.14em] text-ink uppercase shadow-md sm:text-[10px]">
+                      <Check className="h-3 w-3" strokeWidth={2.5} />
+                      <span>{lang === "uk" ? "Обрано" : "Selected"}</span>
+                    </span>
+                  ) : (
+                    <span className="flex h-7 w-7 items-center justify-center rounded-none border border-pearl/25 bg-ink/35 text-pearl/80 backdrop-blur-md transition-colors group-hover:border-accent group-hover:bg-accent group-hover:text-ink sm:h-8 sm:w-8">
+                      <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2.2} />
+                    </span>
+                  )}
+                </div>
+
+                {/* Bottom copy inside photo */}
+                <div className="relative z-10 mt-auto p-3 sm:p-4 lg:p-5">
+                  <p className="font-display text-sm leading-tight font-bold text-pearl sm:text-base lg:text-lg">
+                    {item.title[lang]}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-pearl/75 sm:text-xs">
+                    {item.hint[lang]}
+                  </p>
+                </div>
               </button>
             );
           })}
@@ -889,7 +1589,7 @@ export function HomeClient() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.32, ease: LUXURY_EASE }}
-              className="rounded-[24px] border border-line bg-surface p-5 shadow-[0_8px_32px_rgba(23,26,28,0.04)] sm:p-6 lg:rounded-[28px] lg:p-8"
+              className="rounded-none border border-line bg-surface p-5 shadow-[0_8px_32px_rgba(23,26,28,0.04)] sm:p-6 lg:p-8"
             >
               <div className="flex flex-col justify-between gap-3 border-b border-line pb-4 lg:flex-row lg:items-center lg:gap-4 lg:pb-5">
                 <div>
@@ -924,7 +1624,7 @@ export function HomeClient() {
                       );
                       openOverlay("cart");
                     }}
-                    className="btn-tactile inline-flex min-h-[44px] items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[11px] font-bold tracking-[0.14em] text-surface uppercase hover:bg-accent hover:text-ink lg:min-h-[48px] lg:px-6 lg:py-3 lg:text-xs"
+                    className="btn-tactile inline-flex min-h-[44px] items-center gap-2 rounded-none bg-ink px-5 py-2.5 text-[11px] font-bold tracking-[0.14em] text-surface uppercase hover:bg-accent hover:text-ink lg:min-h-[48px] lg:px-6 lg:py-3 lg:text-xs"
                   >
                     <ShoppingBag className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
                     <span>
@@ -939,12 +1639,14 @@ export function HomeClient() {
                   <Link
                     key={step.product.id}
                     href={`/product/${step.product.id}`}
-                    className="group flex items-center gap-3 rounded-2xl border border-line/80 bg-surface-soft p-2.5 transition-colors hover:border-accent lg:gap-3.5 lg:p-3.5"
+                    className="group flex items-center gap-3 rounded-none border border-line/80 bg-surface-soft p-2.5 transition-colors hover:border-accent lg:gap-3.5 lg:p-3.5"
                   >
                     <img
+                      loading="lazy"
+                      decoding="async"
                       src={step.product.image}
                       alt={step.product.name[lang]}
-                      className="h-16 w-14 shrink-0 rounded-xl object-cover lg:h-20 lg:w-16"
+                      className="h-16 w-14 shrink-0 rounded-none object-cover lg:h-20 lg:w-16"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
@@ -983,13 +1685,15 @@ export function HomeClient() {
                 : "Zero filler claims—only effective concentrations of clean botanical actives chosen by a certified technologist."}
             </p>
 
-            <div className="relative mt-5 overflow-hidden rounded-[22px] border border-line lg:mt-6 lg:rounded-[26px]">
+            <div className="relative mt-5 overflow-hidden rounded-none border border-line lg:mt-6 ">
               <img
+                loading="lazy"
+                decoding="async"
                 src={assetPath("/assets/editorial/journal-actives.jpg")}
                 alt="Botanical laboratory actives"
                 className="aspect-[16/10] w-full object-cover"
               />
-              <span className="absolute bottom-3 left-3 rounded-full bg-ink/88 px-3.5 py-1.5 text-[10px] font-bold tracking-[0.14em] text-accent uppercase backdrop-blur-md">
+              <span className="absolute bottom-3 left-3 rounded-none bg-ink/88 px-3.5 py-1.5 text-[10px] font-bold tracking-[0.14em] text-accent uppercase backdrop-blur-md">
                 {lang === "uk" ? "Сертифікований технолог · Львів" : "Certified Technologist · Lviv"}
               </span>
             </div>
@@ -1048,7 +1752,7 @@ export function HomeClient() {
                             {linked.map((p) => (
                               <div
                                 key={p.id}
-                                className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-soft py-1 pl-3 pr-1 lg:py-1.5 lg:pl-3.5 lg:pr-1.5"
+                                className="inline-flex items-center gap-2 rounded-none border border-line bg-surface-soft py-1 pl-3 pr-1 lg:py-1.5 lg:pl-3.5 lg:pr-1.5"
                               >
                                 <Link
                                   href={`/product/${p.id}`}
@@ -1061,7 +1765,7 @@ export function HomeClient() {
                                   type="button"
                                   onClick={() => addProductToCart(p.id, 1, 0)}
                                   aria-label={t("common.addToCart")}
-                                  className="btn-tactile flex h-6 w-6 items-center justify-center rounded-full bg-ink text-surface hover:bg-accent hover:text-ink lg:h-7 lg:w-7"
+                                  className="btn-tactile flex h-6 w-6 items-center justify-center rounded-none bg-ink text-surface hover:bg-accent hover:text-ink lg:h-7 lg:w-7"
                                 >
                                   <Plus className="h-3 w-3 lg:h-3.5 lg:w-3.5" strokeWidth={2.2} />
                                 </button>
@@ -1085,10 +1789,12 @@ export function HomeClient() {
         className="mx-auto max-w-[1440px] px-4 py-14 sm:px-8 lg:px-12 lg:py-24"
       >
         <Reveal>
-          <div className="relative overflow-hidden rounded-[24px] border border-line bg-surface shadow-sm lg:rounded-[28px]">
+          <div className="relative overflow-hidden rounded-none border border-line bg-surface shadow-sm ">
             {/* Panoramic Campaign Image */}
             <div className="relative aspect-[16/9] w-full overflow-hidden lg:aspect-[21/9] lg:min-h-[480px] xl:min-h-[540px]">
               <img
+                loading="lazy"
+                decoding="async"
                 src={assetPath("/assets/editorial/campaign-giftset.jpg")}
                 alt={activeBundle.name[lang]}
                 className="h-full w-full object-cover"
@@ -1096,7 +1802,7 @@ export function HomeClient() {
             </div>
 
             {/* Architectural Floating Set Switcher Card (bottom-left on desktop, compact block below on mobile) */}
-            <div className="p-4 sm:p-6 lg:absolute lg:bottom-7 lg:left-7 lg:w-[460px] lg:rounded-3xl lg:border lg:border-line/60 lg:bg-surface/95 lg:p-7 lg:shadow-2xl lg:backdrop-blur-md">
+            <div className="p-4 sm:p-6 lg:absolute lg:bottom-7 lg:left-7 lg:w-[460px] lg:border lg:border-line/60 lg:bg-surface/95 lg:p-7 lg:shadow-2xl lg:backdrop-blur-md">
               <p className="eyebrow text-accent">{t("home.setsEyebrow")}</p>
 
               {/* 3 Set Switcher Pills */}
@@ -1106,7 +1812,7 @@ export function HomeClient() {
                     key={b.id}
                     type="button"
                     onClick={() => setSelectedBundleIdx(idx)}
-                    className={`rounded-full px-3 py-1.5 text-[10px] font-bold tracking-[0.1em] uppercase transition-colors lg:text-[11px] ${
+                    className={`rounded-none px-3 py-1.5 text-[10px] font-bold tracking-[0.1em] uppercase transition-colors lg:text-[11px] ${
                       selectedBundleIdx === idx
                         ? "bg-ink text-pearl"
                         : "bg-surface-soft text-muted hover:text-ink"
@@ -1153,7 +1859,7 @@ export function HomeClient() {
                     addBundleToCart(activeBundle.id);
                     openOverlay("cart");
                   }}
-                  className="btn-tactile inline-flex min-h-[44px] items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-xs font-bold tracking-[0.14em] text-surface uppercase hover:bg-accent hover:text-ink"
+                  className="btn-tactile inline-flex min-h-[44px] items-center gap-2 rounded-none bg-ink px-5 py-2.5 text-xs font-bold tracking-[0.14em] text-surface uppercase hover:bg-accent hover:text-ink"
                 >
                   <ShoppingBag className="h-3.5 w-3.5" />
                   <span>{t("common.addToCart")}</span>
@@ -1172,8 +1878,10 @@ export function HomeClient() {
         <div className="mx-auto max-w-[1440px] space-y-16 px-4 sm:px-8 lg:space-y-24 lg:px-12">
           {/* 7A: Behind the Laboratory */}
           <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-14">
-            <ParallaxMedia className="rounded-[22px] border border-line lg:col-span-6 lg:rounded-[26px]">
+            <ParallaxMedia className="rounded-none border border-line lg:col-span-6 ">
               <img
+                loading="lazy"
+                decoding="async"
                 src={assetPath("/assets/editorial/campaign-atelier.jpg")}
                 alt="Sophie Bilynska Lviv botanical laboratory"
                 className="aspect-[16/9] w-full object-cover lg:aspect-[16/10]"
@@ -1222,7 +1930,7 @@ export function HomeClient() {
                   href="https://www.instagram.com/sb.cosm/"
                   target="_blank"
                   rel="noreferrer"
-                  className="btn-tactile inline-flex items-center gap-2 rounded-full border border-ink px-4 py-2 text-xs font-bold tracking-[0.14em] text-ink uppercase hover:bg-ink hover:text-surface lg:px-5 lg:py-2.5"
+                  className="btn-tactile inline-flex items-center gap-2 rounded-none border border-ink px-4 py-2 text-xs font-bold tracking-[0.14em] text-ink uppercase hover:bg-ink hover:text-surface lg:px-5 lg:py-2.5"
                 >
                   <Instagram className="h-4 w-4 text-accent" />
                   <span>@sb.cosm · 16.5K</span>
@@ -1230,46 +1938,12 @@ export function HomeClient() {
                 </a>
               </div>
 
-              {/* Mobile: Centered single-card infinite circular review carousel with hairline chevrons & progress bar */}
-              <MobileCircularCarousel
-                items={CLIENT_REVIEWS}
-                getKey={(rev) => rev.id}
-                prevLabel={lang === "uk" ? "Попередній відгук" : "Previous review"}
-                nextLabel={lang === "uk" ? "Наступний відгук" : "Next review"}
-                theme="light"
-                arrowTopClass="top-1/2"
-                renderItem={(rev) => (
-                  <div className="flex min-h-[220px] flex-col rounded-2xl border border-line bg-paper/55 p-5">
-                    <div className="flex items-center gap-0.5 text-accent">
-                      {Array.from({ length: rev.rating }).map((_, i) => (
-                        <Star key={i} className="h-3.5 w-3.5 fill-current" />
-                      ))}
-                    </div>
-                    <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-soft">
-                      «{rev.text[lang]}»
-                    </p>
-                    <div className="mt-4 border-t border-line pt-3">
-                      <div className="flex items-center justify-between text-xs font-bold text-ink">
-                        <span>{rev.author[lang]}</span>
-                        <span className="text-accent">{rev.city[lang]}</span>
-                      </div>
-                      <Link
-                        href={`/product/${rev.productId}`}
-                        className="mt-1 block truncate text-[11px] font-semibold text-muted hover:text-accent"
-                      >
-                        {rev.productName[lang]} →
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              />
-
-              {/* Desktop: 4-Col Grid */}
-              <div className="mt-7 hidden gap-4 lg:grid lg:grid-cols-4">
+              {/* Mobile: native snap-scroll peeking rail | Desktop: 4-Col Grid */}
+              <div className="no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:-mx-8 sm:px-8 lg:mx-0 lg:mt-7 lg:grid lg:grid-cols-4 lg:gap-4 lg:overflow-visible lg:px-0 lg:pb-0">
                 {CLIENT_REVIEWS.map((rev) => (
                   <div
                     key={rev.id}
-                    className="flex flex-col rounded-2xl border border-line bg-paper/55 p-5"
+                    className="flex w-[82vw] max-w-[320px] shrink-0 snap-start flex-col rounded-none border border-line bg-paper/55 p-5 lg:w-auto lg:max-w-none"
                   >
                     <div className="flex items-center gap-0.5 text-accent">
                       {Array.from({ length: rev.rating }).map((_, i) => (
@@ -1356,14 +2030,14 @@ export function HomeClient() {
               href="https://t.me/+380631790642"
               target="_blank"
               rel="noreferrer"
-              className="btn-tactile inline-flex min-h-[50px] items-center justify-center gap-2 whitespace-nowrap rounded-full bg-ink px-6 py-3 text-xs font-bold tracking-[0.15em] text-surface uppercase hover:bg-accent hover:text-ink"
+              className="btn-tactile inline-flex min-h-[50px] items-center justify-center gap-2 whitespace-nowrap rounded-none bg-ink px-6 py-3 text-xs font-bold tracking-[0.15em] text-surface uppercase hover:bg-accent hover:text-ink"
             >
               <Send className="h-3.5 w-3.5 shrink-0" />
               <span>{lang === "uk" ? "Написати в Telegram" : "Message on Telegram"}</span>
             </a>
             <Link
               href="/quiz"
-              className="btn-tactile inline-flex min-h-[50px] items-center justify-center gap-2 whitespace-nowrap rounded-full border border-ink px-6 py-3 text-xs font-bold tracking-[0.15em] text-ink uppercase hover:bg-ink hover:text-surface"
+              className="btn-tactile inline-flex min-h-[50px] items-center justify-center gap-2 whitespace-nowrap rounded-none border border-ink px-6 py-3 text-xs font-bold tracking-[0.15em] text-ink uppercase hover:bg-ink hover:text-surface"
             >
               <Sparkles className="h-3.5 w-3.5 shrink-0 text-accent" />
               <span>{lang === "uk" ? "Пройти підбір за 30 с" : "30-Sec Ritual Finder"}</span>
