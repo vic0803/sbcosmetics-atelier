@@ -103,6 +103,7 @@ const StoreContext = createContext<StoreContextValue | null>(null);
 const STORAGE_KEYS = {
   lang: "sb_atelier_lang",
   cart: "sb_atelier_cart",
+  promo: "sb_atelier_promo",
   wishlist: "sb_atelier_wishlist",
   quiz: "sb_atelier_quiz",
   user: "sb_atelier_user",
@@ -178,6 +179,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
 
     setCartItems(readJSON<CartItem[]>(STORAGE_KEYS.cart, []));
+    setPromoCode(readJSON<string | null>(STORAGE_KEYS.promo, null));
     setWishlist(readJSON<string[]>(STORAGE_KEYS.wishlist, []));
     setSavedQuiz(readJSON<QuizAnswers | null>(STORAGE_KEYS.quiz, null));
     setUser(readJSON<UserProfile | null>(STORAGE_KEYS.user, null));
@@ -213,6 +215,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (hydrated) writeJSON(STORAGE_KEYS.cart, cartItems);
   }, [cartItems, hydrated]);
+
+  useEffect(() => {
+    if (hydrated) writeJSON(STORAGE_KEYS.promo, promoCode);
+  }, [promoCode, hydrated]);
 
   useEffect(() => {
     if (hydrated) writeJSON(STORAGE_KEYS.wishlist, wishlist);

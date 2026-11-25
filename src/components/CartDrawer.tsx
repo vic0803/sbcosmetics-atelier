@@ -1,13 +1,31 @@
 "use client";
 
-import { ArrowRight, Minus, Plus, Sparkles, Tag, Trash2, Truck } from "lucide-react";
+import { ArrowRight, Check, Minus, Plus, Truck, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useStore } from "@/context/StoreContext";
 import { BUNDLES } from "@/data/bundles";
-import { getProductById, PRODUCTS } from "@/data/products";
-import { formatPrice } from "@/lib/format";
+import {
+  getProductById,
+  getRitualPairings,
+  PRODUCTS,
+  type Product,
+} from "@/data/products";
+import { formatPrice, type Lang } from "@/lib/format";
 import { SlideSheet } from "./SlideSheet";
+
+function formatItemCount(count: number, lang: Lang): string {
+  if (lang === "en") {
+    return `${count} ${count === 1 ? "item" : "items"}`;
+  }
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return `${count} засіб`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return `${count} засоби`;
+  }
+  return `${count} засобів`;
+}
 
 export function CartDrawer() {
   const {
@@ -29,16 +47,54 @@ export function CartDrawer() {
     clearPromo,
   } = useStore();
 
+  const [promoOpen, setPromoOpen] = useState(false);
   const [promoInput, setPromoInput] = useState("");
+  const [promoError, setPromoError] = useState(false);
 
   const remaining = Math.max(0, freeShippingThreshold - cartTotal);
-  const progress = Math.min(100, Math.round((cartTotal / freeShippingThreshold) * 100));
+  const progress = Math.min(
+    100,
+    Math.round((cartTotal / freeShippingThreshold) * 100)
+  );
 
-  // Suggest 1 complementary product not currently in cart
-  const upsellProduct = PRODUCTS.find(
-    (p) =>
-      (p.id === "gel-mask" || p.id === "toner-aloe" || p.id === "scrub-soap") &&
-      !cartItems.some((c) => c.kind === "product" && c.id === p.id)
+  // Collect all product IDs already present in cart (direct or inside bundles)
+  const inCartProductIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const item of cartItems) {
+      if (item.kind === "product") {
+        ids.add(item.id);
+      } else {
+        const bundle = BUNDLES.find((b) => b.id === item.id);
+        bundle?.productIds.forEach((pid) => ids.add(pid));
+      }
+    }
+    return ids;
+  }, [cartItems]);
+
+  // Smart editorial pairing for non-empty cart
+  const upsellProduct: Product | undefined = useMemo(() => {
+    for (const item of cartItems) {
+      if (item.kind === "product") {
+        const prod = getProductById(item.id);
+        if (prod) {
+          const match = getRitualPairings(prod).find(
+            (p) => !inCartProductIds.has(p.id)
+          );
+          if (match) return match;
+        }
+      }
+    }
+    return (
+      PRODUCTS.find(
+        (p) => p.badge === "bestseller" && !inCartProductIds.has(p.id)
+      ) ?? PRODUCTS.find((p) => !inCartProductIds.has(p.id))
+    );
+  }, [cartItems, inCartProductIds]);
+
+  // 2 signature bestsellers for empty bag quick-add
+  const emptyBestsellers = useMemo(
+    () => PRODUCTS.filter((p) => p.badge === "bestseller").slice(0, 2),
+    []
   );
 
   const handleApplyPromo = (e: React.FormEvent) => {
@@ -46,6 +102,10 @@ export function CartDrawer() {
     if (!promoInput.trim()) return;
     if (applyPromo(promoInput)) {
       setPromoInput("");
+      setPromoError(false);
+      setPromoOpen(false);
+    } else {
+      setPromoError(true);
     }
   };
 
@@ -54,118 +114,207 @@ export function CartDrawer() {
       open={activeOverlay === "cart"}
       onClose={closeOverlay}
       title={t("cart.title")}
-      subtitle={
-        cartCount > 0
-          ? `${cartCount} ${lang === "uk" ? "позиц." : "items"} · ${formatPrice(cartTotal, lang)}`
-          : undefined
-      }
+      subtitle={cartCount > 0 ? formatItemCount(cartCount, lang) : undefined}
+      surface="parchment"
       footer={
         cartItems.length > 0 ? (
-          <div className="space-y-3">
-            <div className="space-y-1.5 text-sm">
-              <div className="flex justify-between text-muted">
+          <div>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center justify-between text-muted">
                 <span>{t("cart.subtotal")}</span>
-                <span>{formatPrice(cartSubtotal, lang)}</span>
+                <span className="tabular-nums">
+                  {formatPrice(cartSubtotal, lang)}
+                </span>
               </div>
+
               {discountAmount > 0 && (
-                <div className="flex justify-between text-sage font-medium">
-                  <span className="flex items-center gap-1.5">
-                    {t("cart.discount")} ({promoCode})
+                <div className="flex items-center justify-between font-medium text-sage">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span>
+                      {t("cart.discount")} ({promoCode})
+                    </span>
                     <button
                       type="button"
                       onClick={clearPromo}
-                      className="text-xs underline opacity-75 hover:opacity-100"
+                      aria-label={t("cart.promoRemove")}
+                      className="text-muted transition-colors hover:text-ink"
                     >
-                      ×
+                      <X className="h-3 w-3" strokeWidth={1.8} />
                     </button>
                   </span>
-                  <span>−{formatPrice(discountAmount, lang)}</span>
+                  <span className="tabular-nums">
+                    −{formatPrice(discountAmount, lang)}
+                  </span>
                 </div>
               )}
-              <div className="flex justify-between text-muted">
+
+              <div className="flex items-center justify-between text-muted">
                 <span>{t("cart.shipping")}</span>
-                <span className={remaining === 0 ? "font-medium text-sage" : ""}>
-                  {remaining === 0 ? t("cart.shippingFree") : t("cart.shippingCalc")}
+                <span
+                  className={
+                    remaining === 0
+                      ? "font-medium text-sage"
+                      : "tabular-nums"
+                  }
+                >
+                  {remaining === 0
+                    ? t("cart.shippingFree")
+                    : t("cart.shippingCalc")}
                 </span>
               </div>
-              <div className="flex justify-between border-t border-line pt-2.5 text-base font-medium text-ink">
-                <span>{t("cart.total")}</span>
-                <span>{formatPrice(cartTotal, lang)}</span>
+
+              <div className="flex items-baseline justify-between border-t border-parchment-line pt-3">
+                <span className="text-xs font-semibold tracking-[0.14em] text-ink uppercase">
+                  {t("cart.total")}
+                </span>
+                <span className="font-display text-2xl leading-none font-bold tracking-[-0.015em] text-ink tabular-nums">
+                  {formatPrice(cartTotal, lang)}
+                </span>
               </div>
             </div>
 
             <Link
               href="/checkout"
               onClick={closeOverlay}
-              className="btn-tactile flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-4 text-xs font-medium tracking-[0.18em] text-pearl uppercase hover:bg-accent hover:text-ink"
+              className="btn-tactile mt-4 flex min-h-[54px] w-full items-center justify-center gap-3 rounded-none bg-[#7CCBE0] px-6 py-4 text-xs font-bold tracking-[0.14em] text-ink uppercase hover:bg-ink hover:text-pearl"
             >
               <span>{t("cart.checkout")}</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
             </Link>
           </div>
         ) : undefined
       }
     >
-      {/* Free Shipping Bar */}
-      <div className="mb-5 rounded-2xl border border-line bg-paper/75 p-4">
-        <div className="flex items-center gap-2 text-xs text-ink-soft">
-          <Truck className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.6} />
-          {remaining === 0 ? (
-            <span className="font-medium text-sage">
-              {t("common.freeShippingUnlocked")}
-            </span>
-          ) : (
-            <span>
-              {t("common.freeShippingAt")}{" "}
-              <strong className="font-semibold text-ink">
-                {formatPrice(freeShippingThreshold, lang)}
-              </strong>{" "}
-              ({lang === "uk" ? "ще" : "add"} {formatPrice(remaining, lang)})
-            </span>
-          )}
-        </div>
-        <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-line">
-          <div
-            className="h-full rounded-full bg-accent transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
       {/* Empty State */}
       {cartItems.length === 0 ? (
-        <div className="flex flex-col items-center py-12 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-line bg-paper text-accent">
-            <Sparkles className="h-6 w-6" strokeWidth={1.4} />
+        <div className="flex flex-col py-4">
+          <div className="py-4">
+            <h3 className="font-display text-2xl leading-tight font-bold tracking-[-0.015em] text-ink">
+              {t("cart.emptyTitle")}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted">
+              {t("cart.emptySub")}
+            </p>
+
+            <div className="mt-6 flex flex-col gap-2.5">
+              <Link
+                href="/catalog"
+                onClick={closeOverlay}
+                className="btn-tactile flex min-h-[50px] w-full items-center justify-center gap-2 rounded-none bg-[#7CCBE0] px-5 py-3.5 text-xs font-bold tracking-[0.14em] text-ink uppercase hover:bg-ink hover:text-pearl"
+              >
+                <span>{t("hero.ctaPrimary")}</span>
+                <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
+              </Link>
+              <Link
+                href="/quiz"
+                onClick={closeOverlay}
+                className="btn-tactile flex min-h-[46px] w-full items-center justify-center rounded-none border border-parchment-line px-5 py-3 text-xs font-semibold tracking-[0.14em] text-ink uppercase hover:border-ink"
+              >
+                {t("hero.ctaSecondary")}
+              </Link>
+            </div>
           </div>
-          <h3 className="mt-5 font-display font-bold tracking-[-0.02em] text-2xl text-ink">
-            {t("cart.emptyTitle")}
-          </h3>
-          <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted">
-            {t("cart.emptySub")}
-          </p>
-          <div className="mt-6 flex w-full flex-col gap-2.5">
-            <Link
-              href="/quiz"
-              onClick={closeOverlay}
-              className="btn-tactile flex w-full items-center justify-center gap-2 rounded-full bg-ink px-5 py-3.5 text-xs font-medium tracking-[0.16em] text-pearl uppercase hover:bg-accent hover:text-ink"
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>{t("hero.ctaSecondary")}</span>
-            </Link>
-            <Link
-              href="/catalog"
-              onClick={closeOverlay}
-              className="btn-tactile flex w-full items-center justify-center rounded-full border border-line-strong px-5 py-3.5 text-xs font-medium tracking-[0.16em] text-ink uppercase hover:border-ink"
-            >
-              {t("hero.ctaPrimary")}
-            </Link>
-          </div>
+
+          {/* 2 Signature Bestsellers for quick-add */}
+          {emptyBestsellers.length > 0 && (
+            <div className="mt-8 border-t border-parchment-line pt-6">
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-muted uppercase">
+                {t("cart.emptyBestsellers")}
+              </p>
+              <ul className="mt-4 divide-y divide-parchment-line">
+                {emptyBestsellers.map((prod) => {
+                  const vol = prod.variants[0]?.label[lang];
+                  return (
+                    <li
+                      key={prod.id}
+                      className="flex items-center gap-3.5 py-4 first:pt-0 last:pb-0"
+                    >
+                      <Link
+                        href={`/product/${prod.id}`}
+                        onClick={closeOverlay}
+                        className="h-[72px] w-[58px] shrink-0 overflow-hidden rounded-none bg-surface-soft"
+                      >
+                        <img
+                          src={prod.image}
+                          alt={prod.name[lang]}
+                          className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.04]"
+                        />
+                      </Link>
+                      <div className="min-w-0 flex-1">
+                        <Link
+                          href={`/product/${prod.id}`}
+                          onClick={closeOverlay}
+                          className="block truncate font-display text-sm font-bold text-ink transition-colors hover:text-accent"
+                        >
+                          {prod.line ? prod.line[lang] : prod.name[lang]}
+                        </Link>
+                        <p className="mt-0.5 truncate text-xs text-muted">
+                          {prod.productType[lang]}
+                          {vol ? ` · ${vol}` : ""}
+                        </p>
+                        <p className="mt-1 text-xs font-semibold text-ink tabular-nums">
+                          {formatPrice(prod.price, lang)}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => addProductToCart(prod.id, 1, 0)}
+                        className="btn-tactile shrink-0 rounded-none border border-parchment-line px-3.5 py-2 text-[11px] font-semibold tracking-[0.14em] text-ink uppercase hover:border-ink hover:bg-ink hover:text-pearl"
+                      >
+                        + {t("common.quickAdd")}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
         </div>
       ) : (
-        <div className="space-y-4">
-          {/* Items */}
-          <ul className="divide-y divide-line">
+        <div>
+          {/* Free Shipping Progress — Hairline editorial bar, no box */}
+          <div className="mb-6 border-b border-parchment-line pb-4">
+            <div className="flex items-center gap-2 text-xs">
+              {remaining === 0 ? (
+                <>
+                  <Check
+                    className="h-3.5 w-3.5 shrink-0 text-sage"
+                    strokeWidth={2}
+                  />
+                  <span className="font-medium text-sage">
+                    {t("common.freeShippingUnlocked")}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Truck
+                    className="h-3.5 w-3.5 shrink-0 text-accent"
+                    strokeWidth={1.6}
+                  />
+                  <span className="text-ink-soft">
+                    {lang === "uk" ? "До безкоштовної доставки ще " : "Add "}
+                    <strong className="font-semibold text-ink tabular-nums">
+                      {formatPrice(remaining, lang)}
+                    </strong>
+                    {lang === "uk"
+                      ? ` · НП від ${formatPrice(freeShippingThreshold, lang)}`
+                      : ` for free shipping (${formatPrice(freeShippingThreshold, lang)})`}
+                  </span>
+                </>
+              )}
+            </div>
+            <div className="mt-2.5 h-[2px] w-full overflow-hidden rounded-none bg-parchment-line">
+              <div
+                className={`h-full rounded-none transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  remaining === 0 ? "bg-sage" : "bg-[#2B849E]"
+                }`}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Cart Items */}
+          <ul className="divide-y divide-parchment-line">
             {cartItems.map((item) => {
               if (item.kind === "bundle") {
                 const bundle = BUNDLES.find((b) => b.id === item.id);
@@ -173,55 +322,77 @@ export function CartDrawer() {
                 return (
                   <li
                     key={`bundle-${bundle.id}`}
-                    className="flex gap-4 py-4 first:pt-0"
+                    className="flex gap-4 py-5 first:pt-0"
                   >
-                    <img
-                      src={bundle.image}
-                      alt={bundle.name[lang]}
-                      className="h-24 w-20 shrink-0 rounded-xl border border-line object-cover"
-                    />
-                    <div className="flex flex-1 flex-col">
-                      <span className="text-[10px] font-medium tracking-[0.16em] text-accent uppercase">
-                        {bundle.badge[lang]}
-                      </span>
-                      <p className="mt-0.5 font-display font-bold tracking-[-0.02em] text-lg leading-tight text-ink">
-                        {bundle.name[lang]}
-                      </p>
-                      <p className="mt-1 text-sm font-medium text-ink">
-                        {formatPrice(bundle.bundlePrice * item.qty, lang)}
-                      </p>
+                    <div className="h-[104px] w-[84px] shrink-0 overflow-hidden rounded-none bg-surface-soft">
+                      <img
+                        src={bundle.image}
+                        alt={bundle.name[lang]}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
 
-                      <div className="mt-auto flex items-center justify-between pt-2">
-                        <div className="flex items-center rounded-full border border-line bg-paper">
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="text-[10px] font-semibold tracking-[0.16em] text-accent uppercase">
+                            {bundle.badge[lang]}
+                          </span>
+                          <p className="mt-0.5 font-display text-base leading-snug font-bold tracking-[-0.01em] text-ink">
+                            {bundle.name[lang]}
+                          </p>
+                          <p className="mt-0.5 line-clamp-1 text-xs text-muted">
+                            {bundle.subtitle[lang]}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeCartItem("bundle", bundle.id, 0)}
+                          aria-label={t("cart.removeItem")}
+                          className="-mr-1.5 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-none text-muted/70 transition-colors hover:text-ink"
+                        >
+                          <X className="h-3.5 w-3.5" strokeWidth={1.7} />
+                        </button>
+                      </div>
+
+                      <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+                        <div className="-ml-2 inline-flex items-center gap-0.5">
                           <button
                             type="button"
-                            onClick={() => updateCartQty("bundle", bundle.id, 0, -1)}
+                            onClick={() =>
+                              updateCartQty("bundle", bundle.id, 0, -1)
+                            }
                             aria-label="Decrease quantity"
-                            className="flex h-9 w-9 items-center justify-center text-ink hover:text-accent"
+                            className="flex h-8 w-8 items-center justify-center rounded-none text-ink/70 transition-colors hover:text-ink"
                           >
-                            <Minus className="h-3.5 w-3.5" />
+                            <Minus className="h-3.5 w-3.5" strokeWidth={1.75} />
                           </button>
-                          <span className="min-w-6 text-center text-xs font-medium">
+                          <span className="min-w-6 text-center text-sm font-medium text-ink tabular-nums">
                             {item.qty}
                           </span>
                           <button
                             type="button"
-                            onClick={() => updateCartQty("bundle", bundle.id, 0, 1)}
+                            onClick={() =>
+                              updateCartQty("bundle", bundle.id, 0, 1)
+                            }
                             aria-label="Increase quantity"
-                            className="flex h-9 w-9 items-center justify-center text-ink hover:text-accent"
+                            className="flex h-8 w-8 items-center justify-center rounded-none text-ink/70 transition-colors hover:text-ink"
                           >
-                            <Plus className="h-3.5 w-3.5" />
+                            <Plus className="h-3.5 w-3.5" strokeWidth={1.75} />
                           </button>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => removeCartItem("bundle", bundle.id, 0)}
-                          aria-label="Remove item"
-                          className="flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-line/60 hover:text-ink"
-                        >
-                          <Trash2 className="h-4 w-4" strokeWidth={1.6} />
-                        </button>
+                        <div className="text-right">
+                          {item.qty > 1 && (
+                            <p className="text-[11px] text-muted tabular-nums">
+                              {formatPrice(bundle.bundlePrice, lang)} /{" "}
+                              {t("cart.perUnit")}
+                            </p>
+                          )}
+                          <p className="text-sm font-semibold text-ink tabular-nums">
+                            {formatPrice(bundle.bundlePrice * item.qty, lang)}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -230,78 +401,107 @@ export function CartDrawer() {
 
               const product = getProductById(item.id);
               if (!product) return null;
-              const variant = product.variants[item.variantIndex] ?? product.variants[0];
+              const variant =
+                product.variants[item.variantIndex] ?? product.variants[0];
               const unitPrice = variant ? variant.price : product.price;
 
               return (
                 <li
                   key={`prod-${product.id}-${item.variantIndex}`}
-                  className="flex gap-4 py-4 first:pt-0"
+                  className="flex gap-4 py-5 first:pt-0"
                 >
                   <Link
                     href={`/product/${product.id}`}
                     onClick={closeOverlay}
-                    className="h-24 w-20 shrink-0 overflow-hidden rounded-xl border border-line"
+                    className="h-[104px] w-[84px] shrink-0 overflow-hidden rounded-none bg-surface-soft"
                   >
                     <img
                       src={product.image}
                       alt={product.name[lang]}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.04]"
                     />
                   </Link>
 
-                  <div className="flex flex-1 flex-col">
-                    <Link
-                      href={`/product/${product.id}`}
-                      onClick={closeOverlay}
-                      className="font-display font-bold tracking-[-0.02em] text-lg leading-tight text-ink hover:text-accent"
-                    >
-                      {product.line ? product.line[lang] : product.name[lang]}
-                    </Link>
-                    <p className="mt-0.5 text-xs text-muted">
-                      {variant?.label[lang]}
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-ink">
-                      {formatPrice(unitPrice * item.qty, lang)}
-                    </p>
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <Link
+                          href={`/product/${product.id}`}
+                          onClick={closeOverlay}
+                          className="block font-display text-base leading-snug font-bold tracking-[-0.01em] text-ink transition-colors hover:text-accent"
+                        >
+                          {product.line
+                            ? product.line[lang]
+                            : product.name[lang]}
+                        </Link>
+                        <p className="mt-0.5 truncate text-xs text-muted">
+                          {product.productType[lang]}
+                          {variant ? ` · ${variant.label[lang]}` : ""}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeCartItem(
+                            "product",
+                            product.id,
+                            item.variantIndex
+                          )
+                        }
+                        aria-label={t("cart.removeItem")}
+                        className="-mr-1.5 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-none text-muted/70 transition-colors hover:text-ink"
+                      >
+                        <X className="h-3.5 w-3.5" strokeWidth={1.7} />
+                      </button>
+                    </div>
 
-                    <div className="mt-auto flex items-center justify-between pt-2">
-                      <div className="flex items-center rounded-full border border-line bg-paper">
+                    <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+                      <div className="-ml-2 inline-flex items-center gap-0.5">
                         <button
                           type="button"
                           onClick={() =>
-                            updateCartQty("product", product.id, item.variantIndex, -1)
+                            updateCartQty(
+                              "product",
+                              product.id,
+                              item.variantIndex,
+                              -1
+                            )
                           }
                           aria-label="Decrease quantity"
-                          className="flex h-9 w-9 items-center justify-center text-ink hover:text-accent"
+                          className="flex h-8 w-8 items-center justify-center rounded-none text-ink/70 transition-colors hover:text-ink"
                         >
-                          <Minus className="h-3.5 w-3.5" />
+                          <Minus className="h-3.5 w-3.5" strokeWidth={1.75} />
                         </button>
-                        <span className="min-w-6 text-center text-xs font-medium">
+                        <span className="min-w-6 text-center text-sm font-medium text-ink tabular-nums">
                           {item.qty}
                         </span>
                         <button
                           type="button"
                           onClick={() =>
-                            updateCartQty("product", product.id, item.variantIndex, 1)
+                            updateCartQty(
+                              "product",
+                              product.id,
+                              item.variantIndex,
+                              1
+                            )
                           }
                           aria-label="Increase quantity"
-                          className="flex h-9 w-9 items-center justify-center text-ink hover:text-accent"
+                          className="flex h-8 w-8 items-center justify-center rounded-none text-ink/70 transition-colors hover:text-ink"
                         >
-                          <Plus className="h-3.5 w-3.5" />
+                          <Plus className="h-3.5 w-3.5" strokeWidth={1.75} />
                         </button>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removeCartItem("product", product.id, item.variantIndex)
-                        }
-                        aria-label="Remove item"
-                        className="flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-line/60 hover:text-ink"
-                      >
-                        <Trash2 className="h-4 w-4" strokeWidth={1.6} />
-                      </button>
+                      <div className="text-right">
+                        {item.qty > 1 && (
+                          <p className="text-[11px] text-muted tabular-nums">
+                            {formatPrice(unitPrice, lang)} / {t("cart.perUnit")}
+                          </p>
+                        )}
+                        <p className="text-sm font-semibold text-ink tabular-nums">
+                          {formatPrice(unitPrice * item.qty, lang)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -309,51 +509,114 @@ export function CartDrawer() {
             })}
           </ul>
 
-          {/* Promo Code */}
-          <form onSubmit={handleApplyPromo} className="flex gap-2 pt-2">
-            <div className="relative flex-1">
-              <Tag className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
-              <input
-                type="text"
-                value={promoInput}
-                onChange={(e) => setPromoInput(e.target.value)}
-                aria-label={t("cart.promoPlaceholder")}
-                placeholder={t("cart.promoPlaceholder")}
-                className="w-full rounded-full border border-line bg-paper/70 py-2.5 pl-9 pr-4 text-sm text-ink placeholder:text-muted/75 focus:border-accent"
-              />
-            </div>
-            <button
-              type="submit"
-              className="btn-tactile rounded-full border border-ink px-4 py-2.5 text-xs font-medium tracking-[0.12em] text-ink uppercase hover:bg-ink hover:text-pearl"
-            >
-              {t("cart.promoApply")}
-            </button>
-          </form>
+          {/* Collapsible Promo Code */}
+          <div className="border-t border-parchment-line py-4">
+            {promoCode ? (
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold tracking-[0.1em] text-sage uppercase">
+                  {promoCode} · −10%
+                </span>
+                <button
+                  type="button"
+                  onClick={clearPromo}
+                  className="text-muted underline underline-offset-4 transition-colors hover:text-ink"
+                >
+                  {t("cart.promoRemove")}
+                </button>
+              </div>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPromoOpen((prev) => !prev);
+                    setPromoError(false);
+                  }}
+                  aria-expanded={promoOpen}
+                  className="flex w-full items-center justify-between py-0.5 text-left text-xs font-medium tracking-[0.12em] text-ink-soft uppercase transition-colors hover:text-ink"
+                >
+                  <span>{t("cart.promoToggle")}</span>
+                  {promoOpen ? (
+                    <Minus className="h-3.5 w-3.5 text-muted" strokeWidth={1.7} />
+                  ) : (
+                    <Plus className="h-3.5 w-3.5 text-muted" strokeWidth={1.7} />
+                  )}
+                </button>
 
-          {/* Upsell */}
+                {promoOpen && (
+                  <div className="mt-3">
+                    <form
+                      onSubmit={handleApplyPromo}
+                      className="flex items-stretch gap-2"
+                    >
+                      <input
+                        type="text"
+                        value={promoInput}
+                        onChange={(e) => {
+                          setPromoInput(e.target.value);
+                          if (promoError) setPromoError(false);
+                        }}
+                        aria-label={t("cart.promoPlaceholder")}
+                        placeholder={t("cart.promoPlaceholder")}
+                        className="min-w-0 flex-1 rounded-none border border-parchment-line bg-transparent px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-ink"
+                      />
+                      <button
+                        type="submit"
+                        className="btn-tactile shrink-0 rounded-none border border-ink px-4 py-2.5 text-[11px] font-semibold tracking-[0.14em] text-ink uppercase hover:bg-ink hover:text-pearl"
+                      >
+                        {t("cart.promoApply")}
+                      </button>
+                    </form>
+                    {promoError && (
+                      <p className="mt-2 text-xs text-muted">
+                        {t("cart.promoInvalid")}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Editorial Ritual Upsell — No Box */}
           {upsellProduct && (
-            <div className="rounded-2xl border border-line bg-paper/55 p-4">
-              <p className="eyebrow text-accent">
-                {lang === "uk" ? "Доповнити ритуал" : "Complete the Ritual"}
+            <div className="border-t border-parchment-line pt-5">
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-muted uppercase">
+                {t("cart.upsellTitle")}
               </p>
-              <div className="mt-3 flex items-center gap-3">
-                <img
-                  src={upsellProduct.image}
-                  alt={upsellProduct.name[lang]}
-                  className="h-14 w-12 rounded-lg object-cover"
-                />
+              <div className="mt-3.5 flex items-center gap-3.5">
+                <Link
+                  href={`/product/${upsellProduct.id}`}
+                  onClick={closeOverlay}
+                  className="h-[72px] w-[58px] shrink-0 overflow-hidden rounded-none bg-surface-soft"
+                >
+                  <img
+                    src={upsellProduct.image}
+                    alt={upsellProduct.name[lang]}
+                    className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.04]"
+                  />
+                </Link>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-display font-bold tracking-[-0.02em] text-base text-ink">
-                    {upsellProduct.line ? upsellProduct.line[lang] : upsellProduct.name[lang]}
-                  </p>
-                  <p className="text-xs text-muted">
+                  <Link
+                    href={`/product/${upsellProduct.id}`}
+                    onClick={closeOverlay}
+                    className="block truncate font-display text-sm font-bold text-ink transition-colors hover:text-accent"
+                  >
+                    {upsellProduct.line
+                      ? upsellProduct.line[lang]
+                      : upsellProduct.name[lang]}
+                  </Link>
+                  <p className="mt-0.5 truncate text-xs text-muted tabular-nums">
+                    {upsellProduct.variants[0]?.label[lang]
+                      ? `${upsellProduct.variants[0].label[lang]} · `
+                      : ""}
                     {formatPrice(upsellProduct.price, lang)}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => addProductToCart(upsellProduct.id, 1, 0)}
-                  className="btn-tactile rounded-full bg-ink px-3.5 py-2 text-[11px] font-medium tracking-[0.12em] text-pearl uppercase hover:bg-accent hover:text-ink"
+                  className="btn-tactile shrink-0 rounded-none border border-parchment-line px-3.5 py-2 text-[11px] font-semibold tracking-[0.14em] text-ink uppercase hover:border-ink hover:bg-ink hover:text-pearl"
                 >
                   + {t("common.quickAdd")}
                 </button>
