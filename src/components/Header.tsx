@@ -23,8 +23,10 @@ export function Header() {
   const { lang, setLang, t, cartCount, user, openOverlay } = useStore();
   const [scrolled, setScrolled] = useState(false);
   const [sectionTheme, setSectionTheme] = useState<HeaderTheme>("hero");
+  const [hideOnMobile, setHideOnMobile] = useState(false);
 
   const isHome = pathname === "/";
+  const isProductPage = pathname.startsWith("/product/");
 
   useEffect(() => {
     let rafId = 0;
@@ -44,6 +46,7 @@ export function Header() {
       }
       const sampleY = 66; // vertical midpoint of the 68px nav bar below the 32px announcement bar
       let detected: HeaderTheme = isHome ? "hero" : "paper";
+      let shouldHideMobile = false;
 
       // The Home hero is sticky and later sections slide over it, so several themed
       // elements can overlap the nav bar. Later DOM nodes paint on top: keep the last match.
@@ -54,10 +57,14 @@ export function Header() {
           if (val && val in THEME_BAR_CLASS) {
             detected = val;
           }
+          if (el.dataset.hideMobileHeader === "true") {
+            shouldHideMobile = true;
+          }
         }
       }
 
       setSectionTheme((prev) => (prev === detected ? prev : detected));
+      setHideOnMobile((prev) => (prev === shouldHideMobile ? prev : shouldHideMobile));
     };
 
     const scheduleSample = () => {
@@ -102,7 +109,13 @@ export function Header() {
         : THEME_BAR_CLASS.paper;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        hideOnMobile
+          ? "-translate-y-full opacity-0 pointer-events-none lg:translate-y-0 lg:opacity-100 lg:pointer-events-auto"
+          : "translate-y-0 opacity-100"
+      }`}
+    >
       {/* Act 0A: Ultra-slim Announcement Bar (32px) */}
       <div className="flex h-8 items-center justify-center bg-ink px-3 text-center text-[10px] font-medium tracking-[0.11em] text-pearl/90 uppercase sm:px-4 sm:text-[11px] sm:tracking-[0.14em]">
         <p className="truncate sm:hidden">
@@ -146,7 +159,7 @@ export function Header() {
               type="button"
               onClick={() => openOverlay("menu")}
               aria-label={t("nav.menu")}
-              className={`btn-tactile flex h-10 w-10 items-center justify-center rounded-full lg:hidden ${
+              className={`btn-tactile flex h-10 w-10 items-center justify-center rounded-none lg:hidden ${
                 isDarkTheme
                   ? "text-pearl hover:bg-pearl/10"
                   : "text-ink hover:bg-ink/5"
@@ -223,7 +236,7 @@ export function Header() {
                       <motion.span
                         layoutId="desktop-nav-underline"
                         transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                        className="absolute inset-x-0 bottom-0 h-[2px] rounded-full bg-accent"
+                        className="absolute inset-x-0 bottom-0 h-[2px] rounded-none bg-accent"
                       />
                     )}
                   </Link>
@@ -268,6 +281,27 @@ export function Header() {
                 EN
               </button>
             </div>
+
+            {/* Mobile Cart icon ONLY on PDP (where MobileBottomBar is hidden behind Sticky Buy Bar) */}
+            {isProductPage && (
+              <button
+                type="button"
+                onClick={() => openOverlay("cart")}
+                aria-label={t("nav.cart")}
+                className={`btn-tactile relative flex h-10 w-10 items-center justify-center rounded-none lg:hidden ${
+                  isDarkTheme
+                    ? "text-pearl hover:bg-pearl/10"
+                    : "text-ink hover:bg-ink/5"
+                }`}
+              >
+                <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.8} />
+                {cartCount > 0 && (
+                  <span className="absolute top-1 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-none bg-accent px-1 text-[9px] font-bold text-ink">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            )}
 
             {/* Desktop Account icon */}
             <button

@@ -49,7 +49,7 @@ export function MobileBottomBar() {
             <motion.span
               layoutId="mobile-tab-line"
               transition={{ type: "spring", stiffness: 450, damping: 34 }}
-              className="absolute inset-x-3 top-0 h-[2.5px] rounded-full bg-accent"
+              className="absolute inset-x-3 top-0 h-[2.5px] rounded-none bg-accent"
             />
           )}
           <Home className="h-[19px] w-[19px]" strokeWidth={1.8} />
@@ -61,7 +61,7 @@ export function MobileBottomBar() {
             <motion.span
               layoutId="mobile-tab-line"
               transition={{ type: "spring", stiffness: 450, damping: 34 }}
-              className="absolute inset-x-3 top-0 h-[2.5px] rounded-full bg-accent"
+              className="absolute inset-x-3 top-0 h-[2.5px] rounded-none bg-accent"
             />
           )}
           <Grid2x2 className="h-[19px] w-[19px]" strokeWidth={1.8} />
@@ -73,7 +73,7 @@ export function MobileBottomBar() {
             <motion.span
               layoutId="mobile-tab-line"
               transition={{ type: "spring", stiffness: 450, damping: 34 }}
-              className="absolute inset-x-3 top-0 h-[2.5px] rounded-full bg-accent"
+              className="absolute inset-x-3 top-0 h-[2.5px] rounded-none bg-accent"
             />
           )}
           <Sparkles
@@ -94,13 +94,13 @@ export function MobileBottomBar() {
             <motion.span
               layoutId="mobile-tab-line"
               transition={{ type: "spring", stiffness: 450, damping: 34 }}
-              className="absolute inset-x-3 top-0 h-[2.5px] rounded-full bg-accent"
+              className="absolute inset-x-3 top-0 h-[2.5px] rounded-none bg-accent"
             />
           )}
           <span className="relative">
             <User className="h-[19px] w-[19px]" strokeWidth={1.8} />
             {user && (
-              <span className="absolute -right-1 -top-0.5 h-2 w-2 rounded-full bg-accent" />
+              <span className="absolute -right-1 -top-0.5 h-2 w-2 rounded-none bg-accent" />
             )}
           </span>
           <span className="whitespace-nowrap">{labels.account}</span>
@@ -115,13 +115,13 @@ export function MobileBottomBar() {
             <motion.span
               layoutId="mobile-tab-line"
               transition={{ type: "spring", stiffness: 450, damping: 34 }}
-              className="absolute inset-x-3 top-0 h-[2.5px] rounded-full bg-accent"
+              className="absolute inset-x-3 top-0 h-[2.5px] rounded-none bg-accent"
             />
           )}
           <span className="relative">
             <ShoppingBag className="h-[19px] w-[19px]" strokeWidth={1.8} />
             {cartCount > 0 && (
-              <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[9px] font-bold text-ink">
+              <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-none bg-accent px-1 text-[9px] font-bold text-ink">
                 {cartCount}
               </span>
             )}

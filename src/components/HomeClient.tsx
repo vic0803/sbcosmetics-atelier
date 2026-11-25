@@ -8,7 +8,6 @@ import {
   ChevronDown,
   Instagram,
   Plus,
-  Send,
   ShoppingBag,
   Sparkles,
   Star,
@@ -2033,35 +2032,6 @@ export function HomeClient() {
               })}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ==================== ACT 6 (V2): DARK NAVY CONCIERGE STRIP (SINGLE FOCUSED CTA) ==================== */}
-      <section
-        data-header-theme="navy"
-        className="relative z-10 border-t border-pearl/10 bg-ink py-14 text-pearl lg:py-20"
-      >
-        <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-6 px-4 sm:px-8 lg:flex-row lg:items-center lg:px-12">
-          <div>
-            <p className="eyebrow text-accent">
-              {lang === "uk" ? "Персональна консультація технолога" : "Personal Technologist Concierge"}
-            </p>
-            <h2 className="mt-1.5 font-display text-2xl font-bold uppercase text-pearl sm:text-4xl">
-              {lang === "uk"
-                ? "Сумніваєтесь у виборі? Підберемо догляд разом"
-                : "Unsure what to pick? Let's build your ritual together"}
-            </h2>
-          </div>
-
-          <a
-            href="https://t.me/+380631790642"
-            target="_blank"
-            rel="noreferrer"
-            className="btn-tactile inline-flex min-h-[52px] w-full shrink-0 items-center justify-center gap-2.5 whitespace-nowrap rounded-none bg-surface px-7 py-3.5 text-xs font-bold tracking-[0.16em] text-ink uppercase hover:bg-accent sm:w-auto"
-          >
-            <Send className="h-4 w-4 shrink-0" />
-            <span>{lang === "uk" ? "Написати в Telegram" : "Message on Telegram"}</span>
-          </a>
         </div>
       </section>
       </div>
