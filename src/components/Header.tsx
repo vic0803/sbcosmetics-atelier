@@ -8,11 +8,12 @@ import { useEffect, useState } from "react";
 import { useStore } from "@/context/StoreContext";
 import { assetPath } from "@/lib/assets";
 
-type HeaderTheme = "hero" | "paper" | "surface" | "navy" | "sapphire";
+type HeaderTheme = "hero" | "paper" | "parchment" | "surface" | "navy" | "sapphire";
 
 const THEME_BAR_CLASS: Record<HeaderTheme, string> = {
   hero: "bg-transparent text-ink",
   paper: "bg-paper/72 text-ink backdrop-blur-md",
+  parchment: "bg-parchment/88 text-ink backdrop-blur-md",
   surface: "bg-surface/72 text-ink backdrop-blur-md",
   navy: "bg-ink/72 text-pearl backdrop-blur-md",
   sapphire: "bg-espresso/72 text-pearl backdrop-blur-md",
@@ -27,6 +28,7 @@ export function Header() {
 
   const isHome = pathname === "/";
   const isProductPage = pathname.startsWith("/product/");
+  const isParchmentRoute = isProductPage || pathname === "/catalog";
 
   useEffect(() => {
     let rafId = 0;
@@ -45,7 +47,11 @@ export function Header() {
         refreshSections();
       }
       const sampleY = 66; // vertical midpoint of the 68px nav bar below the 32px announcement bar
-      let detected: HeaderTheme = isHome ? "hero" : "paper";
+      let detected: HeaderTheme = isHome
+        ? "hero"
+        : isParchmentRoute
+          ? "parchment"
+          : "paper";
       let shouldHideMobile = false;
 
       // The Home hero is sticky and later sections slide over it, so several themed
@@ -88,7 +94,7 @@ export function Header() {
       window.removeEventListener("scroll", scheduleSample);
       window.removeEventListener("resize", onResize);
     };
-  }, [pathname, isHome]);
+  }, [pathname, isHome, isParchmentRoute]);
 
   const isDarkTheme = sectionTheme === "navy" || sectionTheme === "sapphire";
 
@@ -100,13 +106,24 @@ export function Header() {
     { href: "/journal", label: t("nav.journal"), match: (p: string) => p.startsWith("/journal") },
   ];
 
-  const navBarClass = isHome && sectionTheme === "hero"
+  const restTheme: HeaderTheme = isParchmentRoute ? "parchment" : "paper";
+  const effectiveTheme: HeaderTheme = isHome
+    ? sectionTheme === "parchment"
+      ? "hero"
+      : sectionTheme
+    : sectionTheme === "hero"
+      ? restTheme
+      : sectionTheme;
+
+  const navBarClass = isHome && effectiveTheme === "hero"
     ? "bg-transparent text-ink"
     : scrolled
-      ? THEME_BAR_CLASS[sectionTheme]
+      ? THEME_BAR_CLASS[effectiveTheme]
       : isHome
         ? "bg-transparent text-ink"
-        : THEME_BAR_CLASS.paper;
+        : effectiveTheme === "parchment"
+          ? "bg-parchment text-ink"
+          : THEME_BAR_CLASS[effectiveTheme];
 
   return (
     <header

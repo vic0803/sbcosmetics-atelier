@@ -3,6 +3,8 @@
 @theme inline {
   /* Sophie Bilynska Palette: Deep Slate Navy (#16212C) + Midnight Sapphire (#0E161E) + Warm Porcelain (#F4EFE9) + Mineral Aqua (#2B849E / #7CCBE0) */
   --color-paper: #f4efe9;
+  --color-parchment: #fdfcfb;
+  --color-parchment-line: #eceae6;
   --color-surface: #ffffff;
   --color-surface-soft: #eae3da;
   --color-line: #dfd7cd;

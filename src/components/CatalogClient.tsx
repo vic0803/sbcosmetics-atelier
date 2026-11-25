@@ -376,7 +376,7 @@ export function CatalogClient() {
   );
 
   return (
-    <div data-header-theme="paper" className="bg-paper pt-28 pb-24 lg:pt-36">
+    <div data-header-theme="parchment" className="bg-parchment pt-28 pb-24 lg:pt-36">
       <section className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
         {/* Editorial Header */}
         <div className="flex flex-col justify-between gap-5 border-b border-line pb-7 lg:flex-row lg:items-end lg:pb-9">

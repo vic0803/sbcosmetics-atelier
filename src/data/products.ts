@@ -899,10 +899,10 @@ export function getRitualPairings(product: Product): Product[] {
     tone: ["cleanse", "treat", "seal"],
     treat: ["tone", "seal", "cleanse"],
     seal: ["tone", "treat", "cleanse"],
-    body: ["body", "hair"],
-    hair: ["body", "treat"],
+    body: ["body", "hair", "treat"],
+    hair: ["body", "treat", "seal"],
   };
-  const desired = stepOrder[product.ritualStep] ?? ["treat", "seal"];
+  const desired = stepOrder[product.ritualStep] ?? ["treat", "seal", "tone"];
   const picked: Product[] = [];
   for (const step of desired) {
     const match = PRODUCTS.find(
