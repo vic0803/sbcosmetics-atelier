@@ -60,7 +60,7 @@ const UK = {
   "catalog.eyebrow": "Колекція Sophie Bilynska",
   "catalog.title": "Каталог догляду",
   "catalog.subtitle":
-    "11 сертифікованих формул для обличчя, тіла та волосся, створених малими партіями у Львові.",
+    "Натуральний догляд ручної роботи для обличчя, тіла та волосся, створений у Львові.",
   "catalog.sortPopular": "Популярні",
   "catalog.sortPriceAsc": "Спочатку дешевші",
   "catalog.sortPriceDesc": "Спочатку дорожчі",
@@ -196,7 +196,7 @@ const EN: Record<TranslationKey, string> = {
   "catalog.eyebrow": "Sophie Bilynska Collection",
   "catalog.title": "Skincare Collection",
   "catalog.subtitle":
-    "11 certified small-batch formulas for face, body, and hair handcrafted in Lviv.",
+    "Handcrafted care for face, body, and hair, made in Lviv.",
   "catalog.sortPopular": "Most Popular",
   "catalog.sortPriceAsc": "Price: Low to High",
   "catalog.sortPriceDesc": "Price: High to Low",

@@ -395,6 +395,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
                   product={item}
                   layout="editorial"
                   density="compact"
+                  showTypeAtRest
                   heightClassName="aspect-[4/5] sm:aspect-[3/4]"
                   index={idx}
                 />

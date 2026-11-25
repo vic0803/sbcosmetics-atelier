@@ -46,6 +46,7 @@ export interface Product {
   image: string;
   gallery: string[];
   line?: LocalizedText;
+  productType: LocalizedText;
   name: LocalizedText;
   shortTagline: LocalizedText;
   texture: LocalizedText;
@@ -76,6 +77,7 @@ const RAW_PRODUCTS: Product[] = [
       "/assets/editorial/journal-actives.jpg",
     ],
     line: { uk: "Дотик шовку", en: "Silk Touch" },
+    productType: { uk: "Зволожуюча гель-сироватка", en: "Hydrating gel serum" },
     name: {
       uk: "Гель-сироватка для обличчя, шиї та декольте «Дотик шовку»",
       en: "Silk Touch — Hydrating Gel Serum",
@@ -166,6 +168,7 @@ const RAW_PRODUCTS: Product[] = [
       "/assets/editorial/campaign-giftset.jpg",
     ],
     line: { uk: "Делікатний 2в1", en: "2-in-1 Contour" },
+    productType: { uk: "Крем для очей і обличчя", en: "Eye & face cream" },
     name: {
       uk: "Зволожувальний крем для шкіри навколо очей та обличчя 2в1",
       en: "Hydrating 2-in-1 Eye Contour & Face Cream",
@@ -244,6 +247,7 @@ const RAW_PRODUCTS: Product[] = [
       "/assets/editorial/campaign-atelier.jpg",
     ],
     line: { uk: "Базовий догляд", en: "Essential Care" },
+    productType: { uk: "Щоденний крем для обличчя", en: "Daily face cream" },
     name: {
       uk: "Щоденний зволожувальний крем для обличчя, шиї та декольте",
       en: "Essential Care — Daily Hydrating Face & Neck Cream",
@@ -322,6 +326,7 @@ const RAW_PRODUCTS: Product[] = [
       "/assets/editorial/journal-actives.jpg",
     ],
     line: { uk: "Фреш Алое", en: "Fresh Aloe" },
+    productType: { uk: "Заспокійливий тонік", en: "Soothing face toner" },
     name: {
       uk: "Тонік для обличчя «Фреш Алое» з янтарною кислотою",
       en: "Fresh Aloe — Botanical Facial Mist Toner",
@@ -400,6 +405,7 @@ const RAW_PRODUCTS: Product[] = [
       "/assets/editorial/campaign-giftset.jpg",
     ],
     line: { uk: "Рідкі патчі", en: "Liquid Patches" },
+    productType: { uk: "Гель-маска під очі", en: "Eye gel mask" },
     name: {
       uk: "Гель-маска для обличчя та зони під очима «Рідкі патчі»",
       en: "Liquid Patches — Cooling Eye & Face Gel Mask",
@@ -475,6 +481,7 @@ const RAW_PRODUCTS: Product[] = [
     image: "/assets/products/face-foam.jpg",
     gallery: ["/assets/products/face-foam.jpg"],
     line: { uk: "М'яке очищення", en: "Cloud Cleanse" },
+    productType: { uk: "Пінка для вмивання", en: "Cleansing foam" },
     name: {
       uk: "Делікатна пінка для щоденного очищення обличчя",
       en: "Gentle Daily Botanical Cleansing Foam",
@@ -550,6 +557,7 @@ const RAW_PRODUCTS: Product[] = [
     image: "/assets/products/wash-gel.jpg",
     gallery: ["/assets/products/wash-gel.jpg"],
     line: { uk: "Баланс", en: "Daily Balance" },
+    productType: { uk: "Гель для вмивання", en: "Cleansing gel" },
     name: {
       uk: "Крем-гель для вмивання обличчя для підлітків та дорослих",
       en: "Cream-Gel Facial Wash for Teens & Adults",
@@ -616,6 +624,7 @@ const RAW_PRODUCTS: Product[] = [
     image: "/assets/products/body-cream.jpg",
     gallery: ["/assets/products/body-cream.jpg"],
     line: { uk: "Відновлення", en: "Body Repair" },
+    productType: { uk: "Крем для тіла", en: "Body repair cream" },
     name: {
       uk: "Універсальний крем для тіла: відновлення, заспокоєння та зволоження",
       en: "Universal Botanical Body Repair Cream",
@@ -682,6 +691,7 @@ const RAW_PRODUCTS: Product[] = [
     image: "/assets/products/intimate-foam.jpg",
     gallery: ["/assets/products/intimate-foam.jpg"],
     line: { uk: "Щоденна", en: "Pure Daily" },
+    productType: { uk: "Пінка для інтимної гігієни", en: "Intimate hygiene foam" },
     name: {
       uk: "Делікатна пінка для зовнішньої інтимної гігієни «Щоденна»",
       en: "Pure Daily — Gentle Intimate Hygiene Foam",
@@ -748,6 +758,7 @@ const RAW_PRODUCTS: Product[] = [
     image: "/assets/products/shampoo.jpg",
     gallery: ["/assets/products/shampoo.jpg"],
     line: { uk: "Ботанічне волосся", en: "Botanical Hair" },
+    productType: { uk: "Шампунь для росту", en: "Strengthening shampoo" },
     name: {
       uk: "Шампунь для об'єму, зміцнення та стимулювання росту волосся",
       en: "Botanical Volume & Growth Strengthening Shampoo",
@@ -814,6 +825,7 @@ const RAW_PRODUCTS: Product[] = [
     image: "/assets/products/scrub-soap.jpg",
     gallery: ["/assets/products/scrub-soap.jpg"],
     line: { uk: "Крафтове мило", en: "Artisan Soap" },
+    productType: { uk: "Мило-скраб з гвоздикою", en: "Exfoliating scrub soap" },
     name: {
       uk: "Мило-скраб ручної роботи з пряною гвоздикою",
       en: "Handcrafted Spiced Clove Exfoliating Soap",

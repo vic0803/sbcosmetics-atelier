@@ -11,6 +11,7 @@ interface ProductCardProps {
   variant?: "light" | "dark";
   layout?: "classic" | "editorial";
   density?: "default" | "compact";
+  showTypeAtRest?: boolean;
   fillHeight?: boolean;
   heightClassName?: string;
   index?: number;
@@ -21,6 +22,7 @@ export function ProductCard({
   variant = "light",
   layout = "classic",
   density = "default",
+  showTypeAtRest = false,
   fillHeight = false,
   heightClassName,
 }: ProductCardProps) {
@@ -57,8 +59,12 @@ export function ProductCard({
           {/* Top subtle vignette (always on mobile; fades in on desktop hover for badge/heart legibility) */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-ink/45 via-ink/15 to-transparent transition-opacity duration-400 lg:opacity-0 lg:group-hover:opacity-100" />
 
-          {/* Resting short bottom scrim (keeps Name + Price crisp while leaving upper ~70% of photo bright) */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[36%] bg-gradient-to-t from-ink/90 via-ink/45 to-transparent" />
+          {/* Resting short bottom scrim (keeps Name + optional Type/Volume + Price crisp while leaving upper photo bright) */}
+          <div
+            className={`pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/90 via-ink/48 to-transparent ${
+              showTypeAtRest ? "h-[42%]" : "h-[36%]"
+            }`}
+          />
 
           {/* Expanded hover bottom scrim (always on mobile; smoothly deepens on desktop hover for tagline & buttons) */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-ink/96 via-ink/72 to-transparent transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:opacity-0 lg:group-hover:opacity-100" />
@@ -123,7 +129,9 @@ export function ProductCard({
             <div className="overflow-hidden">
               <p className="mb-1.5 truncate text-[10px] font-semibold tracking-[0.16em] text-accent uppercase lg:text-[11px]">
                 {getStepLabel(product.ritualStep, lang)}
-                {product.variants[0] ? ` · ${product.variants[0].label[lang]}` : ""}
+                {!showTypeAtRest && product.variants[0]
+                  ? ` · ${product.variants[0].label[lang]}`
+                  : ""}
               </p>
             </div>
           </div>
@@ -141,6 +149,14 @@ export function ProductCard({
           >
             {product.line ? product.line[lang] : product.name[lang]}
           </Link>
+
+          {/* Product Type & Volume (always visible at rest in catalog for instant comparison) */}
+          {showTypeAtRest && (
+            <p className="mt-1 truncate text-xs font-medium tracking-[0.01em] text-pearl/82 sm:text-[13px]">
+              {product.productType[lang]}
+              {product.variants[0] ? ` · ${product.variants[0].label[lang]}` : ""}
+            </p>
+          )}
 
           {/* Short Tagline (expands smoothly below title and lifts text block generously above price on desktop hover) */}
           <div className="grid grid-rows-[1fr] transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] lg:grid-rows-[0fr] lg:opacity-0 lg:delay-75 lg:group-hover:grid-rows-[1fr] lg:group-hover:opacity-100">
