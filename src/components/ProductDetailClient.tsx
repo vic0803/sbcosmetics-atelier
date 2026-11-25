@@ -49,7 +49,6 @@ export function ProductDetailClient({ product }: { product: Product }) {
   } = useStore();
 
   const [activeImage, setActiveImage] = useState(0);
-  const [variantIndex, setVariantIndex] = useState(0);
   const [qty, setQty] = useState(1);
   const [openAccordion, setOpenAccordion] = useState<string>("benefits");
   const [footerVisible, setFooterVisible] = useState(false);
@@ -57,7 +56,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
   const mobileTrackRef = useRef<HTMLDivElement>(null);
 
   const galleryCount = product.gallery.length;
-  const variant = product.variants[variantIndex] ?? product.variants[0];
+  const variant = product.variants[0];
   const unitPrice = variant ? variant.price : product.price;
   const lineTotal = unitPrice * qty;
   const liked = isWishlisted(product.id);
@@ -113,7 +112,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
   };
 
   const handleAdd = () => {
-    addProductToCart(product.id, qty, variantIndex);
+    addProductToCart(product.id, qty, 0);
     openOverlay("cart");
   };
 
@@ -136,7 +135,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
       data-header-theme="parchment"
       className="bg-parchment pt-24 pb-36 sm:pt-28 lg:pt-32 lg:pb-24"
     >
-      <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
+      <div className="mx-auto max-w-[1560px] px-4 sm:px-8 lg:px-12">
         {/* Quiet Breadcrumbs */}
         <nav
           aria-label="Breadcrumb"
@@ -162,10 +161,10 @@ export function ProductDetailClient({ product }: { product: Product }) {
           </span>
         </nav>
 
-        {/* Main Editorial Split (7 / 5 on Desktop) */}
-        <div className="grid gap-8 lg:grid-cols-12 lg:items-start lg:gap-16">
+        {/* Main Editorial Split (2-col on lg, 3-col with dedicated sticky Buy column on xl+) */}
+        <div className="grid gap-8 lg:grid-cols-12 lg:items-start lg:gap-12 xl:gap-14">
           {/* Left: Dominant Full-Bleed Editorial Gallery */}
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-7 xl:col-span-5">
             <div className="lg:sticky lg:top-28">
               {/* Mobile Swipeable Gallery (< lg) */}
               <div className="relative lg:hidden">
@@ -292,8 +291,8 @@ export function ProductDetailClient({ product }: { product: Product }) {
             </div>
           </div>
 
-          {/* Right: Seamless Editorial Buy Column (Zero White Boxes) */}
-          <div className="lg:col-span-5 lg:pt-2">
+          {/* Center: Seamless Editorial Info, Ledger & Accordions */}
+          <div className="lg:col-span-5 lg:pt-2 xl:col-span-4">
             {/* Step Eyebrow */}
             <p className="eyebrow inline-flex items-center gap-2.5 text-ink/75">
               <span className="h-[1.5px] w-6 bg-accent" />
@@ -326,9 +325,15 @@ export function ProductDetailClient({ product }: { product: Product }) {
               </button>
             </div>
 
-            {/* Clean Subtitle (Product Type) */}
+            {/* Clean Subtitle (Product Type + Volume) */}
             <p className="mt-1.5 text-base font-medium text-ink-soft sm:text-lg">
               {product.productType[lang]}
+              {variant ? (
+                <span className="font-normal text-muted">
+                  {" "}
+                  · {variant.label[lang]}
+                </span>
+              ) : null}
             </p>
 
             {/* Rating + Texture */}
@@ -349,71 +354,40 @@ export function ProductDetailClient({ product }: { product: Product }) {
               {product.shortTagline[lang]}
             </p>
 
-            {/* Desktop Buy Controls: Volume + Quantity + Price + CTA (Mobile lives in persistent sticky bar) */}
-            <div className="mt-7 hidden border-t border-parchment-line pt-6 lg:block">
-              <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
-                {/* Volume selector (clean typography, no underline) */}
-                <div className="flex items-baseline gap-5">
-                  {product.variants.length > 1 ? (
-                    product.variants.map((v, idx) => {
-                      const selected = idx === variantIndex;
-                      return (
-                        <button
-                          key={v.label.uk}
-                          type="button"
-                          onClick={() => setVariantIndex(idx)}
-                          aria-pressed={selected}
-                          className={`text-[22px] leading-none tracking-[0.02em] transition-colors ${
-                            selected
-                              ? "font-medium text-ink"
-                              : "font-normal text-muted/55 hover:text-ink"
-                          }`}
-                        >
-                          {v.label[lang]}
-                        </button>
-                      );
-                    })
-                  ) : (
-                    <span className="text-[20px] leading-none font-normal tracking-[0.02em] text-muted">
-                      {variant?.label[lang]}
-                    </span>
-                  )}
-                </div>
-
-                {/* Inline Quantity + Total Price */}
-                <div className="flex items-center gap-5">
-                  <div className="inline-flex items-center gap-1 border-b border-line-strong pb-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setQty((q) => Math.max(1, q - 1))}
-                      aria-label="Decrease quantity"
-                      className="flex h-8 w-8 items-center justify-center text-muted transition-colors hover:text-ink"
-                    >
-                      <Minus className="h-3.5 w-3.5" strokeWidth={1.9} />
-                    </button>
-                    <span className="min-w-6 text-center text-sm font-bold text-ink tabular-nums">
-                      {qty}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setQty((q) => q + 1)}
-                      aria-label="Increase quantity"
-                      className="flex h-8 w-8 items-center justify-center text-muted transition-colors hover:text-ink"
-                    >
-                      <Plus className="h-3.5 w-3.5" strokeWidth={1.9} />
-                    </button>
-                  </div>
-
-                  <span className="font-display text-[34px] leading-none font-bold tracking-[-0.015em] text-ink tabular-nums">
-                    {formatPrice(lineTotal, lang)}
+            {/* Tablet/Laptop Buy Controls (lg only; mobile uses sticky bar, xl+ uses dedicated right column) */}
+            <div className="mt-7 hidden border-t border-parchment-line pt-6 lg:block xl:hidden">
+              <div className="flex items-center justify-between gap-4">
+                <div className="inline-flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    aria-label="Decrease quantity"
+                    className="flex h-9 w-9 items-center justify-center text-ink/70 transition-colors hover:text-ink"
+                  >
+                    <Minus className="h-4 w-4" strokeWidth={1.75} />
+                  </button>
+                  <span className="min-w-7 text-center text-lg font-medium text-ink tabular-nums">
+                    {qty}
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => setQty((q) => q + 1)}
+                    aria-label="Increase quantity"
+                    className="flex h-9 w-9 items-center justify-center text-ink/70 transition-colors hover:text-ink"
+                  >
+                    <Plus className="h-4 w-4" strokeWidth={1.75} />
+                  </button>
                 </div>
+
+                <span className="font-display text-[34px] leading-none font-bold tracking-[-0.015em] text-ink tabular-nums">
+                  {formatPrice(lineTotal, lang)}
+                </span>
               </div>
 
               <button
                 type="button"
                 onClick={handleAdd}
-                className="btn-tactile mt-6 flex min-h-[56px] w-full items-center justify-center gap-3 rounded-none bg-[#CBE4EC] px-7 py-4 text-sm font-bold tracking-[0.12em] text-ink uppercase hover:bg-ink hover:text-pearl"
+                className="btn-tactile mt-5 flex min-h-[56px] w-full items-center justify-center gap-3 rounded-none bg-[#7CCBE0] px-7 py-4 text-sm font-bold tracking-[0.12em] text-ink uppercase hover:bg-ink hover:text-pearl"
               >
                 <span>{t("common.addToCart")}</span>
                 <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.75} />
@@ -532,6 +506,77 @@ export function ProductDetailClient({ product }: { product: Product }) {
               })}
             </div>
           </div>
+
+          {/* Right (xl+): Dedicated Sticky Buy Column separated from editorial copy */}
+          <aside className="hidden xl:col-span-3 xl:block">
+            <div className="sticky top-28 border-l border-parchment-line pl-8">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-[11px] font-semibold tracking-[0.16em] text-muted uppercase">
+                  {product.line ? product.line[lang] : product.name[lang]}
+                </p>
+                {variant && (
+                  <span className="text-[11px] font-medium tracking-[0.12em] text-muted uppercase">
+                    {variant.label[lang]}
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-5 flex items-center justify-between gap-4 border-t border-parchment-line pt-5">
+                <div className="-ml-2 inline-flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    aria-label="Decrease quantity"
+                    className="flex h-9 w-9 items-center justify-center text-ink/70 transition-colors hover:text-ink"
+                  >
+                    <Minus className="h-4 w-4" strokeWidth={1.75} />
+                  </button>
+                  <span className="min-w-7 text-center text-lg font-medium text-ink tabular-nums">
+                    {qty}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setQty((q) => q + 1)}
+                    aria-label="Increase quantity"
+                    className="flex h-9 w-9 items-center justify-center text-ink/70 transition-colors hover:text-ink"
+                  >
+                    <Plus className="h-4 w-4" strokeWidth={1.75} />
+                  </button>
+                </div>
+
+                <span className="font-display text-3xl leading-none font-bold tracking-[-0.015em] text-ink tabular-nums">
+                  {formatPrice(lineTotal, lang)}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleAdd}
+                className="btn-tactile mt-5 flex min-h-[54px] w-full items-center justify-center gap-3 rounded-none bg-[#7CCBE0] px-6 py-4 text-xs font-bold tracking-[0.14em] text-ink uppercase hover:bg-ink hover:text-pearl"
+              >
+                <span>{t("common.addToCart")}</span>
+                <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.75} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toggleWishlist(product.id)}
+                aria-pressed={liked}
+                className="mt-4 inline-flex items-center gap-2 text-xs font-medium tracking-[0.08em] text-muted transition-colors hover:text-ink"
+              >
+                <Heart
+                  className={`h-4 w-4 ${liked ? "text-accent" : ""}`}
+                  strokeWidth={1.7}
+                  fill={liked ? "currentColor" : "none"}
+                />
+                <span>
+                  {liked
+                    ? t("common.savedToWishlist")
+                    : t("common.save")}
+                </span>
+              </button>
+            </div>
+          </aside>
         </div>
 
         {/* Full-Width Open Editorial Band: Key Botanical Actives (Zero White Boxes) */}
@@ -623,64 +668,29 @@ export function ProductDetailClient({ product }: { product: Product }) {
         )}
       </div>
 
-      {/* PERSISTENT MOBILE STICKY BUY BAR: Volume + Price + Qty + Add to Bag */}
+      {/* PERSISTENT MOBILE STICKY BUY BAR: Borderless Qty + Price above Full-Width CTA */}
       <div
         aria-hidden={!showStickyBar}
-        className={`fixed inset-x-0 bottom-0 z-40 border-t border-parchment-line bg-parchment/96 px-4 pt-3 pb-[calc(0.85rem+env(safe-area-inset-bottom,0px))] backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden ${
+        className={`fixed inset-x-0 bottom-0 z-40 border-t border-parchment-line bg-parchment/96 px-4 pt-2.5 pb-[calc(0.85rem+env(safe-area-inset-bottom,0px))] backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden ${
           showStickyBar
             ? "translate-y-0 opacity-100"
             : "pointer-events-none translate-y-full opacity-0"
         }`}
       >
         <div className="mx-auto max-w-lg space-y-2.5">
-          {/* Row 1: Volume selector + Live Total Price */}
-          <div className="flex items-baseline justify-between gap-4">
-            <div className="flex items-baseline gap-4">
-              {product.variants.length > 1 ? (
-                product.variants.map((v, idx) => {
-                  const selected = idx === variantIndex;
-                  return (
-                    <button
-                      key={v.label.uk}
-                      type="button"
-                      onClick={() => setVariantIndex(idx)}
-                      tabIndex={showStickyBar ? 0 : -1}
-                      aria-pressed={selected}
-                      className={`text-lg leading-none tracking-[0.02em] transition-colors ${
-                        selected
-                          ? "font-medium text-ink"
-                          : "font-normal text-muted/55 hover:text-ink"
-                      }`}
-                    >
-                      {v.label[lang]}
-                    </button>
-                  );
-                })
-              ) : (
-                <span className="text-lg leading-none font-normal tracking-[0.02em] text-muted">
-                  {variant?.label[lang]}
-                </span>
-              )}
-            </div>
-
-            <span className="font-display text-2xl leading-none font-bold tracking-[-0.015em] text-ink tabular-nums">
-              {formatPrice(lineTotal, lang)}
-            </span>
-          </div>
-
-          {/* Row 2: Quantity Stepper + Add to Bag */}
-          <div className="flex items-stretch gap-2.5">
-            <div className="flex h-[46px] shrink-0 items-center border border-parchment-line bg-parchment">
+          {/* Row 1: Borderless Quantity Stepper (Left) + Live Total Price (Right) */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="-ml-2 inline-flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
                 tabIndex={showStickyBar ? 0 : -1}
                 aria-label="Decrease quantity"
-                className="flex h-full w-10 items-center justify-center text-ink transition-colors hover:text-accent"
+                className="flex h-9 w-9 items-center justify-center text-ink/70 transition-colors hover:text-ink"
               >
-                <Minus className="h-3.5 w-3.5" strokeWidth={1.9} />
+                <Minus className="h-4 w-4" strokeWidth={1.75} />
               </button>
-              <span className="min-w-6 text-center text-sm font-bold text-ink tabular-nums">
+              <span className="min-w-7 text-center text-lg font-medium text-ink tabular-nums">
                 {qty}
               </span>
               <button
@@ -688,22 +698,27 @@ export function ProductDetailClient({ product }: { product: Product }) {
                 onClick={() => setQty((q) => q + 1)}
                 tabIndex={showStickyBar ? 0 : -1}
                 aria-label="Increase quantity"
-                className="flex h-full w-10 items-center justify-center text-ink transition-colors hover:text-accent"
+                className="flex h-9 w-9 items-center justify-center text-ink/70 transition-colors hover:text-ink"
               >
-                <Plus className="h-3.5 w-3.5" strokeWidth={1.9} />
+                <Plus className="h-4 w-4" strokeWidth={1.75} />
               </button>
             </div>
 
-            <button
-              type="button"
-              onClick={handleAdd}
-              tabIndex={showStickyBar ? 0 : -1}
-              className="btn-tactile inline-flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-none bg-[#CBE4EC] px-5 py-2.5 text-xs font-bold tracking-[0.14em] text-ink uppercase hover:bg-ink hover:text-pearl"
-            >
-              <span>{t("common.addToCart")}</span>
-              <ShoppingBag className="h-4 w-4" strokeWidth={1.75} />
-            </button>
+            <span className="font-display text-2xl leading-none font-bold tracking-[-0.015em] text-ink tabular-nums">
+              {formatPrice(lineTotal, lang)}
+            </span>
           </div>
+
+          {/* Row 2: Full-Width Add to Bag CTA */}
+          <button
+            type="button"
+            onClick={handleAdd}
+            tabIndex={showStickyBar ? 0 : -1}
+            className="btn-tactile flex min-h-[48px] w-full items-center justify-center gap-2.5 rounded-none bg-[#7CCBE0] px-6 py-3 text-xs font-bold tracking-[0.14em] text-ink uppercase hover:bg-ink hover:text-pearl"
+          >
+            <span>{t("common.addToCart")}</span>
+            <ShoppingBag className="h-4 w-4" strokeWidth={1.75} />
+          </button>
         </div>
       </div>
     </div>
