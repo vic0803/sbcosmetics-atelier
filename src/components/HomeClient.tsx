@@ -444,23 +444,37 @@ export function HomeClient() {
   // Act 1: Sticky hero exit choreography (0 = hero fully visible, 1 = next section covers it)
   const prefersReducedMotion = useReducedMotion();
   const { scrollY } = useScroll();
+  const heroReveal = useMotionValue(0);
   const heroExit = useMotionValue(0);
-  const syncHeroExit = (y: number) => {
+  const mobileExitLift = useMotionValue(0);
+
+  // Hero scroll choreography (165svh stage = 65svh living-skin scrub + 100svh Act 2 takeover):
+  // - 10px -> 0.62*vh: stone sculpture comes alive from fingertips (heroReveal 0 -> 1) while pinned
+  // - 0.65*vh -> 1.65*vh: Act 2 slides over the now-living hero (heroExit 0 -> 1)
+  const HERO_RUNWAY_RATIO = 0.65;
+  const syncHeroScroll = (y: number) => {
     const vh = window.innerHeight || 1;
-    heroExit.set(Math.min(1, Math.max(0, y / vh)));
+    const runwayPx = vh * HERO_RUNWAY_RATIO;
+    const revealSpan = Math.max(1, runwayPx - 10);
+    heroReveal.set(Math.min(1, Math.max(0, (y - 10) / revealSpan)));
+
+    const exitY = Math.max(0, y - runwayPx);
+    heroExit.set(Math.min(1, Math.max(0, exitY / vh)));
+    mobileExitLift.set(-exitY);
+
     // Once Act 2 completely covers the sticky Hero, hide the Hero from the compositor
     // so its WebGL/sticky layers can never bleed through or cause tile gaps below Act 2.
     if (heroSectionRef.current) {
-      const shouldHide = y >= vh + 24;
+      const shouldHide = y >= runwayPx + vh + 24;
       const nextVis = shouldHide ? "hidden" : "visible";
       if (heroSectionRef.current.style.visibility !== nextVis) {
         heroSectionRef.current.style.visibility = nextVis;
       }
     }
   };
-  useMotionValueEvent(scrollY, "change", syncHeroExit);
+  useMotionValueEvent(scrollY, "change", syncHeroScroll);
   useEffect(() => {
-    const onResize = () => syncHeroExit(window.scrollY);
+    const onResize = () => syncHeroScroll(window.scrollY);
     onResize();
     window.addEventListener("resize", onResize, { passive: true });
     return () => window.removeEventListener("resize", onResize);
@@ -489,8 +503,8 @@ export function HomeClient() {
   const desktopCtaOpacity = useTransform(heroExit, [0.02, 0.38], [1, 0]);
   const desktopCtaY = useTransform(heroExit, [0, 0.45], [0, -50]);
 
-  // --- MOBILE ANIMATION: 1:1 synchronous upward scroll lift, fading strictly at 25% (buttons) and 38% (title) ---
-  const mobileScrollLift = useTransform(scrollY, (s) => -s);
+  // --- MOBILE ANIMATION: stays steady during living-skin scrub, then lifts 1:1 with Act 2 ---
+  const mobileScrollLift = mobileExitLift;
 
   const mobileEyebrowBlur = useTransform(heroExit, [0, 0.18], [0, 8]);
   const mobileEyebrowFilter = useTransform(mobileEyebrowBlur, toBlurFilter);
@@ -739,44 +753,50 @@ export function HomeClient() {
 
   return (
     <div className="overflow-x-clip">
-      {/* ==================== ACT 1: HERO — STICKY 100SVH FULL-BLEED EDITORIAL PORTRAIT (next sections slide over it) ==================== */}
+      {/* ==================== ACT 1: HERO — STICKY 100SVH PORTRAIT + 65SVH LIVING-SKIN SCROLL RUNWAY ==================== */}
       <section
         ref={heroSectionRef}
         data-header-theme="hero"
         className="sticky top-[min(0px,calc(100svh-680px))] z-0 h-[100svh] min-h-[680px] overflow-hidden bg-paper"
       >
-        {/* Mobile Full-Height Sculptural Portrait: flush inset-0 so top edge never detaches or exposes a gap on scroll */}
-        <div className="pointer-events-auto absolute inset-0 overflow-hidden lg:hidden">
-          <SilkVeilHero
-            src={assetPath("/assets/hero/hero-sculpture.jpg")}
-            alt={
-              lang === "uk"
-                ? "Порцелянова гладкість і сяйво шкіри Sophie Bilynska Cosmetics"
-                : "Porcelain smoothness and radiant skin with Sophie Bilynska Cosmetics"
-            }
-            scrollProgress={heroExit}
-            objectPosition={[0.22, 0.42]}
-            className="h-full w-full"
-            imgClassName="object-cover object-[22%_42%]"
-          />
-        </div>
+          {/* Mobile Full-Height Sculptural -> Living Portrait: preserves exact original portrait framing */}
+          <div className="pointer-events-auto absolute inset-0 overflow-hidden lg:hidden">
+            <SilkVeilHero
+              src={assetPath("/assets/hero/hero-sculpture.jpg")}
+              livingSrc={assetPath("/assets/hero/hero-living.jpg")}
+              alt={
+                lang === "uk"
+                  ? "Порцелянова гладкість і сяйво шкіри Sophie Bilynska Cosmetics"
+                  : "Porcelain smoothness and radiant skin with Sophie Bilynska Cosmetics"
+              }
+              revealProgress={heroReveal}
+              scrollProgress={heroExit}
+              objectPosition={[0.22, 0.42]}
+              enableShimmer={false}
+              className="h-full w-full"
+              imgClassName="object-cover object-[22%_42%]"
+            />
+          </div>
 
-        {/* Desktop Full-Bleed 16:9 Mineral-Plaster Portrait Canvas: flush inset-0 (zero top gap on overscroll/return to top) */}
-        <div className="pointer-events-auto absolute inset-0 hidden overflow-hidden lg:block">
-          <SilkVeilHero
-            src={assetPath("/assets/hero/hero-sculpture-wide.jpg")}
-            alt={
-              lang === "uk"
-                ? "Порцелянова гладкість і сяйво шкіри Sophie Bilynska Cosmetics"
-                : "Porcelain smoothness and radiant skin with Sophie Bilynska Cosmetics"
-            }
-            scrollProgress={heroExit}
-            objectPosition={[1, 0.5]}
-            shimmerMinX={0.44}
-            className="h-full w-full"
-            imgClassName="object-cover object-right"
-          />
-        </div>
+          {/* Desktop Full-Bleed 16:9 Mineral-Plaster -> Living Skin Portrait Canvas */}
+          <div className="pointer-events-auto absolute inset-0 hidden overflow-hidden lg:block">
+            <SilkVeilHero
+              src={assetPath("/assets/hero/hero-sculpture-wide.jpg")}
+              livingSrc={assetPath("/assets/hero/hero-living-wide.jpg")}
+              alt={
+                lang === "uk"
+                  ? "Порцелянова гладкість і сяйво шкіри Sophie Bilynska Cosmetics"
+                  : "Porcelain smoothness and radiant skin with Sophie Bilynska Cosmetics"
+              }
+              revealProgress={heroReveal}
+              scrollProgress={heroExit}
+              objectPosition={[1, 0.5]}
+              shimmerMinX={0.44}
+              enableShimmer={false}
+              className="h-full w-full"
+              imgClassName="object-cover object-right"
+            />
+          </div>
 
         {/* Soft ink veil deepens the portrait as the next section slides over the sticky hero */}
         <motion.div
@@ -943,6 +963,9 @@ export function HomeClient() {
           </div>
         </div>
       </section>
+
+      {/* 65svh transparent scroll runway: holds sticky Hero pinned while scroll scrubs stone -> living skin before Act 2 slides up */}
+      <div aria-hidden="true" data-header-theme="hero" className="pointer-events-none h-[65svh]" />
 
       {/* Everything after the hero rides on an isolated opaque layer (no CSS transform so fixed window apertures pin to the viewport) */}
       <div className="relative z-10 isolate bg-[#f4efe8]">
