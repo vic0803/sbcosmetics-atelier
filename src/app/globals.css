@@ -45,6 +45,13 @@
   html {
     overscroll-behavior-y: none;
     background-color: var(--color-paper);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
   }
 
   /* Prevent flash of default Ukrainian HTML when user has selected English before hydration commits */
